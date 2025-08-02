@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title><%= title %></title>
+  <link href="https://fonts.googleapis.com/css2?family=Urbanist&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/styles.css" />
+  <link rel="stylesheet" href="/css/footer_nav.css" />
+
+  <!-- AOS CSS -->
+<link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+
+</head>
+<body>
+  <%- include("partials/navbar") %>
+
+  <main class="container">
+    <%- body %>
+  </main>
+  
+  <%- include("partials/footer") %>
+
+  <script src="/js/navbar.js"></script>
+  <!-- AOS JS -->
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+<script>
+  AOS.init({
+    duration: 800, // animation duration
+    once: true     // animation triggers only once
+  });
+</script>
+
+</body>
+
+</html>
