@@ -14,7 +14,7 @@ body {
 
 .navbar .containerr {
     
-  max-width: 1200px;
+
   margin: auto;
   display: flex;
   justify-content: space-between;
@@ -24,6 +24,12 @@ body {
 .container{
   padding: 0 15vmin 0 15vmin;
 }
+
+  @media screen and (max-width: 600px) {
+    .container{
+      padding: 0 5vmin;
+    }
+  }
 
 .brand {
   padding: 0.5rem 1rem;
@@ -86,7 +92,7 @@ body {
 
 /* Force hamburger button to always show */
 .menu-toggle {
-  height: 20px;
+  height: 25px;
   padding: 5px;
   display: flex;
   flex-direction: column;
@@ -497,4 +503,11 @@ section{
   .nav-links {
     flex-direction: column;
   }
+}
+
+html, body {
+  overflow-x: hidden !important;
+}
+[data-aos] {
+  backface-visibility: hidden !important;
 }

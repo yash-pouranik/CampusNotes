@@ -2,19 +2,21 @@
   <div class="containerr">
     <a href="/" class="brand">CampusNotes</a>
 
-    <div class="menu-toggle" id="menu-toggle">
+    <button class="menu-toggle" id="menu-toggle">
       <span></span>
       <span></span>
       <span></span>
-    </div>
+    </button>
 
     <ul class="nav-links" id="nav-links">
-      <% if (!user) { %>
+      <% if (!currUser) { %>
         <li><a href="/login-n" class="nav-a">Login</a></li>
         <li><a href="/register-n" class="nav-a">Signup</a></li>
+        <li><a href="/explore" class="nav-a">Explore</a></li>
       <% } else { %>
         <li><a href="/rankings" class="nav-a">Rankings</a></li>
-        <li><a href="/profile" class="nav-a">Profile</a></li>
+        <li><a href="/profile/<%= currUser._id %>" class="nav-a">Profile</a></li>
+        <li><a href="/explore" class="nav-a">Explore</a></li>
         <li><a href="/logout" class="nav-a">Logout</a></li>
       <% } %>
     </ul>

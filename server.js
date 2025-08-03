@@ -23,6 +23,11 @@ app.use(express.static(path.join(__dirname, "public")));
 const connectDB = require('./config/db');
 connectDB();
 
+//dbs
+const User = require("./models/user");  // or correct path
+const Note = require('./models/note');
+
+
 
 
 
@@ -41,7 +46,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use((req, res, next) => {
-  res.locals.user = req.user;
+  res.locals.currUser = req.user;
   next();
 });
 
@@ -50,14 +55,58 @@ app.use((req, res, next) => {
 
 
 const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/user');
+const notesRoutes = require('./routes/notes');
+
+app.use('/', notesRoutes);
 app.use('/', authRoutes);
+app.use('/', userRoutes);
 
 
 
 
-app.get("/", (req, res) => {
-  console.log(req.user)
-  res.render("home/index", { title: "CampusNotes" });
+app.get("/", async (req, res) => {
+  try {
+    const topContributors = await Note.aggregate([
+      {
+        $group: {
+          _id: "$uploadedBy",
+          uploadCount: { $sum: 1 }
+        }
+      },
+      { $sort: { uploadCount: -1 } },
+      { $limit: 3 },
+      {
+        $lookup: {
+          from: "users", // your collection name may differ
+          localField: "_id",
+          foreignField: "_id",
+          as: "userDetails"
+        }
+      },
+      { $unwind: "$userDetails" },
+      {
+        $project: {
+          username: "$userDetails.username",
+          course: "$userDetails.course",
+          avatar: "$userDetails.avatar", // if available, else default
+          uploadCount: 1
+        }
+      }
+    ]);
+
+    console.log(topContributors)
+    res.render("home/index", {
+      title: "CampusNotes",
+      topContributors,
+    });
+  } catch (err) {
+    console.error(err);
+    res.render("home/index", {
+      title: "CampusNotes",
+      topContributors: [],
+    });
+  }
 });
 
 app.listen(3000, () => {

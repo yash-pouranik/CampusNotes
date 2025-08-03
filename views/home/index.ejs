@@ -1,6 +1,6 @@
 <section class="hero" >
   <div class="hero-left" data-aos="fade-right">
-    <img src="/images/hero_img.webp" alt="Campus Notes" />
+    <img src="/images/notes-hero.webp" alt="Campus Notes" />
   </div>
     <div class="hero-right" data-aos="fade-left">
     <h1>Your campus, your notes <br>— simplified.</h1>
@@ -20,7 +20,7 @@
   <h2>How CampusNotes Works</h2>
   <div class="steps">
     <div class="step " data-aos="fade-up">
-      <img src="/images/explore.png" alt="Browse Notes" style="">
+      <img src="/images/explore.png" alt="Browse Notes">
       <h3>Find Notes</h3>
       <p>Search for semester-wise or subject-wise notes uploaded by real students from your campus.</p>
     </div>
@@ -44,23 +44,20 @@
 <section class="top-contributors">
   <h2>Meet Our Top Contributors</h2>
   <div class="contributors">
-    <div class="contributor" data-aos="flip-right">
-      <img src="/images/dummy_profile.avif" alt="User Avatar">
-      <h4>Priya Sharma</h4>
-      <p>56 uploads • B.Tech CSE</p>
-    </div>
-    <div class="contributor" data-aos="flip-up">
-      <img src="/images/dummy_profile.avif" alt="User Avatar" >
-      <h4>Aditya Singh</h4>
-      <p>42 uploads • B.Sc Physics</p>
-    </div>
-    <div class="contributor" data-aos="flip-left">
-      <img src="/images/dummy_profile.avif" alt="User Avatar">
-      <h4>Megha Jain</h4>
-      <p>38 uploads • B.Com Hons.</p>
-    </div>
+    <% if (topContributors && topContributors.length) { %>
+      <% topContributors.forEach(contributor => { %>
+        <div class="contributor" data-aos="flip-up">
+          <img src="<%= contributor.avatar || '/images/dummy_profile.avif' %>" alt="User Avatar">
+          <h4><%= contributor.name || contributor.username %></h4>
+          <p><%= contributor.uploadCount %> uploads • <%= contributor.course || 'N/A' %></p>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <p>No contributors yet.</p>
+    <% } %>
   </div>
 </section>
+
 
 <hr>
 

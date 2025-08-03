@@ -15,9 +15,9 @@ router.get("/register-n", (req, res) => {
 
 
 router.post("/register", async (req, res) => {
-  const { username, email, password } = req.body;
+  const { username, email, password, course } = req.body;
   try {
-    const user = new User({ username, email, password });
+    const user = new User({ username, email, password, course });
     await user.save();
     res.redirect("/");
   } catch (err) {

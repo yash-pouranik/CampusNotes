@@ -1,0 +1,147 @@
+
+<style>
+  .profile-container {
+    max-width: 900px;
+    margin: 3rem auto;
+    padding: 2rem;
+    border-radius: 16px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    font-family: 'Segoe UI', sans-serif;
+  }
+
+  .profile-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .profile-header h2 {
+    font-size: 2rem;
+    color: #222;
+  }
+
+  .profile-data {
+    text-align: center;
+    color: #555;
+    font-size: 1rem;
+  }
+
+  .stats {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 2rem 0;
+    gap: 1rem;
+  }
+
+  .stat-card {
+    background-color: #f3f4f6;
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    min-width: 120px;
+    text-align: center;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .notes-list {
+    margin-top: 2rem;
+  }
+
+  .notes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .note-card {
+    background-color: #e4e4e491;
+    padding: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    text-align: center;
+  }
+
+  .note-preview {
+    width: 100%;
+    max-height: 250px;
+    object-fit: contain;
+    margin-bottom: 0.5rem;
+    border-radius: 8px;
+  }
+
+  .note-link {
+    font-size: 0.9rem;
+    word-break: break-word;
+    color: #0a66c2;
+    text-decoration: none;
+  }
+
+  .note-link:hover {
+    text-decoration: underline;
+  }
+
+  .back-link {
+    display: block;
+    margin-top: 3rem;
+    text-align: center;
+    color: #0a66c2;
+    font-weight: bold;
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  @media screen and (max-width: 600px) {
+    .profile-header h2 {
+      font-size: 1.5rem;
+    }
+
+    .stat-card {
+      padding: 0.8rem 1.5rem;
+    }
+  }
+</style>
+
+<div class="profile-container">
+  <div class="profile-header">
+    <h2><%= user.username %>'s Profile</h2>
+    <div class="profile-data"><%= user.email %></div>
+  </div>
+
+  <div class="stats">
+    <div class="stat-card">📤 Uploaded: <%= user.uploaded %></div>
+    <div class="stat-card">📥 Downloaded: <%= user.downloadedNotes %></div>
+  </div>
+
+  <div class="notes-list">
+    <h3>Uploaded Notes</h3>
+    <% if (user.notes.length > 0) { %>
+      <div class="notes-grid">
+        <% user.notes.forEach(note => { %>
+            <div class="note-card">
+                <% if (note.fileUrl.match(/\.(jpg|jpeg|png|webp|gif)$/i)) { %>
+                <img class="note-preview" src="<%= note.fileUrl %>" alt="Note Preview">
+                <% } else if (note.fileUrl.match(/\.pdf$/i)) { %>
+                <iframe class="note-preview" src="<%= note.fileUrl %>" type="application/pdf"></iframe>
+                <% } else { %>
+                <p>Preview not available</p>
+                <% } %>
+
+                <div style="font-weight: bold; margin-top: 0.5rem;"><%= note.title %></div>
+                <div style="font-size: 0.8rem; color: #666;"><%= note.subject %> — <%= note.course %></div>
+
+                <a href="/notes/<%= note._id %>" class="note-link">View Note</a>
+            </div>
+            <% }) %>
+
+      </div>
+    <% } else { %>
+      <p style="text-align: center; color: #888;">No notes uploaded yet.</p>
+    <% } %>
+  </div>
+
+  <a href="/" class="back-link">← Back to Home</a>
+</div>
