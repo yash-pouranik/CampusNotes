@@ -1,0 +1,19 @@
+<link rel="stylesheet" href="/css/login.css">
+
+<section class="auth-section">
+  <h2>Sign Up for CampusNotes</h2>
+  
+  <form action="/register" method="POST">
+    <input type="text" name="username" placeholder="Your Name" required />
+    <input type="email" name="email" placeholder="Email" required />
+    <input type="password" name="password" placeholder="Password" required />
+    <button type="submit">Sign Up</button>
+  </form>
+
+  <p>or</p>
+
+  <a href="/auth/linkedin" class="linkedin-login-btn">
+    <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="LinkedIn" width="20" style="vertical-align: middle; margin-right: 8px;">
+    Sign Up with LinkedIn
+  </a>
+</section>

@@ -1,0 +1,54 @@
+  .auth-section {
+    max-width: 400px;
+    margin: 4rem auto;
+    text-align: center;
+    font-family: sans-serif;
+  }
+
+  .auth-section h2 {
+    margin-bottom: 1rem;
+  }
+
+  .auth-section form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 1rem;
+  }
+
+  .auth-section input {
+    padding: 10px;
+    font-size: 1rem;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+
+  .auth-section button {
+    padding: 10px;
+    background-color: #0a66c2;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .auth-section button:hover {
+    background-color: #084b94;
+  }
+
+  .linkedin-login-btn {
+    display: inline-block;
+    padding: 12px 24px;
+    background-color: #0a66c2;
+    color: white;
+    border-radius: 6px;
+    font-weight: bold;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+  }
+
+  .linkedin-login-btn:hover {
+    background-color: #084b94;
+  }

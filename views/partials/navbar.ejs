@@ -9,10 +9,14 @@
     </div>
 
     <ul class="nav-links" id="nav-links">
-      <li><a href="/login">Login</a></li>
-      <li><a href="/signup">Signup</a></li>
-      <li><a href="/logout">Logout</a></li>
-      <li><a href="/rankings">Rankings</a></li>
+      <% if (!user) { %>
+        <li><a href="/login-n" class="nav-a">Login</a></li>
+        <li><a href="/register-n" class="nav-a">Signup</a></li>
+      <% } else { %>
+        <li><a href="/rankings" class="nav-a">Rankings</a></li>
+        <li><a href="/profile" class="nav-a">Profile</a></li>
+        <li><a href="/logout" class="nav-a">Logout</a></li>
+      <% } %>
     </ul>
   </div>
 </nav>

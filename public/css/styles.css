@@ -53,9 +53,17 @@ body {
 }
 
 .nav-links a {
-    all: unset;
+    color: white;
+    text-decoration: none;
+    height: 100%;
+    width: 100%;
 
 }
+
+.nav-a{
+  width: 160px !important;
+}
+
 .nav-links li{
     padding: 5px;
 }
@@ -412,6 +420,13 @@ section{
 .contributor:hover {
   transform: translateY(-5px);
 }
+
+
+.nav-a{
+  width: 160px !important;
+}
+
+
 
 @keyframes bounce {
   0%, 100% { transform: translateY(0); }
