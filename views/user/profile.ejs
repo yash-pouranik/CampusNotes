@@ -107,7 +107,14 @@
 
 <div class="profile-container">
   <div class="profile-header">
-    <h2><%= user.username %>'s Profile</h2>
+    <h2 style="display: flex; align-items: center; justify-content: center;">
+      <%= user.username %>
+      <% if(user.liwfijssouhfns) { %>
+              <img src="/images/icons8-checkmark.svg" alt="Developer" style="width: 35px;">
+      <% } else if(user.verified) {%>
+              <span style="color: green; font-size: 0.8rem;">Verified</span>
+      <% } %>
+    </h2>
     <div class="profile-data"><%= user.email %></div>
   </div>
 
@@ -142,6 +149,9 @@
       <p style="text-align: center; color: #888;">No notes uploaded yet.</p>
     <% } %>
   </div>
+  <% if(!user.verified) {%>
+    <a href="/verify" class="back-link">← Verify Here</a>
+  <% } %>
 
   <a href="/" class="back-link">← Back to Home</a>
 </div>

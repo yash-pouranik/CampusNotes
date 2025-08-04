@@ -1,6 +1,8 @@
 const express = require("express");
 const path = require("path");
 const expressLayouts = require("express-ejs-layouts");
+const flash = require("connect-flash");
+
 
 const app = express();
 const session = require('express-session');
@@ -41,12 +43,16 @@ app.use(session({
   }
 }));
 
+app.use(flash());
+
 
 app.use(passport.initialize());
 app.use(passport.session());
 
 app.use((req, res, next) => {
   res.locals.currUser = req.user;
+  res.locals.success_msg = req.flash("success");
+  res.locals.error_msg = req.flash("error");
   next();
 });
 
@@ -57,43 +63,20 @@ app.use((req, res, next) => {
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const notesRoutes = require('./routes/notes');
+const verifyRRoute = require("./routes/verify");
 
 app.use('/', notesRoutes);
 app.use('/', authRoutes);
 app.use('/', userRoutes);
-
+app.use("/", verifyRRoute)
 
 
 
 app.get("/", async (req, res) => {
   try {
-    const topContributors = await Note.aggregate([
-      {
-        $group: {
-          _id: "$uploadedBy",
-          uploadCount: { $sum: 1 }
-        }
-      },
-      { $sort: { uploadCount: -1 } },
-      { $limit: 3 },
-      {
-        $lookup: {
-          from: "users", // your collection name may differ
-          localField: "_id",
-          foreignField: "_id",
-          as: "userDetails"
-        }
-      },
-      { $unwind: "$userDetails" },
-      {
-        $project: {
-          username: "$userDetails.username",
-          course: "$userDetails.course",
-          avatar: "$userDetails.avatar", // if available, else default
-          uploadCount: 1
-        }
-      }
-    ]);
+    const topContributors = await User.find({})
+          .sort({ uploaded: -1 }) // sort by most uploaded notes
+          .limit(3);
 
     console.log(topContributors)
     res.render("home/index", {
@@ -108,6 +91,29 @@ app.get("/", async (req, res) => {
     });
   }
 });
+
+
+app.get("/admin/verify-requests", async (req, res) => {
+  const unverifiedUsers = await User.find({ verified: false, verificationDoc: { $exists: true } });
+  res.render("admin/verify-list", { unverifiedUsers, title: "Verify? | CampusNotes" });
+});
+
+app.post("/admin/verify/:id", async (req, res) => {
+  await User.findByIdAndUpdate(req.params.id, { verified: true });
+  req.flash("success", "User verified successfully!");
+  res.redirect("/admin/verify-requests");
+});
+
+
+
+
+
+
+
+
+
+
+
 
 app.listen(3000, () => {
   console.log("Server running on http://localhost:3000");

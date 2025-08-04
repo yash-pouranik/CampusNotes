@@ -1,0 +1,140 @@
+<style>
+  .leaderboard-section {
+  padding: 60px 20px;
+  text-align: center;
+  background-color: #f9fafb;
+  border-radius: 20px;
+}
+
+.leaderboard-title {
+  margin-top: 0;
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 8px;
+}
+
+.leaderboard-subtitle {
+  color: #6b7280;
+  font-size: 1rem;
+  margin-bottom: 40px;
+}
+
+.leaderboard-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.leaderboard-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: transform 0.2s ease;
+  border: 1px solid #e5e7eb;
+}
+
+.leaderboard-card:hover {
+  transform: translateY(-4px);
+}
+
+.rank-badge {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #3b82f6;
+  margin-right: 12px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+  text-align: left;
+}
+
+.user-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #3b82f6;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.display-name {
+  font-size: 1.05rem;
+  color: #111827;
+}
+
+.username {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.course-name {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.upload-count {
+  text-align: right;
+}
+
+.upload-count span {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #10b981;
+}
+
+.upload-count small {
+  display: block;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+</style>
+
+
+
+<section class="leaderboard-section">
+  <h1 class="leaderboard-title">🏆 Top Contributors</h1>
+  <p class="leaderboard-subtitle">Based on number of notes uploaded</p>
+
+  <div class="leaderboard-container">
+    <% topUsers.forEach((user, index) => { %>
+      <div class="leaderboard-card">
+        <div class="rank-badge">#<%= index + 1 %></div>
+        <div class="user-info">
+          <img src="<%= user.avatar %>" alt="Avatar of <%= user.username %>" class="user-avatar" />
+          <div class="user-details">
+            <strong class="display-name" style="display: flex; align-items: center;"><%= user.name || user.username %>
+                <% if(user.liwfijssouhfns) { %>
+                        <img src="/images/icons8-checkmark.svg" alt="Developer" style="all: unset; width: 20px;">
+                <% } else if(user.verified) {%>
+                        <span style="color: green; font-size: 0.8rem;">✔</span>
+                <% } %>
+            </strong>
+            <span class="username">@<%= user.username %></span>
+            <span class="course-name"><%= user.course || "-" %></span>
+          </div>
+        </div>
+        <div class="upload-count">
+          <span><%= user.uploaded %></span>
+          <small>Uploads</small>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+</section>
+

@@ -4,3 +4,11 @@ module.exports.isLoggedIn = (req, res, next) => {
   }
   next();
 };
+
+module.exports.notLoggedIn = (req, res, next) => {
+  if (req.user) {
+    req.flash("error", "You are already logged in!");
+    return res.redirect("/")
+  }
+  next();
+};

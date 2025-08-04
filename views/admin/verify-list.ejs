@@ -1,0 +1,76 @@
+<link rel="stylesheet" href="/css/admin.css" />
+
+
+<style>
+  .admin-section {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+  }
+
+  .admin-section h2 {
+    margin-bottom: 20px;
+    font-size: 26px;
+    text-align: center;
+  }
+
+  .verification-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .verify-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px 20px;
+    margin-bottom: 12px;
+    background-color: #fefefe;
+  }
+
+  .verify-card a {
+    text-decoration: none;
+    color: #0077cc;
+    font-weight: bold;
+  }
+
+  .verify-card form button {
+    background-color: #0077cc;
+    color: #fff;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  .verify-card form button:hover {
+    background-color: #005fa3;
+  }
+</style>
+
+
+<section class="admin-section">
+  <h2>Pending Verifications</h2>
+
+  <% if (unverifiedUsers.length === 0) { %>
+    <p>No pending requests.</p>
+  <% } else { %>
+    <ul class="verification-list">
+      <% unverifiedUsers.forEach(user => { %>
+        <li class="verify-card">
+          <div>
+            <strong><%= user.username %></strong> (<%= user.course %>)  
+          </div>
+          <div>
+            <a href="<%= user.verificationDoc %>" target="_blank">View ID</a>
+          </div>
+          <form action="/admin/verify/<%= user._id %>" method="POST">
+            <button type="submit">Verify</button>
+          </form>
+        </li>
+      <% }) %>
+    </ul>
+  <% } %>
+</section>

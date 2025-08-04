@@ -48,8 +48,14 @@
       <% topContributors.forEach(contributor => { %>
         <div class="contributor" data-aos="flip-up">
           <img src="<%= contributor.avatar || '/images/dummy_profile.avif' %>" alt="User Avatar">
-          <h4><%= contributor.name || contributor.username %></h4>
-          <p><%= contributor.uploadCount %> uploads • <%= contributor.course || 'N/A' %></p>
+          <h4 style="display: flex; align-items: center;"><%= contributor.name || contributor.username %>
+            <% if(contributor.liwfijssouhfns) { %>
+                    <img src="/images/icons8-checkmark.svg" alt="Developer" style="all: unset; width: 20px;">
+            <% } else if(contributor.verified) {%>
+                    <span style="color: green; font-size: 0.8rem;">✔</span>
+            <% } %>
+          </h4>
+          <p><%= contributor.uploaded %> uploads • <%= contributor.course || 'N/A' %></p>
         </div>
       <% }) %>
     <% } else { %>

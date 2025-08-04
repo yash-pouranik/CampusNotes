@@ -2,11 +2,18 @@
 
 <section class="auth-section">
   <h2>Sign Up for CampusNotes</h2>
-  
+
   <form action="/register" method="POST">
-    <input type="text" name="username" placeholder="Your Name" required />
+    <input type="text" name="username" placeholder="Username" required />
+    <input type="text" name="name" placeholder="Full Name" />
     <input type="email" name="email" placeholder="Email" required />
-    <input type="course" name="course" placeholder="course" required />
+    <input type="text" name="course" placeholder="Course" />
+    <select name="gender" required>
+      <option disabled selected>Select Gender</option>
+      <option value="He/Him">He/Him</option>
+      <option value="She/Her">She/Her</option>
+      <option value="Other">Other</option>
+    </select>
     <input type="password" name="password" placeholder="Password" required />
     <button type="submit">Sign Up</button>
   </form>

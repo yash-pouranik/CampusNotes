@@ -1,0 +1,62 @@
+<link rel="stylesheet" href="/css/form.css" />
+
+<style>
+  .auth-section {
+    max-width: 450px;
+    margin: 40px auto;
+    background: #f9f9f9;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+
+  .auth-section h2 {
+    margin-bottom: 15px;
+    font-size: 24px;
+  }
+
+  .auth-section p {
+    margin-bottom: 20px;
+    color: #555;
+  }
+
+  .auth-section input[type="file"] {
+    margin-bottom: 20px;
+  }
+
+  .auth-section button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  .auth-section button:hover {
+    background-color: #45a049;
+  }
+
+  .note {
+    font-size: 0.9em;
+    color: #888;
+    margin-top: 10px;
+  }
+</style>
+
+
+
+<section class="auth-section">
+  <h2>Verify Your Account</h2>
+
+  <p>Please upload a valid student or faculty ID. Our team will review it shortly.</p>
+
+  <form action="/verify" method="POST" enctype="multipart/form-data">
+    <input type="file" name="idProof" accept="image/*,.pdf" required />
+    <button type="submit">Submit for Verification</button>
+  </form>
+
+  <p class="note">Only verified users can upload notes.</p>
+</section>

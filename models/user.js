@@ -28,6 +28,11 @@ const userSchema = new mongoose.Schema({
     type: String, 
     required: true 
   },
+  gender: {
+    type: String, 
+    enum: ["He/Him", "She/Her", "Other"],
+    default: "He/Him",
+  },
   uploaded: {
     type: Number,
     default: 0,
@@ -41,8 +46,17 @@ const userSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: "Note"
     }
-  ]
-
+  ],
+  verified: { 
+    type: Boolean, default: false 
+  },
+  verificationDoc: { 
+    type: String // URL or file path to ID proof
+  }, 
+  liwfijssouhfns: {
+    type: Boolean,
+    default: false
+  }
 });
 
 

@@ -180,7 +180,7 @@
             <% }) %>
         </select>
 
-        <button type="submit">🔍 Search</button>
+        <button type="submit">Search</button>
     </form>
 
     <div class="note-grid">
@@ -188,7 +188,15 @@
         <div class="note-card">
           <h3><%= note.title %></h3>
           <p><strong>Subject:</strong> <%= note.subject || 'N/A' %></p>
-          <p><strong>Uploaded by:</strong> <%= note.uploadedBy?.username || "Unknown" %></p>
+          <p style="display: flex; align-items: center;"><strong>Uploaded by:</strong> <%= note.uploadedBy?.username || "Unknown" %> &nbsp;
+
+            <% if(note.uploadedBy.liwfijssouhfns) { %>
+              <img src="/images/icons8-checkmark.svg" alt="Developer" style="width: 20px;">
+            <% } else if(note.uploadedBy.verified) {%>
+              <span style="color: green; font-size: 0.8rem;">✔</span>
+            <% } %>
+            
+          </p>
           <time><%= note.uploadedAt.toDateString() %></time>
 
           <% if (note.tags?.length) { %>

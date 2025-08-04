@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/x-icon" href="/images/CAMPUSNOTES_LOGO.png">
+
 
   <title><%= title %></title>
   <link href="https://fonts.googleapis.com/css2?family=Urbanist&display=swap" rel="stylesheet" />
@@ -16,6 +18,15 @@
 </head>
 <body>
   <%- include("partials/navbar") %>
+
+  <% if (success_msg.length) { %>
+    <div class="flash flash-success"><%= success_msg %></div>
+  <% } %>
+
+  <% if (error_msg.length) { %>
+    <div class="flash flash-error"><%- error_msg %></div>
+  <% } %>
+
 
   <main class="container">
     <%- body %>

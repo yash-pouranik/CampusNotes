@@ -10,14 +10,17 @@
 
     <ul class="nav-links" id="nav-links">
       <% if (!currUser) { %>
-        <li><a href="/login-n" class="nav-a">Login</a></li>
-        <li><a href="/register-n" class="nav-a">Signup</a></li>
-        <li><a href="/explore" class="nav-a">Explore</a></li>
+        <a href="/login-n" class="nav-a">Login</a>
+        <a href="/register-n" class="nav-a">Signup</a>
+        <a href="/explore" class="nav-a">Explore</a>
+        <a href="/rankings" class="nav-a">Rankings</a>
+        <a href="/upload" class="nav-a">Upload</a>
       <% } else { %>
-        <li><a href="/rankings" class="nav-a">Rankings</a></li>
-        <li><a href="/profile/<%= currUser._id %>" class="nav-a">Profile</a></li>
-        <li><a href="/explore" class="nav-a">Explore</a></li>
-        <li><a href="/logout" class="nav-a">Logout</a></li>
+        <a href="/rankings" class="nav-a">Rankings</a>
+        <a href="/profile/<%= currUser._id %>" class="nav-a">Profile</a>
+        <a href="/explore" class="nav-a">Explore</a>
+        <a href="/upload" class="nav-a">Upload</a>
+        <a href="/logout" class="nav-a">Logout</a>
       <% } %>
     </ul>
   </div>

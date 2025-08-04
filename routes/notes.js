@@ -9,6 +9,13 @@ const upload = multer({ storage });
 
 
 router.get("/upload", isLoggedIn, async (req, res) => {
+
+  if (!req.user.verified) {
+    req.flash("error", 'You are not verified! Verify <a href="/verify">here</a>');
+    return res.redirect("/explore");
+  }
+
+
   res.render("notes/upload", {title: "Upload Notes"});
 })
 
@@ -17,6 +24,14 @@ router.get("/upload", isLoggedIn, async (req, res) => {
 
 
 router.post("/upload", isLoggedIn, upload.single("file"), async (req, res) => {
+
+  if (!req.user.verified) {
+    req.flash("error", "You are not Verified")
+    return res.redirect("/explore");
+  }
+
+
+
   const { title, description, subject, course } = req.body;
   const tags = req.body.tags ? req.body.tags.split(',').map(t => t.trim()) : [];
 
