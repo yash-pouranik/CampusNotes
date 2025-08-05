@@ -9,12 +9,14 @@ cloudinary.config({
 });
 
 const storage = new CloudinaryStorage({
-    cloudinary: cloudinary,
-    params: {
-        folder: "trekStay_DEV",
-        allowedFormats: ["png", "jpg", "jpeg"]
-    },
+  cloudinary,
+  params: {
+    folder: "campusNotes", // or your preferred folder
+    resource_type: "raw", // ✅ enables upload of any file (not just images)
+    public_id: (req, file) => file.originalname.split('.')[0] + '-' + Date.now(),
+  },
 });
+
 
 
 module.exports = {
