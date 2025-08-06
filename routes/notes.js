@@ -10,7 +10,7 @@ const upload = multer({ storage });
 
 router.get("/upload", isLoggedIn, async (req, res) => {
 
-  if (!req.user.verified) {
+  if (!req.user.verified && !req.user.moderator_YASH_09) {
     req.flash("error", 'You are not verified! Verify <a href="/verify">here</a>');
     return res.redirect("/explore");
   }
@@ -128,7 +128,7 @@ router.get('/explore', async (req, res) => {
 router.get('/admin/verify-notes', isModerator, async (req, res) => {
   try {
     const unverifiedNotes = await Note.find({ isVerified: false }).populate('uploadedBy');
-    res.render('verify/verifyNotes', {
+    res.render('admin/verifyNotes', {
       title: "Verify Notes | Admin",
       unverifiedNotes
     });
@@ -149,12 +149,18 @@ router.post('/admin/verify-notes', async (req, res) => {
   }
 
   try {
-    const note = await Note.findById(noteId);
+    const note = await Note.findById(noteId)
+    .populate('uploadedBy');
 
     if (!note) return res.status(404).send("Note not found");
 
     if (action === 'accept') {
+      //updating user
+      note.uploadedBy.uploaded += 1;
+      await note.uploadedBy.save(); 
+
       note.isVerified = true;
+
       await note.save();
     } else if (action === 'reject') {
       // 🔍 Extract public_id from fileUrl

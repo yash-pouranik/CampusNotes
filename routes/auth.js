@@ -5,7 +5,7 @@ const User = require("../models/user")
 const {notLoggedIn} = require("../middlewares");
 
 router.get("/auth/linkedin", (req, res) => {
-  req.flash("success", "Linked Login is currently in development")
+  req.flash("success", "Linkedin Login is currently in development")
   res.redirect("/login-n");
 })
 
@@ -16,7 +16,8 @@ router.get("/login-n", notLoggedIn, (req, res) => {
 
 
 router.get("/register-n", (req, res) => {
- 
+  req.flash("success", "CampusNotes is currently in early access, mail me if you want access @yashpouranik1245@gmail.com");
+  return res.redirect("/login-n");
     res.render("auth/signup", {title: "Signup | campusnotes"});
 })
 
