@@ -38,6 +38,10 @@ const noteSchema = new mongoose.Schema({
   uploadedAt: {
     type: Date,
     default: Date.now,
+  },
+  isVerified: {
+    type: Boolean,
+    default: false,
   }
 });
 

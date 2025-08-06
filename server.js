@@ -10,6 +10,9 @@ const passport = require('passport');
 require('dotenv').config();
 require('./config/passport'); // path to the passport file
 
+//requiring middleware
+const {isModerator} = require("./middlewares")
+
 
 
 app.set("view engine", "ejs");
@@ -93,12 +96,12 @@ app.get("/", async (req, res) => {
 });
 
 
-app.get("/admin/verify-requests", async (req, res) => {
+app.get("/admin/verify-requests", isModerator, async (req, res) => {
   const unverifiedUsers = await User.find({ verified: false, verificationDoc: { $exists: true } });
   res.render("admin/verify-list", { unverifiedUsers, title: "Verify? | CampusNotes" });
 });
 
-app.post("/admin/verify/:id", async (req, res) => {
+app.post("/admin/verify/:id", isModerator, async (req, res) => {
   await User.findByIdAndUpdate(req.params.id, { verified: true });
   req.flash("success", "User verified successfully!");
   res.redirect("/admin/verify-requests");

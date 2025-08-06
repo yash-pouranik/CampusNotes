@@ -37,14 +37,36 @@
 }
 
 /* Phones (landscape & portrait) */
-@media (max-width: 600px) {
+@media (max-width: 650px) {
   .note-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+  .note-card {
+    padding: 12px !important;
+  }
+
+  h3 {
+    font-size: 1rem !important;
+    margin: 8px 0 4px;
+  }
+
+  p, time {
+    font-size: 12px !important;
+  }
+
+  .view-link {
+    font-size: 0.75rem !important;
+    padding: 6px 12px !important;
+  }
+
+  .note-card .tags {
+    display: none;
+  }
+
 }
 
 /* Very small phones */
-@media (max-width: 400px) {
+@media (max-width: 500px) {
   .note-grid {
     grid-template-columns: 1fr;
   }

@@ -1,0 +1,128 @@
+<style>
+  .verify-notes-container {
+    max-width: 1300px;
+    margin: 60px auto;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    font-family: 'Segoe UI', sans-serif;
+  }
+
+  .note-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+  }
+
+  .note-card {
+    background-color: #f7f9fc;
+    border: 1px solid #e0e6ed;
+    border-left: 6px solid #3b82f6;
+    border-radius: 12px;
+    padding: 24px;
+    transition: box-shadow 0.3s ease;
+  }
+
+  .note-card:hover {
+    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.2);
+  }
+
+  .note-card h3 {
+    margin: 0 0 10px;
+    font-size: 20px;
+    color: #1f2937;
+  }
+
+  .note-card p {
+    margin: 6px 0;
+    color: #4b5563;
+    font-size: 15px;
+  }
+
+  .note-card form {
+    display: inline-block;
+    margin-top: 16px;
+  }
+
+  .note-card button {
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    padding: 8px 18px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: background-color 0.3s ease;
+  }
+
+  .note-card button.reject {
+    background-color: #ef4444;
+  }
+
+  .note-card button:hover {
+    background-color: #2563eb;
+  }
+
+  .note-card button.reject:hover {
+    background-color: #dc2626;
+  }
+
+  .verify-notes-container > p {
+    text-align: center;
+    font-size: 18px;
+    color: #10b981;
+    font-weight: 600;
+  }
+
+  .back-link {
+    display: inline-block;
+    text-decoration: none ;
+    margin-top: 3rem;
+    text-align: center;
+    color: #0a66c2 !important;
+    font-weight: bold;
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+
+
+</style>
+
+<div class="verify-notes-container">
+  <% if (unverifiedNotes.length === 0) { %>
+    <p>🎉 All notes are verified!</p>
+  <% } else { %>
+    <div class="note-grid">
+      <% unverifiedNotes.forEach(note => { %>
+        <div class="note-card">
+          <h3><%= note.title %></h3>
+          <p><strong>Subject:</strong> <%= note.subject %></p>
+          <p><strong>Uploaded by:</strong> <%= note.uploadedBy?.username || 'Unknown' %></p>
+
+          <!-- View Button -->
+          <a href="/notes/<%= note._id %>" class="back-link">← View</a>
+
+          <!-- Accept Form -->
+          <form method="POST" action="/admin/verify-notes">
+            <input type="hidden" name="noteId" value="<%= note._id %>">
+            <input type="hidden" name="action" value="accept">
+            <button type="submit">Accept</button>
+          </form>
+
+          <!-- Reject Form -->
+          <form method="POST" action="/admin/verify-notes">
+            <input type="hidden" name="noteId" value="<%= note._id %>">
+            <input type="hidden" name="action" value="reject">
+            <button type="submit" class="reject">Reject</button>
+          </form>
+        </div>
+        
+      <% }) %>
+    </div>
+  <% } %>
+</div>
