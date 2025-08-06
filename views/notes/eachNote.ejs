@@ -115,8 +115,15 @@
   <p><strong>Description:</strong></p>
   <p><%= note.description || 'No description provided.' %></p>
 
-  <p><strong>Uploaded by:</strong> 
+  <p style="display: flex; align-items: center;"><strong>Uploaded by:</strong> 
     <%= note.uploadedBy?.name || note.uploadedBy?.username || "Unknown" %>
+              <% if (note.uploadedBy.moderator_YASH_09) { %>
+                <img src="/images/blueCheckmark.svg" alt="Moderator" style="all: unset; width: 23px;">
+              <% } else if (note.uploadedBy.liwfijssouhfns) { %>
+                <img src="/images/icons8-checkmark.svg" alt="Developer" style="all: unset; width: 23px;">
+              <% } else if (note.uploadedBy.verified) { %>
+                <span style="color: green; font-size: 0.8rem;">✔</span>
+              <% } %>
   </p>
 
   <p><strong>Download Count:</strong> <%= note.downloadCount %></p>

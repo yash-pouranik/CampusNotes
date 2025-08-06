@@ -16,8 +16,7 @@ router.get("/login-n", notLoggedIn, (req, res) => {
 
 
 router.get("/register-n", (req, res) => {
- req.flash("success", "It is in Alpha Testing, Just log in with ur given accounts");
-  return res.redirect("/login-n")
+ 
     res.render("auth/signup", {title: "Signup | campusnotes"});
 })
 

@@ -119,10 +119,12 @@
           <img src="<%= user.avatar %>" alt="Avatar of <%= user.username %>" class="user-avatar" />
           <div class="user-details">
             <strong class="display-name" style="display: flex; align-items: center;"><%= user.name || user.username %>
-                <% if(user.liwfijssouhfns) { %>
-                        <img src="/images/icons8-checkmark.svg" alt="Developer" style="all: unset; width: 20px;">
-                <% } else if(user.verified) {%>
-                        <span style="color: green; font-size: 0.8rem;">✔</span>
+                <% if (user.moderator_YASH_09) { %>
+                  <img src="/images/blueCheckmark.svg" alt="Moderator" style="all: unset; width: 30px;">
+                <% } else if (user.liwfijssouhfns) { %>
+                  <img src="/images/icons8-checkmark.svg" alt="Developer" style="all: unset; width: 30px;">
+                <% } else if (user.verified) { %>
+                  <span style="color: green; font-size: 0.8rem;">✔</span>
                 <% } %>
             </strong>
             <span class="username">@<%= user.username %></span>
