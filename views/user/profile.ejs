@@ -107,13 +107,15 @@
 
 <div class="profile-container">
   <div class="profile-header">
-    <h2 style="display: flex; align-items: center; justify-content: center;">
+    <h2 style="display: flex; align-items: center !important; justify-content: center;">
       <%= user.username %>
-      <% if(user.liwfijssouhfns) { %>
-              <img src="/images/icons8-checkmark.svg" alt="Developer" style="width: 35px;">
-      <% } else if(user.verified) {%>
-              <span style="color: green; font-size: 0.8rem;">Verified</span>
-      <% } %>
+            <% if (user.moderator_YASH_09) { %>
+              <img src="/images/blueCheckmark.svg" alt="Moderator" style="all: unset; width: 30px;">
+            <% } else if (user.liwfijssouhfns) { %>
+              <img src="/images/icons8-checkmark.svg" alt="Developer" style="all: unset; width: 20px;">
+            <% } else if (user.verified) { %>
+              <span style="color: green; font-size: 0.8rem;">✔</span>
+            <% } %>
     </h2>
     <div class="profile-data"><%= user.email %></div>
   </div>

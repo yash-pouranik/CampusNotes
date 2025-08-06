@@ -12,3 +12,12 @@ module.exports.notLoggedIn = (req, res, next) => {
   }
   next();
 };
+
+
+module.exports.isModerator = (req, res, next) => {
+  if(req.user && req.user.moderator_YASH_09) {
+    return next();
+  } 
+  req.flash("error", "You are not authorized");
+  return res.redirect("/explore");
+}

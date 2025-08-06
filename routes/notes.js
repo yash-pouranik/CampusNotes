@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const Note = require("../models/note");
-const {isLoggedIn} = require("../middlewares");
+const {isLoggedIn, isModerator} = require("../middlewares");
 const multer = require("multer");
-const { storage } = require("../config/cloud");
+const { storage, cloudinary  } = require("../config/cloud");
 const upload = multer({ storage });
 
 
@@ -96,7 +96,10 @@ router.get("/notes/:nid/download", async (req, res) => {
 router.get('/explore', async (req, res) => {
   const { q, tag } = req.query;
 
-  let filter = {};
+  let filter = {
+    isVerified: true  // ✅ Only show verified notes
+  };
+
   if (q) {
     filter.$or = [
       { title: new RegExp(q, 'i') },
@@ -111,8 +114,75 @@ router.get('/explore', async (req, res) => {
   const notes = await Note.find(filter).populate('uploadedBy');
   const allTags = await Note.distinct("tags");
 
-  res.render('notes/explore', { notes, query: q, tag, allTags, title: "Explore | campusnotes" });
+  res.render('notes/explore', {
+    notes,
+    query: q,
+    tag,
+    allTags,
+    title: "Explore | campusnotes"
+  });
 });
+
+
+// GET - Show unverified notes
+router.get('/admin/verify-notes', isModerator, async (req, res) => {
+  try {
+    const unverifiedNotes = await Note.find({ isVerified: false }).populate('uploadedBy');
+    res.render('verify/verifyNotes', {
+      title: "Verify Notes | Admin",
+      unverifiedNotes
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server Error");
+  }
+});
+
+
+
+// POST - Accept or reject a note
+router.post('/admin/verify-notes', async (req, res) => {
+  const { noteId, action } = req.body;
+
+  if (!noteId || !action) {
+    return res.status(400).send("Missing note ID or action");
+  }
+
+  try {
+    const note = await Note.findById(noteId);
+
+    if (!note) return res.status(404).send("Note not found");
+
+    if (action === 'accept') {
+      note.isVerified = true;
+      await note.save();
+    } else if (action === 'reject') {
+      // 🔍 Extract public_id from fileUrl
+      const fileUrl = note.fileUrl;
+
+      // Assuming URL format like:
+      // https://res.cloudinary.com/<cloud-name>/raw/upload/v1234567890/campusNotes/filename-12345.pdf
+      const publicIdWithFolder = fileUrl
+        .split('/upload/')[1] // gives: v1234567890/campusNotes/filename-12345.pdf
+        .split('.')[0];       // removes .pdf (or .docx etc.)
+
+      // 🗑 Delete from cloudinary
+      await cloudinary.uploader.destroy(publicIdWithFolder, {
+        resource_type: "raw"
+      });
+
+      // 🧼 Delete note from DB
+      await Note.findByIdAndDelete(noteId);
+    }
+
+    res.redirect('/admin/verify-notes');
+  } catch (err) {
+    req.flash("error", "Cloudinary or DB error");
+    res.status(500).send("Error processing note");
+  }
+});
+
+
 
 
 

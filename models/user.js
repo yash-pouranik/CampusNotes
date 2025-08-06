@@ -56,7 +56,11 @@ const userSchema = new mongoose.Schema({
   liwfijssouhfns: {
     type: Boolean,
     default: false
-  }
+  },
+  moderator_YASH_09: {
+    type: Boolean,
+    default: null || false,
+  },
 });
 
 

@@ -11,7 +11,7 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
   cloudinary,
   params: {
-    folder: "campus-notes", // or your preferred folder
+    folder: "campusNotes", // or your preferred folder
     resource_type: "raw", // ✅ enables upload of any file (not just images)
     public_id: (req, file) => file.originalname.split('.')[0] + '-' + Date.now(),
   },

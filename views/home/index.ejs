@@ -20,7 +20,7 @@
   <h2>How CampusNotes Works</h2>
   <div class="steps">
     <div class="step " data-aos="fade-up">
-      <img src="/images/explore.png" alt="Browse Notes">
+      <img src="/images/CAMPUSNOTES_LOGO.png" alt="Browse Notes">
       <h3>Find Notes</h3>
       <p>Search for semester-wise or subject-wise notes uploaded by real students from your campus.</p>
     </div>
@@ -47,13 +47,17 @@
     <% if (topContributors && topContributors.length) { %>
       <% topContributors.forEach(contributor => { %>
         <div class="contributor" data-aos="flip-up">
+          
           <img src="<%= contributor.avatar || '/images/dummy_profile.avif' %>" alt="User Avatar">
           <h4 style="display: flex; align-items: center;"><%= contributor.name || contributor.username %>
-            <% if(contributor.liwfijssouhfns) { %>
-                    <img src="/images/icons8-checkmark.svg" alt="Developer" style="all: unset; width: 20px;">
-            <% } else if(contributor.verified) {%>
-                    <span style="color: green; font-size: 0.8rem;">✔</span>
+            <% if (contributor.moderator_YASH_09) { %>
+              <img src="/images/blueCheckmark.svg" alt="Moderator" style="all: unset; width: 20px;">
+            <% } else if (contributor.liwfijssouhfns) { %>
+              <img src="/images/icons8-checkmark.svg" alt="Developer" style="all: unset; width: 20px;">
+            <% } else if (contributor.verified) { %>
+              <span style="color: green; font-size: 0.8rem;">✔</span>
             <% } %>
+
           </h4>
           <p><%= contributor.uploaded %> uploads • <%= contributor.course || 'N/A' %></p>
         </div>
