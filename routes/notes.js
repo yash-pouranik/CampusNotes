@@ -61,7 +61,8 @@ router.get("/notes/:nid", async (req, res) => {
   try {
     const file = await Note.findById(req.params.nid).populate("uploadedBy");
     if (!file) {
-      return res.status(404).send("Note not found");
+      req.flash("error", "Note doesn't exist!")
+      return res.redirect("/explore");
     }
 
     res.render("notes/eachNote", { note: file, title: `${file.title} | campusnotes` });
@@ -122,6 +123,64 @@ router.get('/explore', async (req, res) => {
     title: "Explore | campusnotes"
   });
 });
+
+
+router.get("/notes/:nid/edit", isLoggedIn, async (req, res) => {
+  try {
+    const file = await Note.findById(req.params.nid).populate("uploadedBy");
+    const noteId = req.params.nid;
+    
+    if (!file) {
+      req.flash("error", "Note doesn't exist!")
+      return res.redirect("/explore");
+    }
+
+    console.log(file.uploadedBy._id.toString(), "--", req.user._id.toString())
+    console.log("--", req.user._id.toString())
+    if(file.uploadedBy._id.toString() != req.user._id.toString() &&  !req.user.moderator_YASH_09) {
+      req.flash("error", "You are not auhorized to do this")
+      return res.redirect(`/notes/${noteId}`);
+    }
+   
+    res.render("notes/editNote", { note: file, title: `${file.title} | campusnotes` });
+  } catch (e) {
+    console.error(e);
+    req.flash("error", "Some Error At Our End.");
+    res.redirect(500)("/explore");
+  }
+});
+
+
+
+router.put('/notes/:id', async (req, res) => {
+  try {
+    console.log("1")
+    const { title, description, tags, subject, course } = req.body;
+    console.log("2")
+
+    const notee = await Note.findById(req.params.id);
+    console.log("3")
+
+    await Note.findByIdAndUpdate(req.params.id, {
+      title,
+      description,
+      tags: tags ? tags.split(',').map(tag => tag.trim()) : [],
+      subject,
+      course,
+      fileUrl: notee.fileUrl
+    });
+    console.log("4")
+
+    res.redirect(`/notes/${req.params.id}`);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error updating note');
+  }
+});
+
+
+
+
 
 
 // GET - Show unverified notes

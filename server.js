@@ -2,6 +2,8 @@ const express = require("express");
 const path = require("path");
 const expressLayouts = require("express-ejs-layouts");
 const flash = require("connect-flash");
+const methodOverride = require('method-override');
+
 
 
 const app = express();
@@ -9,6 +11,7 @@ const session = require('express-session');
 const passport = require('passport');
 require('dotenv').config();
 require('./config/passport'); // path to the passport file
+app.use(methodOverride('_method'));
 
 //requiring middleware
 const {isModerator} = require("./middlewares")
