@@ -103,6 +103,11 @@
       padding: 0.8rem 1.5rem;
     }
   }
+
+  .operations{
+    position: relative;
+    left: 1rem;
+  }
 </style>
 
 <div class="profile-container">
@@ -116,6 +121,9 @@
             <% } else if (user.verified) { %>
               <span style="color: green; font-size: 0.8rem;">✔</span>
             <% } %>
+            <div class="operations">
+              <a href="/profile/<%= user._id %>/edit" class="edit-btn">edit</a>
+            </div>
     </h2>
     <div class="profile-data"><%= user.email %></div>
   </div>
