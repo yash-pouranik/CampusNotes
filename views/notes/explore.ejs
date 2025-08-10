@@ -190,6 +190,18 @@
   <h1 class="explore-heading">Explore All Notes</h1>
 
   <% if (notes.length === 0) { %>
+    <form method="GET" action="/explore" class="search-filter-form">
+        <input type="text" name="q" placeholder="Search by title or subject..." value="<%= typeof query !== 'undefined' ? query : '' %>">
+
+        <select name="tag">
+            <option value="">All Tags</option>
+            <% allTags.forEach(t => { %>
+            <option value="<%= t %>" <%= tag === t ? 'selected' : '' %>><%= t %></option>
+            <% }) %>
+        </select>
+
+        <button type="submit">Search</button>
+    </form>
     <p style="text-align: center; font-size: 1.1rem; color: #666;">No notes uploaded yet.</p>
   <% } else { %>
     <form method="GET" action="/explore" class="search-filter-form">
