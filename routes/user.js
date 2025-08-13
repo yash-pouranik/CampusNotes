@@ -24,18 +24,29 @@ router.get("/profile/:id",  async (req, res) => {
 
 router.get("/rankings", async (req, res) => {
   try {
-    const topUsers = await User.find({})
-      .sort({ uploaded: -1 }); // sort by most uploaded notes // Top 20
+    const topUsers = await User.aggregate([
+      { $addFields: { uploaded: { $size: "$notes" } } },
+      { $sort: { uploaded: -1 } },
+      { $limit: 20 }
+    ]);
+
+
     res.render("user/rankings", { topUsers, title: "Top Users | CampusNotes"});
   } catch (err) {
     console.error("Error fetching rankings:", err);
-    res.status(500).send("Server Error");
+    req.flash("error", "Server Error")
+    res.status(500).redirect("/explore");
   }
 });
 
 
 router.get("/profile/:id/edit", isLoggedIn,  async (req, res) => {
   try {
+    if (req.user._id.toString() !== req.params.id && !req.user.roles.isModerator) {
+      req.flash("error", "Not authorized to edit this profile");
+      return res.redirect(`/profile/${req.params.id}`);
+    }
+
     const user = await User.findById(req.params.id).populate('notes');
     if (!user) {
       return res.send("User does not exist");
@@ -54,11 +65,15 @@ router.get("/profile/:id/edit", isLoggedIn,  async (req, res) => {
 
 router.put("/profile/:id/edit", isLoggedIn,  async (req, res) => {
   try{
+    if (req.user._id.toString() !== req.params.id && !req.user.roles.isModerator) {
+      req.flash("error", "Not authorized to edit this profile");
+      return res.redirect(`/profile/${req.params.id}`);
+    }
+
     const {username, name, email, course} = req.body;
     const user = await User.findByIdAndUpdate(req.params.id, {
       username,
       name,
-      email,
       course,
     });
 

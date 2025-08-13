@@ -1,3 +1,5 @@
 node_modules
 .env
 ihfi.js
+subInit.js
+mgSC.js

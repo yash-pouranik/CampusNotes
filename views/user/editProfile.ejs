@@ -6,7 +6,6 @@
   <form action="/profile/<%= user._id %>/edit?_method=PUT" method="POST">
     <input type="text" name="username" placeholder="Username" required value="<%= user.username %>"/>
     <input type="text" name="name" placeholder="Full Name" value="<%= user.name %>"/>
-    <input type="email" name="email" placeholder="Email" required value="<%= user.email %>"/>
     <input type="text" name="course" placeholder="Course" value="<%= user.course %>"/>
 
     <button type="submit">Update</button>

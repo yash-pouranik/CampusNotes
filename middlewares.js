@@ -15,7 +15,7 @@ module.exports.notLoggedIn = (req, res, next) => {
 
 
 module.exports.isModerator = (req, res, next) => {
-  if(req.user && req.user.moderator_YASH_09) {
+  if(req.user && req.user.roles.isModerator) {
     return next();
   } 
   req.flash("error", "You are not authorized");

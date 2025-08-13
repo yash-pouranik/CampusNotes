@@ -5,66 +5,69 @@ const userSchema = new mongoose.Schema({
   username: { 
     type: String, 
     unique: true, 
-    required: true 
+    required: true,
+    trim: true
   },
-  name: {                     // 👈 NEW: Display name (optional)
+  name: { 
     type: String,
-    required: false
+    trim: true
   },
-  course: {                   // 👈 NEW: For showing on homepage
+  course: {
     type: String,
-    required: false
+    enum: [
+      "B.Tech CSE", 
+      "B.Tech IT", 
+      "B.Tech ECE", 
+      "B.Tech ME", 
+      "MBA", 
+      "BBA", 
+      "MCA", 
+      "BCA"
+    ],
+    required: true
   },
-  avatar: {                   // 👈 Optional profile picture
-    type: String,
-    default: "/images/dummy_profile.avif"
+  avatar: { 
+    type: String, 
+    default: "/images/dummy_profile.avif" 
   },
   email: { 
     type: String, 
     unique: true, 
-    required: true 
+    required: true,
+    trim: true
   },
   password: { 
     type: String, 
-    required: true 
+    required: true, 
+    select: false // will not be returned by default in queries
   },
   gender: {
-    type: String, 
-    enum: ["He/Him", "She/Her", "Other"],
-    default: "He/Him",
-  },
-  uploaded: {
-    type: Number,
-    default: 0,
-  },
-  downloadedNotes: {
-    type: Number,
-    default: 0,
+    type: String,
+    enum: ["He/Him", "She/Her", "They/Them", "Other"],
+    default: "He/Him"
   },
   notes: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Note"
+    { 
+      type: mongoose.Schema.Types.ObjectId, 
+      ref: "Note" 
     }
   ],
-  verified: { 
-    type: Boolean, default: false 
+  verification: {
+    docUrl: { type: String }, // URL/path of verification document
+    verified: { type: Boolean, default: false },
+    verifiedAt: { type: Date }
   },
-  verificationDoc: { 
-    type: String // URL or file path to ID proof
-  }, 
-  liwfijssouhfns: {
-    type: Boolean,
-    default: false
+  roles: {
+    isModerator: { type: Boolean, default: false },
+    isDev: { type: Boolean, default: false }
   },
-  moderator_YASH_09: {
-    type: Boolean,
-    default: null || false,
-  },
+  socialLinks: {
+    linkedin: { type: String, default: null },
+    github: { type: String, default: null }
+  }
+}, {
+  timestamps: true
 });
-
-
-
 
 // Hash password before saving
 userSchema.pre("save", async function (next) {
@@ -73,11 +76,16 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-
-
-// Password verification method
+// Compare passwords
 userSchema.methods.comparePassword = function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
+};
+
+// Remove sensitive data when converting to JSON
+userSchema.methods.toJSON = function () {
+  const obj = this.toObject();
+  delete obj.password;
+  return obj;
 };
 
 module.exports = mongoose.model("User", userSchema);

@@ -114,9 +114,9 @@
   <div class="profile-header">
     <h2 style="display: flex; align-items: center !important; justify-content: center;">
       <%= user.username %>
-            <% if (user.moderator_YASH_09) { %>
+            <% if (user.roles.isModerator) { %>
               <img src="/images/blueCheckmark.svg" alt="Moderator" style="all: unset; width: 30px;">
-            <% } else if (user.liwfijssouhfns) { %>
+            <% } else if (user.roles.isDev) { %>
               <img src="/images/icons8-checkmark.svg" alt="Developer" style="all: unset; width: 20px;">
             <% } else if (user.verified) { %>
               <span style="color: green; font-size: 0.8rem;">✔</span>
@@ -159,7 +159,7 @@
       <p style="text-align: center; color: #888;">No notes uploaded yet.</p>
     <% } %>
   </div>
-  <% if(!user.verified) {%>
+  <% if(!user.verification.verified) {%>
     <a href="/verify" class="back-link">← Verify Here</a>
   <% } %>
 

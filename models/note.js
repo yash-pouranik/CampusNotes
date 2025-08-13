@@ -1,48 +1,65 @@
 const mongoose = require("mongoose");
 
 const noteSchema = new mongoose.Schema({
-  title: {
+  title: { 
+    type: String, 
+    required: true, 
+    trim: true 
+  },
+  description: { 
+    type: String, 
+    trim: true 
+  },
+  subject: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: "Subject", 
+    required: true 
+  },
+  course: { 
     type: String,
-    required: true,
-    trim: true,
+    enum: [
+      "B.Tech CSE", 
+      "B.Tech IT", 
+      "B.Tech ECE", 
+      "B.Tech ME", 
+      "MBA", 
+      "BBA", 
+      "MCA", 
+      "BCA"
+    ],
+    required: true
   },
-  description: {
-    type: String,
-    trim: true,
+  fileUrl: { 
+    type: String, 
+    required: true 
   },
-  tags: [String], // e.g. ["math", "sem3", "algebra"]
+  uploadedBy: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: "User", 
+    required: true 
+  },
+  downloadCount: { 
+    type: Number, 
+    default: 0 
+  },
+  visibility: { 
+    type: String, 
+    enum: ["public", "private"], 
+    default: "public" 
+  },
+  isVerified: { 
+    type: Boolean, 
+    default: false 
+  },
+  upvotes: [
+    { 
+      type: mongoose.Schema.Types.ObjectId, 
+      ref: "User" 
+    }
+  ]
 
-  fileUrl: {
-    type: String,
-    required: true,
-  },
-
-  uploadedBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
-
-  downloadCount: {
-    type: Number,
-    default: 0,
-  },
-
-  subject: String,
-  course: String,
-  college: {
-    type: String,
-    default: "SVVV, Indore",
-  },
-
-  uploadedAt: {
-    type: Date,
-    default: Date.now,
-  },
-  isVerified: {
-    type: Boolean,
-    default: false,
-  }
+}, {
+  timestamps: true
 });
 
 module.exports = mongoose.model("Note", noteSchema);

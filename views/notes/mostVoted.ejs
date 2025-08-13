@@ -1,7 +1,8 @@
 <style>
   .explore-container {
     max-width: 1100px;
-    margin: 30px auto;
+    margin: 50px auto;
+    margin-top: 0px;
     padding: 20px;
   }
 
@@ -22,18 +23,80 @@
     margin: 12px auto 0;
     border-radius: 6px;
   }
+.note-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 25px;
+}
 
-  /* Notes grid */
+/* Tablets and small laptops */
+@media (max-width: 900px) {
   .note-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 25px;
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Phones (landscape & portrait) */
+@media (max-width: 650px) {
+  .note-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .note-card {
+    padding: 12px !important;
   }
 
-  /* Note card */
+  h3 {
+    font-size: 1rem !important;
+    margin: 8px 0 4px;
+  }
+
+  p, time {
+    font-size: 12px !important;
+  }
+
+  .view-link {
+    font-size: 0.75rem !important;
+    padding: 6px 12px !important;
+  }
+
+  .note-card .tags {
+    display: none;
+  }
+
+}
+
+/* Very small phones */
+@media (max-width: 500px) {
+  .note-grid {
+    grid-template-columns: 1fr;
+  }
+
   .note-card {
-    background: #fff;
-    padding: 20px;
+    padding: 12px !important;
+  }
+
+  h3 {
+    font-size: 1rem !important;
+    margin: 8px 0 4px;
+  }
+
+  p, time {
+    font-size: 12px !important;
+  }
+
+  .view-link {
+    font-size: 0.75rem !important;
+    padding: 6px 12px !important;
+  }
+
+  .note-card .tags {
+    display: none;
+  }
+}
+
+  .note-card {
+    background: #ffffff;
+    padding: 22px;
     border-radius: 16px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
     transition: all 0.3s ease;
@@ -56,14 +119,10 @@
     margin: 6px 0;
   }
 
-  .note-card time {
-    display: block;
-    font-size: 0.8rem;
-    color: #888;
+  .note-card .tags {
     margin-top: 10px;
   }
 
-  /* Tags */
   .note-card .tag {
     display: inline-block;
     background-color: #d4f3e1;
@@ -74,7 +133,13 @@
     margin: 2px 4px 0 0;
   }
 
-  /* View link button */
+  .note-card time {
+    display: block;
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 10px;
+  }
+
   .view-link {
     display: inline-block;
     margin-top: 15px;
@@ -92,80 +157,46 @@
     background: linear-gradient(to right, #1f1f4d, #3a3a7e);
   }
 
-  /* Search form */
   .search-filter-form {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 30px;
-  }
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 30px;
+}
 
-  .search-filter-form input,
-  .search-filter-form button {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 1rem;
-  }
+.search-filter-form input,
+.search-filter-form select,
+.search-filter-form button {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+.search-filter-form button {
+  background: #2b2b6b;
+  color: #fff;
+  cursor: pointer;
+}
 
-  .search-filter-form button {
-    background: #2b2b6b;
-    color: #fff;
-    cursor: pointer;
-  }
 
-  /* Most Voted link styled as button */
-  .most-voted-link {
-    display: inline-block;
-    margin-bottom: 25px;
-    background: linear-gradient(to right, #4CAF50, #81C784);
-    color: #fff;
-    padding: 10px 18px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 500;
-    transition: background 0.3s ease, transform 0.2s ease;
-  }
 
-  .most-voted-link:hover {
-    background: linear-gradient(to right, #43A047, #66BB6A);
-    transform: translateY(-2px);
-  }
-
-  /* Responsive tweaks */
-  @media (max-width: 900px) {
-    .note-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  @media (max-width: 650px) {
-    .note-grid {
-      grid-template-columns: 1fr;
-    }
-  }
 </style>
 
+
+
+
 <div class="explore-container">
-  <h1 class="explore-heading">Explore All Notes</h1>
-
-  <form method="GET" action="/explore" class="search-filter-form">
-    <input type="text" name="q" placeholder="Search by title or subject..." value="<%= typeof query !== 'undefined' ? query : '' %>">
-    <button type="submit">Search</button>
-  </form>
-
-  <a href="/most-voted" class="most-voted-link">
-    Most Voted Notes
-  </a>
+  <h1 class="explore-heading">Most Voted Notes</h1>
 
   <% if (notes.length === 0) { %>
-    <p style="text-align: center; font-size: 1.1rem; color: #666;">No notes uploaded yet.</p>
+    <p style="text-align: center; font-size: 1.1rem; color: #666;">No notes have been upvoted yet.</p>
   <% } else { %>
     <div class="note-grid">
       <% notes.forEach(note => { %>
         <div class="note-card">
           <h3><%= note.title %></h3>
+
           <p><strong>Subject:</strong> <%= note.subject?.name || 'N/A' %></p>
           <p><strong>Course:</strong> <%= note.course %></p>
 
@@ -180,11 +211,15 @@
             <% } %>
           </p>
 
-          <p><strong>Downloads:</strong> <%= note.downloads %></p>
+          <p><strong>Upvotes:</strong> <%= note.upvotes.length %></p>
+          <p><strong>Downloads:</strong> <%= note.downloadCount || 0 %></p>
+
           <time><%= note.createdAt ? note.createdAt.toDateString() : 'Date not available' %></time>
+
           <a href="/notes/<%= note._id %>" class="view-link">📄 View Note</a>
         </div>
       <% }) %>
     </div>
   <% } %>
 </div>
+

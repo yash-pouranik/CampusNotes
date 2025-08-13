@@ -80,34 +80,23 @@ app.use("/", verifyRRoute)
 
 app.get("/", async (req, res) => {
   try {
-    const topContributors = await User.find({})
-          .sort({ uploaded: -1 }) // sort by most uploaded notes
-          .limit(3);
+    const topContributors = await User.aggregate([
+      { $addFields: { uploaded: { $size: "$notes" } } },
+      { $sort: { uploaded: -1 } },
+      { $limit: 3 }
+    ]);
 
-    console.log(topContributors)
     res.render("home/index", {
       title: "CampusNotes",
-      topContributors,
+      topContributors
     });
   } catch (err) {
     console.error(err);
     res.render("home/index", {
       title: "CampusNotes",
-      topContributors: [],
+      topContributors: []
     });
   }
-});
-
-
-app.get("/admin/verify-requests", isModerator, async (req, res) => {
-  const unverifiedUsers = await User.find({ verified: false, verificationDoc: { $exists: true } });
-  res.render("admin/verify-list", { unverifiedUsers, title: "Verify? | CampusNotes" });
-});
-
-app.post("/admin/verify/:id", isModerator, async (req, res) => {
-  await User.findByIdAndUpdate(req.params.id, { verified: true });
-  req.flash("success", "User verified successfully!");
-  res.redirect("/admin/verify-requests");
 });
 
 
