@@ -19,13 +19,17 @@ background: white;
       <% if (!currUser) { %>
         <a href="/login-n" class="nav-a">Login</a>
         <a href="/register-n" class="nav-a">Signup</a>
+        <a href="/requestnotes" class="nav-a">Request Notes</a>
         <a href="/explore" class="nav-a">Explore</a>
         <a href="/rankings" class="nav-a">Rankings</a>
         <a href="/upload" class="nav-a">Upload</a>
         <a href="/most-voted" class="nav-a">Most Voted Notes</a>
+        
+
       <% } else { %>
         <a href="/rankings" class="nav-a">Rankings</a>
         <a href="/profile/<%= currUser._id %>" class="nav-a">Profile</a>
+        <a href="/requestnotes" class="nav-a">Request Notes</a>
         <a href="/explore" class="nav-a">Explore</a>
         <a href="/upload" class="nav-a">Upload</a>
         <a href="/most-voted" class="nav-a">Most Voted Notes</a>

@@ -1,13 +1,19 @@
 <link rel="stylesheet" href="/css/login.css">
 
+<% if (currUser && currUser._id.toString() === user._id.toString()) { %>
 <section class="auth-section">
   <h2>Edit Profile</h2>
 
   <form action="/profile/<%= user._id %>/edit?_method=PUT" method="POST">
-    <input type="text" name="username" placeholder="Username" required value="<%= user.username %>"/>
-    <input type="text" name="name" placeholder="Full Name" value="<%= user.name %>"/>
-    <input type="text" name="course" placeholder="Course" value="<%= user.course %>"/>
+    <input type="text" name="username" placeholder="Username" required value="<%= user.username %>" />
+    <input type="text" name="name" placeholder="Full Name" value="<%= user.name %>" />
+    <input type="text" name="course" placeholder="Course" value="<%= user.course %>" />
+
+    <h3>Social Links</h3>
+    <input type="url" name="socialLinks[linkedin]" placeholder="LinkedIn Profile URL" value="<%= user.socialLinks?.linkedin || '' %>" />
+    <input type="url" name="socialLinks[github]" placeholder="GitHub Profile URL" value="<%= user.socialLinks?.github || '' %>" />
 
     <button type="submit">Update</button>
   </form>
 </section>
+<% } %>

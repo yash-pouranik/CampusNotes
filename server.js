@@ -70,11 +70,16 @@ const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const notesRoutes = require('./routes/notes');
 const verifyRRoute = require("./routes/verify");
+const reqNotes = require("./routes/reqNotes");
+const companyRoutes = require("./routes/company")
+
 
 app.use('/', notesRoutes);
 app.use('/', authRoutes);
 app.use('/', userRoutes);
+app.use("/", reqNotes)
 app.use("/", verifyRRoute)
+app.use("/", companyRoutes)
 
 
 

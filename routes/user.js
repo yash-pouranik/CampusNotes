@@ -22,6 +22,8 @@ router.get("/profile/:id",  async (req, res) => {
 });
 
 
+
+
 router.get("/rankings", async (req, res) => {
   try {
     const topUsers = await User.aggregate([
@@ -63,27 +65,36 @@ router.get("/profile/:id/edit", isLoggedIn,  async (req, res) => {
 });
 
 
-router.put("/profile/:id/edit", isLoggedIn,  async (req, res) => {
-  try{
+router.put("/profile/:id/edit", isLoggedIn, async (req, res) => {
+  try {
     if (req.user._id.toString() !== req.params.id && !req.user.roles.isModerator) {
       req.flash("error", "Not authorized to edit this profile");
       return res.redirect(`/profile/${req.params.id}`);
     }
 
-    const {username, name, email, course} = req.body;
-    const user = await User.findByIdAndUpdate(req.params.id, {
+    const { username, name, course } = req.body;
+    const socialLinks = req.body.socialLinks || {};
+
+    const existingUser = await User.findById(req.params.id);
+
+    await User.findByIdAndUpdate(req.params.id, {
       username,
       name,
       course,
+      socialLinks: {
+        linkedin: socialLinks.linkedin || existingUser.socialLinks.linkedin,
+        github: socialLinks.github || existingUser.socialLinks.github
+      }
     });
 
-    req.flash("success", "Updated");
-    res.redirect(`/profile/${req.params.id}`)
-  }catch(e) {
-    req.flash("error", "Something went wrong at our end!");
+    req.flash("success", "Profile updated successfully");
+    res.redirect(`/profile/${req.params.id}`);
+  } catch (err) {
+    console.error(err);
+    req.flash("error", "Something went wrong");
     res.redirect(`/profile/${req.params.id}`);
   }
-})
+});
 
 
 

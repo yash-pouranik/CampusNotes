@@ -94,6 +94,34 @@
     text-decoration: underline;
   }
 
+  .social-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 400px;
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 10px;
+  }
+  .social-form input {
+    padding: 0.6rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+  }
+  .social-form button {
+    background: #2563eb;
+    color: white;
+    padding: 0.6rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .social-form button:hover {
+    background: #1d4ed8;
+  }
+
+
+
   @media screen and (max-width: 600px) {
     .profile-header h2 {
       font-size: 1.5rem;
@@ -121,9 +149,12 @@
             <% } else if (user.verified) { %>
               <span style="color: green; font-size: 0.8rem;">✔</span>
             <% } %>
+            <% if (currUser && currUser._id.toString() === user._id.toString()) { %>
             <div class="operations">
-              <a href="/profile/<%= user._id %>/edit" class="edit-btn">edit</a>
+              <a href="/profile/<%= user._id %>/edit" class="edit-btn">Edit</a>
             </div>
+<% } %>
+
     </h2>
     <div class="profile-data"><%= user.email %></div>
   </div>
@@ -132,6 +163,29 @@
     <div class="stat-card">📤 Uploaded: <%= user.uploaded %></div>
     <div class="stat-card">📥 Downloaded: <%= user.downloadedNotes %></div>
   </div>
+
+<div class="profile-section">
+  <h2>Social Links</h2>
+
+  <% if (user.socialLinks?.linkedin || user.socialLinks?.github) { %>
+    <% if (user.socialLinks?.linkedin) { %>
+      <p>🔗 LinkedIn: <a href="<%= user.socialLinks.linkedin %>" target="_blank"><%= user.socialLinks.linkedin %></a></p>
+    <% } else { %>
+      <p>🔗 LinkedIn: Not added</p>
+    <% } %>
+
+    <% if (user.socialLinks?.github) { %>
+      <p>💻 GitHub: <a href="<%= user.socialLinks.github %>" target="_blank"><%= user.socialLinks.github %></a></p>
+    <% } else { %>
+      <p>💻 GitHub: Not added</p>
+    <% } %>
+
+  <% } else { %>
+    <p style="color: gray;">No social links yet. Add via</p>
+  <% } %>
+</div>
+
+
 
   <div class="notes-list">
     <h3>Uploaded Notes</h3>

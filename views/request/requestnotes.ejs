@@ -1,0 +1,69 @@
+<link rel="stylesheet" href="/css/requestnotes.css">
+
+<section class="request-notes-section">
+  <div class="container">
+    <h1>📢 Request Notes</h1>
+    
+    <!-- Desktop Form -->
+    <form action="/requestnotes" method="POST" class="request-form">
+      <textarea name="content" placeholder="Request notes from your peers..." maxlength="280" required></textarea>
+      <button type="submit">Post</button>
+    </form>
+
+    <!-- Floating Action Button for Mobile -->
+    <div class="fab" onclick="document.querySelector('.request-form').style.display='flex'">+</div>
+
+    <!-- Feed -->
+    <div class="requests-feed">
+      <% if (requests && requests.length) { %>
+        <% requests.forEach(request => { %>
+          <div class="request-card">
+            <div class="request-user">
+              <img src="<%= request.user.avatar || '/images/dummy_profile.avif' %>" alt="User Avatar">
+              <div>
+                <h4><%= request.user.name || request.user.username %></h4>
+                <span class="timestamp"><%= request.createdAt.toLocaleString() %></span>
+              </div>
+            </div>
+
+            <p class="request-content"><%= request.content %></p>
+
+            <!-- Delete button -->
+            <% if (currUser && (currUser._id.equals(request.user._id) || currUser.role === "moderator")) { %>
+              <form action="/requestnotes/<%= request._id %>/delete" method="POST" onsubmit="return confirm('Delete this request?')">
+                <button type="submit" class="delete-btn">🗑 Delete</button>
+              </form>
+            <% } %>
+
+            <!-- Comments Section -->
+            <div class="comments-section">
+              <% if (request.comments && request.comments.length) { %>
+                <% request.comments.forEach(comment => { %>
+                  <div class="comment">
+                    <strong><%= comment.user.name || comment.user.username %>:</strong>
+                    <span><%= comment.content %></span>
+                    <span class="timestamp"><%= comment.createdAt.toLocaleString() %></span>
+                  </div>
+                <% }) %>
+              <% } else { %>
+                <p class="no-comments">No comments yet.</p>
+              <% } %>
+            </div>
+
+            <!-- Add Comment Form -->
+            <% if (currUser) { %>
+              <form action="/requestnotes/<%= request._id %>/comment" method="POST" class="comment-form">
+                <input type="text" name="content" placeholder="Write a comment..." maxlength="200" required>
+                <button type="submit">💬</button>
+              </form>
+            <% } %>
+</div>
+
+
+        <% }) %>
+      <% } else { %>
+        <p class="no-requests">No requests yet. Be the first to ask! 🚀</p>
+      <% } %>
+    </div>
+  </div>
+</section>

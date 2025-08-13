@@ -1,0 +1,54 @@
+<link rel="stylesheet" href="/css/our-team.css">
+
+
+<section class="team-section">
+  <div class="section-header">
+    <h1>Meet Our Team</h1>
+    <p>Passionate minds building CampusNotes for students everywhere</p>
+  </div>
+
+  <div class="team-container">
+    <% teamMembers.forEach(member => { %>
+      <div class="team-card">
+        <div class="avatar-wrapper">
+          <img src="<%= member.avatar %>" alt="<%= member.name %>" class="avatar">
+        </div>
+
+        <h2 class="member-name">
+          <%= member.name %>
+          <% if (member.roles.isModerator) { %>
+            <img src="/images/blueCheckmark.svg" alt="Moderator" class="role-icon">
+          <% } else if (member.roles.isDev) { %>
+            <img src="/images/icons8-checkmark.svg" alt="Developer" class="role-icon">
+          <% } else if (member.verification && member.verification.verified) { %>
+            <span class="verified-icon">✔</span>
+          <% } %>
+        </h2>
+
+        <p class="username">@<%= member.username %></p>
+        <p class="role">
+          <%= member.roles.isDev 
+                ? "Developer" 
+                : member.roles.isModerator 
+                  ? "Moderator" 
+                  : "Team Member" %>
+        </p>
+
+        <% if (member.bio) { %>
+          <p class="bio"><%= member.bio %></p>
+        <% } else { %>
+          <p class="bio muted">No bio available.</p>
+        <% } %>
+
+        <div class="social-links">
+          <% if (member.socialLinks && member.socialLinks.linkedin) { %>
+            <a href="<%= member.socialLinks.linkedin %>" target="_blank" class="social-link linkedin">LinkedIn</a>
+          <% } %>
+          <% if (member.socialLinks && member.socialLinks.github) { %>
+            <a href="<%= member.socialLinks.github %>" target="_blank" class="social-link github">GitHub</a>
+          <% } %>
+        </div>
+      </div>
+    <% }); %>
+  </div>
+</section>
