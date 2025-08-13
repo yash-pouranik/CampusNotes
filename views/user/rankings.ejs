@@ -127,7 +127,8 @@
                   <span style="color: green; font-size: 0.8rem;">✔</span>
                 <% } %>
             </strong>
-            <span class="username">@<%= user.username %></span>
+            <span class="username">@<%= user.username %></span> 
+            <a href="/profile/<%= user._id %>">visit</a>
             <span class="course-name"><%= user.course || "-" %></span>
           </div>
         </div>

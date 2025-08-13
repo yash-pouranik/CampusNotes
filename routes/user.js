@@ -11,6 +11,9 @@ router.get("/profile/:id",  async (req, res) => {
       return res.send("User does not exist");
     }
 
+    const n = user.notes.length;
+    user.uploaded = n
+
     res.render("user/profile", {
       user,
       title: user.username || user.name || "Profile",
