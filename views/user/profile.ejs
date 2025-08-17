@@ -213,7 +213,7 @@
       <p style="text-align: center; color: #888;">No notes uploaded yet.</p>
     <% } %>
   </div>
-  <% if(!user.verification.verified) {%>
+  <% if(currUser && currUser._id.toString() === user._id.toString() && !user.verification.verified) {%>
     <a href="/verify" class="back-link">← Verify Here</a>
   <% } %>
 
