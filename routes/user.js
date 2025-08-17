@@ -4,11 +4,12 @@ const User = require("../models/user")
 const Note = require("../models/note")
 const {isLoggedIn} = require("../middlewares")
 
-router.get("/profile/:id",  async (req, res) => {
+router.get("/profile/:id",  async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id).populate('notes');
     if (!user) {
-      return res.send("User does not exist");
+      req.flash("error", "Something went wrong! try again later");
+      return next()
     }
 
     const n = user.notes.length;
@@ -20,7 +21,8 @@ router.get("/profile/:id",  async (req, res) => {
     });
   } catch (e) {
     console.error(e);
-    res.send("Some error occurred", e);
+    req.flash("error", "Something went wrong! try again later");
+    return next()
   }
 });
 

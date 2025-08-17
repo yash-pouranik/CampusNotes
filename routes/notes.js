@@ -6,7 +6,11 @@ const Subject = require("../models/subject");
 const {isLoggedIn, isModerator} = require("../middlewares");
 const multer = require("multer");
 const { storage, cloudinary  } = require("../config/cloud");
-const upload = multer({ storage });
+const upload = multer({ 
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 } // max 5MB
+});
+
 
 
 router.get("/upload", isLoggedIn, async (req, res) => {
@@ -46,58 +50,32 @@ router.get("/upload", isLoggedIn, async (req, res) => {
 
 
 router.post("/upload", isLoggedIn, upload.single("file"), async (req, res) => {
-  if (!req.user.verification?.verified && !req.user.roles.isModerator) {
-    req.flash("error", "You are not Verified");
-    return res.redirect("/explore");
-  }
-
   try {
     const { title, description, subject, course, visibility, newSubject } = req.body;
-    const tags = req.body.tags ? req.body.tags.split(",").map(t => t.trim()) : [];
-
-    let subjectId = subject;
-
-    // If user selected "other", create new subject
-    if (subject === "other" && newSubject?.trim()) {
-      const createdSub = await Subject.create({
-        name: newSubject.trim()
-      });
-      subjectId = createdSub._id;
-    }
-
-    if (!mongoose.Types.ObjectId.isValid(subjectId)) {
-      req.flash("error", "Invalid subject selected");
-      return res.redirect("/notes/upload");
-    }
 
     if (!req.file) {
-      req.flash("error", "Please upload a file");
+      req.flash("error", "Please upload a PDF file less than 5MB");
       return res.redirect("/notes/upload");
     }
 
-    const newNote = new Note({
-      title,
-      description,
-      subject: subjectId,
-      course,
-      tags,
-      visibility,
-      fileUrl: req.file.path,
-      uploadedBy: req.user._id
-    });
+    // ✅ only pdf
+    if (req.file.mimetype !== "application/pdf") {
+      req.flash("error", "Only PDF files are allowed");
+      return res.redirect("/notes/upload");
+    }
 
-    await newNote.save();
-
-    req.user.notes.push(newNote._id);
-    await req.user.save();
-
-    res.redirect(`/profile/${req.user._id}`);
+    // continue saving note...
   } catch (err) {
+    if (err.code === "LIMIT_FILE_SIZE") {
+      req.flash("error", "File must be less than 5MB");
+      return res.redirect("/notes/upload");
+    }
     console.error(err);
-    req.flash("error", "Something went wrong while uploading the note");
+    req.flash("error", "Something went wrong while uploading");
     res.redirect("/notes/upload");
   }
 });
+
 
 // most voted notes
 router.get("/most-voted", async (req, res) => {

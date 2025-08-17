@@ -21,3 +21,48 @@
     Continue with LinkedIn
   </a>
 </section>
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const form = document.querySelector("form");
+    const email = form.querySelector("input[name='email']");
+    const password = form.querySelector("input[name='password']");
+
+    form.addEventListener("submit", (e) => {
+      let errors = [];
+
+      // Email validation
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!email.value.trim()) {
+        errors.push("Email is required.");
+      } else if (!emailPattern.test(email.value)) {
+        errors.push("Enter a valid email address.");
+      }
+
+      // Password validation
+      if (!password.value.trim()) {
+        errors.push("Password is required.");
+      } else if (password.value.length < 4) {
+        errors.push("Password must be at least 4 characters long.");
+      }
+
+      if (errors.length > 0) {
+        e.preventDefault();
+
+        // remove old errors
+        form.querySelectorAll(".error-message").forEach(el => el.remove());
+
+        // show new errors
+        errors.forEach(msg => {
+          const err = document.createElement("div");
+          err.classList.add("error-message");
+          err.style.color = "red";
+          err.style.fontSize = "0.9rem";
+          err.textContent = msg;
+          form.insertBefore(err, form.firstChild);
+        });
+      }
+    });
+  });
+</script>

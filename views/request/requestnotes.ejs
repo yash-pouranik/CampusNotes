@@ -40,7 +40,7 @@
               <% if (request.comments && request.comments.length) { %>
                 <% request.comments.forEach(comment => { %>
                   <div class="comment">
-                    <strong><%= comment.user.name || comment.user.username %>:</strong>
+                    <a href="/profile/<%= comment.user._id %>" class="comments-username"><strong><%= comment.user.username || comment.user.name %>:</strong></a>
                     <span><%= comment.content %></span>
                     <span class="timestamp"><%= comment.createdAt.toLocaleString() %></span>
                   </div>
@@ -67,3 +67,46 @@
     </div>
   </div>
 </section>
+
+<script>
+  // Request form validation
+  document.querySelector(".request-form").addEventListener("submit", function (e) {
+    const textarea = this.querySelector("textarea");
+    const content = textarea.value.trim();
+
+    if (!content) {
+      alert("Request cannot be empty!");
+      e.preventDefault();
+      return;
+    }
+
+    if (content.length <= 10) {
+      alert("Request must be greater than 10 characters!");
+      e.preventDefault();
+    }
+
+    if (content.length > 280) {
+      alert("Request must be 280 characters or less!");
+      e.preventDefault();
+    }
+  });
+
+  // Comment form validation
+  document.querySelectorAll(".comment-form").forEach(form => {
+    form.addEventListener("submit", function (e) {
+      const input = this.querySelector("input[name='content']");
+      const content = input.value.trim();
+
+      if (!content) {
+        alert("Comment cannot be empty!");
+        e.preventDefault();
+        return;
+      }
+
+      if (content.length > 200) {
+        alert("Comment must be 200 characters or less!");
+        e.preventDefault();
+      }
+    });
+  });
+</script>

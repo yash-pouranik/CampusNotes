@@ -108,6 +108,13 @@ app.get("/", async (req, res) => {
 
 
 
+//404
+// 404 Page Not Found handler
+app.use((req, res) => {
+  res.status(404).render("errors/404", { 
+    title: "Page Not Found | CampusNotes",
+  });
+});
 
 
 

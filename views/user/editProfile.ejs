@@ -4,16 +4,43 @@
 <section class="auth-section">
   <h2>Edit Profile</h2>
 
-  <form action="/profile/<%= user._id %>/edit?_method=PUT" method="POST">
+  <form action="/profile/<%= user._id %>/edit?_method=PUT" method="POST" onsubmit="return validateForm()">
     <input type="text" name="username" placeholder="Username" required value="<%= user.username %>" />
     <input type="text" name="name" placeholder="Full Name" value="<%= user.name %>" />
     <input type="text" name="course" placeholder="Course" value="<%= user.course %>" />
 
     <h3>Social Links</h3>
-    <input type="url" name="socialLinks[linkedin]" placeholder="LinkedIn Profile URL" value="<%= user.socialLinks?.linkedin || '' %>" />
-    <input type="url" name="socialLinks[github]" placeholder="GitHub Profile URL" value="<%= user.socialLinks?.github || '' %>" />
+    <input type="url" name="socialLinks[linkedin]" placeholder="LinkedIn Profile URL"
+           pattern="https?://.+" value="<%= user.socialLinks?.linkedin || '' %>" />
+    <input type="url" name="socialLinks[github]" placeholder="GitHub Profile URL"
+           pattern="https?://.+" value="<%= user.socialLinks?.github || '' %>" />
 
     <button type="submit">Update</button>
   </form>
 </section>
 <% } %>
+
+<script>
+  function validateForm() {
+    const username = document.querySelector("[name='username']").value.trim();
+    const linkedin = document.querySelector("[name='socialLinks[linkedin]']").value.trim();
+    const github = document.querySelector("[name='socialLinks[github]']").value.trim();
+
+    if (username.length < 6) {
+      alert("Username must be at least 6 characters long");
+      return false;
+    }
+
+    const urlRegex = /^https?:\/\/.+/;
+    if (linkedin && !urlRegex.test(linkedin)) {
+      alert("Enter a valid LinkedIn URL (must start with http:// or https://)");
+      return false;
+    }
+    if (github && !urlRegex.test(github)) {
+      alert("Enter a valid GitHub URL (must start with http:// or https://)");
+      return false;
+    }
+
+    return true;
+  }
+</script>
