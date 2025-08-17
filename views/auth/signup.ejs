@@ -1,25 +1,85 @@
+<style>
+  /* Style all select elements */
+.auth-section select {
+  width: 100%;
+  padding: 10px 12px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #fff;
+  font-size: 1rem;
+  color: #333;
+  appearance: none; /* Remove default arrow */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* On focus */
+.auth-section select:focus {
+  border-color: #2563EB; /* Blue 600 like your navbar */
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+  outline: none;
+}
+
+/* Optional: add custom arrow using background */
+.auth-section select {
+  background-image: url('data:image/svg+xml;utf8,<svg fill="%23333" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+}
+
+</style>
+
+
 <link rel="stylesheet" href="/css/login.css">
 
 <section class="auth-section">
   <h2>Sign Up for CampusNotes</h2>
 
   <form action="/register" method="POST">
+    <!-- Username (required) -->
     <input type="text" name="username" placeholder="Username" required />
+
+    <!-- Full Name (optional) -->
     <input type="text" name="name" placeholder="Full Name" />
+
+    <!-- Email (required) -->
     <input type="email" name="email" placeholder="Email" required />
-    <input type="text" name="course" placeholder="Course" />
+
+    <!-- Course (required, must match schema enum) -->
+    <select name="course" required>
+      <option disabled selected>Select Course</option>
+      <option value="B.Tech CSE">B.Tech CSE</option>
+      <option value="B.Tech IT">B.Tech IT</option>
+      <option value="B.Tech ECE">B.Tech ECE</option>
+      <option value="B.Tech ME">B.Tech ME</option>
+      <option value="MBA">MBA</option>
+      <option value="BBA">BBA</option>
+      <option value="MCA">MCA</option>
+      <option value="BCA">BCA</option>
+    </select>
+
+    <!-- Gender (required, must match schema enum) -->
     <select name="gender" required>
       <option disabled selected>Select Gender</option>
       <option value="He/Him">He/Him</option>
       <option value="She/Her">She/Her</option>
+      <option value="They/Them">They/Them</option>
       <option value="Other">Other</option>
     </select>
+
+    <!-- Password (required) -->
     <input type="password" name="password" placeholder="Password" required />
+
+    <!-- Submit -->
     <button type="submit">Sign Up</button>
   </form>
 
   <p>or</p>
 
+  <!-- LinkedIn OAuth -->
   <a href="/auth/linkedin" class="linkedin-login-btn">
     <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="LinkedIn" width="20" style="vertical-align: middle; margin-right: 8px;">
     Sign Up with LinkedIn

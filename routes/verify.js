@@ -17,7 +17,7 @@ router.get("/verify", (req, res) => {
 
 router.post("/verify", upload.single("idProof"), async (req, res) => {
   const user = await User.findById(req.user._id);
-  user.verificationDoc = req.file.path;
+  user.verification.docUrl = req.file.path;
   await user.save();
   res.redirect("/explore");
 });
