@@ -3,6 +3,16 @@
     background: linear-gradient(to right, #f8f9fa, #eef1f7);
   }
 
+  .badge-warning {
+  background-color: #ff5900;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  margin-left: 0.5rem;
+}
+
+
 
 
 </style>
@@ -11,7 +21,10 @@
 
 
 <section class="note-detail">
-  <h1 style="margin-top: 0;"><%= note.title %></h1>
+  <h1 style="margin-top: 0;"><%= note.title %>
+  <% if (!note.isVerified) { %>
+    <span class="badge badge-warning">Unverified</span>
+  <% } %></h1>
 
   <% 
     const isPdf = note.fileUrl?.toLowerCase().endsWith(".pdf"); 
@@ -19,6 +32,11 @@
   %>
 
   <div class="preview-area" style="margin-top: 30px;">
+
+      <% if (!note.isVerified) { %>
+        <div class="flash flash-error">Wait or contact moderator inside /our-team(in footer-bottom) to be verified.</div>
+      <% } %>
+
     <div class="preview" style="display: flex; align-items: center; justify-content: space-between;">
       <h2 style="font-size: 1.4rem; margin-bottom: 15px; color: #2b2b6b;">Preview:</h2>
       <% if(currUser && (
@@ -61,7 +79,8 @@
 
   <p><strong>Downloads:</strong> <%= note.downloadCount %></p>
 
-  <p><strong>Uploaded at:</strong> <%= note.createdAt ? note.createdAt.toDateString() : 'Date not available' %></p>
+  <p><strong>Uploaded at:</strong> <%= note.createdAt ? note.createdAt.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Date not available' %>
+</p>
 
 
 

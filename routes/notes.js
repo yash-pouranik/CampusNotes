@@ -150,7 +150,7 @@ router.get("/notes/:nid/download", async (req, res) => {
 router.get('/explore', async (req, res) => {
   const { q } = req.query;
 
-  let filter = {};
+  let filter = { isVerified: true };
 
   // Search by title or subject name
   if (q) {
@@ -161,6 +161,7 @@ router.get('/explore', async (req, res) => {
     filter.$or = [
       { title: new RegExp(q, 'i') },
       { subject: { $in: subjectIds } }
+      
     ];
   }
 
