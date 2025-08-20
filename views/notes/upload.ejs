@@ -5,6 +5,35 @@
     margin-top: 4px;
     display: none;
   }
+  progress {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 60%;
+  height: 25px;
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: #f3f4f6; /* light gray background */
+  box-shadow: 0 0 5px rgba(0,0,0,0.1) inset;
+}
+
+/* For Chrome/Safari */
+progress::-webkit-progress-bar {
+  background-color: #f3f4f6;
+  border-radius: 12px;
+}
+
+progress::-webkit-progress-value {
+  background: linear-gradient(90deg, #3b82f6, #2563eb); /* blue gradient */
+  border-radius: 12px;
+  transition: width 0.3s ease;
+}
+
+/* For Firefox */
+progress::-moz-progress-bar {
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
+  border-radius: 12px;
+}
+
 </style>
 
 <link rel="stylesheet" href="/css/eachNoteCss.css">
@@ -80,13 +109,29 @@
   </form>
 
   <!-- Progress bar -->
-<div id="progressContainer" style="display:none; margin-top:10px;">
-  <progress id="progressBar" value="0" max="100" style="width:100%;"></progress>
-  <span id="progressText">0%</span>
-</div>
+
 
 
 </div>
+
+<div id="progressContainer" style="
+  display:none;
+  position: fixed; 
+  top: 0; 
+  left: 0; 
+  width: 100%; 
+  height: 100%; 
+  background: rgba(255, 241, 241, 0.9); 
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+">
+  <progress id="progressBar" value="0" max="100" style="width: 60%; height: 25px;"></progress>
+  <span id="progressText" style="margin-top:10px; font-size:1.2rem; font-weight:600;">0%</span>
+</div>
+
+
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
@@ -136,7 +181,7 @@
     if (fileError.style.display === "block") return;
 
     const formData = new FormData(form);
-    progressContainer.style.display = "block";
+    progressContainer.style.display = "flex";
 
     axios.post("/upload", formData, {
       headers: { "Content-Type": "multipart/form-data" },
@@ -154,7 +199,7 @@
       progressText.innerText = "0%";
 
       // ✅ redirect after success
-      window.location.href = "/requestnotes"; 
+      window.location.href = "/explore"; 
     })
 
     .catch(err => {
