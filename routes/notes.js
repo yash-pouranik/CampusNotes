@@ -2,13 +2,13 @@ const express = require("express");
 const mongoose = require("mongoose")
 const router = express.Router();
 const Note = require("../models/note");
-const Subject = require("../models/subject");
+const Subject = require("../models/subject")
 const {isLoggedIn, isModerator} = require("../middlewares");
 const multer = require("multer");
 const { storage, cloudinary  } = require("../config/cloud");
 const upload = multer({ 
   storage,
-  limits: { fileSize: 5 * 1024 * 1024 } // max 5MB
+  limits: { fileSize: 10 * 1024 * 1024 } // max 5MB
 });
 
 
@@ -32,10 +32,24 @@ router.get("/upload", isLoggedIn, async (req, res) => {
       "BCA"
     ];
 
+    const semester = [
+      "I", 
+      "II", 
+      "III", 
+      "IV", 
+      "V", 
+      "VI", 
+      "VII", 
+      "VIII",
+      "IX",
+      "X"
+    ]
+
     res.render("notes/upload", {
       title: "Upload Notes",
       subjects,
-      courses
+      courses,
+      semester
     });
   } catch (err) {
     console.error(err);
@@ -51,7 +65,7 @@ router.get("/upload", isLoggedIn, async (req, res) => {
 
 router.post("/upload", isLoggedIn, upload.single("file"), async (req, res) => {
   try {
-    const { title, description, subject, course, visibility, newSubject } = req.body;
+    const { title, description, subject, course, visibility, newSubject, semester } = req.body;
 
     if (!req.file) {
       req.flash("error", "Please upload a PDF file less than 5MB");
@@ -60,19 +74,31 @@ router.post("/upload", isLoggedIn, upload.single("file"), async (req, res) => {
 
     // ✅ only pdf
     if (req.file.mimetype !== "application/pdf") {
-      req.flash("error", "Only PDF files are allowed");
-      return res.redirect("/notes/upload");
+      return res.status(400).json({ success: false, error: "Only PDF files are allowed" });
     }
 
     // continue saving note...
+    const note = new Note({
+      title,
+      description,
+      subject: subject === "other" ? newSubject : subject,
+      course,
+      semester,
+      visibility,
+      fileUrl: req.file.path, // ya jo bhi path store karna hai
+      uploadedBy: req.user._id,
+    });
+
+    await note.save();
+
+    res.json({ success: true, redirectUrl: "/explore" });
+
   } catch (err) {
     if (err.code === "LIMIT_FILE_SIZE") {
-      req.flash("error", "File must be less than 5MB");
-      return res.redirect("/notes/upload");
+      return res.status(400).json({ success: false, error: "File must be less than 5MB" });
     }
     console.error(err);
-    req.flash("error", "Something went wrong while uploading");
-    res.redirect("/notes/upload");
+    res.status(500).json({ success: false, error: "Something went wrong while uploading" });
   }
 });
 
@@ -270,6 +296,50 @@ router.put('/notes/:id', isLoggedIn, async (req, res) => {
     console.error(err);
     req.flash("error", "Error updating note");
     res.redirect(`/notes/${req.params.id}/edit`);
+  }
+});
+
+
+router.delete("/notes/:id", isLoggedIn, async (req, res) => {
+  try {
+    const note = await Note.findById(req.params.id);
+
+    if (!note) {
+      req.flash("error", "Note not found");
+      return res.redirect("/explore");
+    }
+
+    // ✅ permission check
+    if (
+      note.uploadedBy.toString() !== req.user._id.toString() &&
+      !req.user.roles?.isModerator
+    ) {
+      req.flash("error", "You are not authorized to delete this note");
+      return res.redirect(`/notes/${note._id}`);
+    }
+
+    // ✅ delete file from Cloudinary
+    if (note.fileUrl) {
+      const urlParts = note.fileUrl.split('/');
+      const publicIdWithFolder = urlParts.slice(urlParts.indexOf('upload') + 1).join('/').split('.')[0];
+      await cloudinary.uploader.destroy(publicIdWithFolder, { resource_type: "raw" });
+    }
+
+    // ✅ user.notes array se bhi remove karo
+    await mongoose.model("User").updateOne(
+      { _id: note.uploadedBy },
+      { $pull: { notes: note._id } }
+    );
+
+    // ✅ finally note delete
+    await note.deleteOne();
+
+    req.flash("success", "Note deleted successfully!");
+    res.redirect("/explore");
+  } catch (err) {
+    console.error(err);
+    req.flash("error", "Something went wrong while deleting");
+    res.redirect("/explore");
   }
 });
 

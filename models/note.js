@@ -29,6 +29,22 @@ const noteSchema = new mongoose.Schema({
     ],
     required: true
   },
+  semester: { 
+    type: String,
+    enum: [
+      "I", 
+      "II", 
+      "III", 
+      "IV", 
+      "V", 
+      "VI", 
+      "VII", 
+      "VIII",
+      "IX",
+      "X"
+    ],
+    required: true
+  },
   fileUrl: { 
     type: String, 
     required: true 

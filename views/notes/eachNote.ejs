@@ -45,7 +45,12 @@
       )) { %>
         <div class="operations">
           <a href="/notes/<%= note._id %>/edit" class="edit-btn">edit</a>
-          <button class="dlt-btn">delete</button>
+          <form action="/notes/<%= note._id %>?_method=DELETE" method="POST" style="display:inline;">
+            <button type="submit" class="dlt-btn" onclick="return confirm('Are you sure you want to delete this note?');">
+              delete
+            </button>
+          </form>
+
         </div>
       <% } %>
     </div>

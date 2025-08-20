@@ -11,7 +11,7 @@
 
 <div class="upload-form-container">
   <h2>📤 Upload New Note</h2>
-  <form id="uploadForm" action="/upload" method="POST" enctype="multipart/form-data">
+  <form id="uploadForm" enctype="multipart/form-data">
     
     <div class="form-group">
       <label for="title">Title *</label>
@@ -50,6 +50,18 @@
       </select>
     </div>
 
+
+    <div class="form-group">
+      <label for="semester">Semester *</label>
+      <select name="semester" id="semester" required>
+        <option value="">-- Select Semester --</option>
+        <% semester.forEach(s => { %>
+          <option value="<%= s %>"><%= s %></option>
+        <% }) %>
+      </select>
+    </div>
+
+
     <div class="form-group">
       <label for="visibility">Visibility *</label>
       <select name="visibility" id="visibility" required>
@@ -66,26 +78,40 @@
 
     <button type="submit" class="form-submit-btn">Upload Note</button>
   </form>
+
+  <!-- Progress bar -->
+<div id="progressContainer" style="display:none; margin-top:10px;">
+  <progress id="progressBar" value="0" max="100" style="width:100%;"></progress>
+  <span id="progressText">0%</span>
 </div>
 
-<script>
-  // Subject toggle
-  document.getElementById("subject").addEventListener("change", function() {
-    document.getElementById("newSubjectGroup").style.display = 
-      this.value === "other" ? "block" : "none";
-  });
 
-  // File validation
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+
+<script>
   const fileInput = document.getElementById("file");
   const fileError = document.getElementById("fileError");
   const form = document.getElementById("uploadForm");
 
+  const progressContainer = document.getElementById("progressContainer");
+  const progressBar = document.getElementById("progressBar");
+  const progressText = document.getElementById("progressText");
+
+  // Subject toggle
+  document.getElementById("subject").addEventListener("change", function() {
+    document.getElementById("newSubjectGroup").style.display =
+      this.value === "other" ? "block" : "none";
+  });
+
+  // File validation
   fileInput.addEventListener("change", function() {
     fileError.style.display = "none";
     const file = this.files[0];
     if (!file) return;
 
-    // Check file type
     if (file.type !== "application/pdf") {
       fileError.textContent = "❌ Only PDF files are allowed.";
       fileError.style.display = "block";
@@ -93,19 +119,47 @@
       return;
     }
 
-    // Reject if > 5MB
-    if (file.size > 5 * 1024 * 1024) {
-      fileError.textContent = "❌ File must be less than 5MB. or compress it.";
+    if (file.size > 10 * 1024 * 1024) {
+      fileError.textContent = "❌ File must be less than 10MB. Compress it.";
       fileError.style.display = "block";
       this.value = "";
       return;
     }
   });
 
-  // Prevent submit if error is shown
+
+
+  
+  // Submit with progress bar
   form.addEventListener("submit", function(e) {
-    if (fileError.style.display === "block") {
-      e.preventDefault();
-    }
+    e.preventDefault();
+    if (fileError.style.display === "block") return;
+
+    const formData = new FormData(form);
+    progressContainer.style.display = "block";
+
+    axios.post("/upload", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+      onUploadProgress: function(progressEvent) {
+        const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+        progressBar.value = percent;
+        progressText.innerText = percent + "%";
+      }
+    })
+    .then(res => {
+      alert("✅ Upload successful!");
+      form.reset();
+      progressContainer.style.display = "none";
+      progressBar.value = 0;
+      progressText.innerText = "0%";
+
+      // ✅ redirect after success
+      window.location.href = "/requestnotes"; 
+    })
+
+    .catch(err => {
+      alert("❌ Upload failed: " + (err.response?.data?.error || err.message));
+      progressContainer.style.display = "none";
+    });
   });
 </script>

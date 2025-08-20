@@ -180,7 +180,7 @@
             <% } %>
           </p>
 
-          <p><strong>Downloads:</strong> <%= note.downloads %></p>
+          <p><strong>Downloads:</strong> <%= note.downloadCount %></p>
           <time><%= note.createdAt ? note.createdAt.toDateString() : 'Date not available' %></time>
           <a href="/notes/<%= note._id %>" class="view-link">📄 View Note</a>
         </div>
