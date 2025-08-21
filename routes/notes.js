@@ -172,35 +172,77 @@ router.get("/notes/:nid/download", async (req, res) => {
 
 
 
-//explore
-router.get('/explore', async (req, res) => {
-  const { q } = req.query;
+// /explore
+router.get("/explore", async (req, res) => {
+  try {
+    const { q, course, semester, visibility } = req.query;
 
-  let filter = { isVerified: true };
+    let filter = { isVerified: true };
 
-  // Search by title or subject name
-  if (q) {
-    // First find matching subjects
-    const subjectMatches = await Subject.find({ name: new RegExp(q, 'i') }).select('_id');
-    const subjectIds = subjectMatches.map(s => s._id);
+    // 🔍 Search by query
+    if (q) {
+      // Match subjects
+      const subjectMatches = await Subject.find({
+        name: new RegExp(q, "i"),
+      }).select("_id");
 
-    filter.$or = [
-      { title: new RegExp(q, 'i') },
-      { subject: { $in: subjectIds } }
-      
-    ];
+      const subjectIds = subjectMatches.map((s) => s._id);
+
+      filter.$or = [
+        { title: new RegExp(q, "i") },
+        { description: new RegExp(q, "i") }, // ✅ also allow description search
+        { course: new RegExp(q, "i") },
+        { semester: new RegExp(q, "i") },
+        { subject: { $in: subjectIds } },
+      ];
+    }
+
+    // 🎓 Filter by course (dropdown filter in frontend)
+    if (course && course !== "all") {
+      filter.course = course;
+    }
+
+    // 📚 Filter by semester
+    if (semester && semester !== "all") {
+      filter.semester = semester;
+    }
+
+    // 🌍 Filter by visibility
+    if (visibility && visibility !== "all") {
+      filter.visibility = visibility;
+    }
+
+    // 📄 Pagination (for better performance)
+    const page = parseInt(req.query.page) || 1;
+    const limit = 12;
+    const skip = (page - 1) * limit;
+
+    const notes = await Note.find(filter)
+      .populate("subject", "name")
+      .populate("uploadedBy", "username name roles verification")
+      .sort({ createdAt: -1 }) // newest first
+      .skip(skip)
+      .limit(limit);
+
+    const totalNotes = await Note.countDocuments(filter);
+    const totalPages = Math.ceil(totalNotes / limit);
+
+    res.render("notes/explore", {
+      notes,
+      query: q,
+      course,
+      semester,
+      visibility,
+      currentPage: page,
+      totalPages,
+      title: "Explore | CampusNotes",
+    });
+  } catch (err) {
+    console.error("❌ Explore Error:", err);
+    res.status(500).send("Server error while fetching notes.");
   }
-
-  const notes = await Note.find(filter)
-    .populate('subject', 'name')
-    .populate('uploadedBy', 'username name roles verification');
-
-  res.render('notes/explore', {
-    notes,
-    query: q,
-    title: "Explore | campusnotes"
-  });
 });
+
 
 
 router.get("/notes/:nid/edit", isLoggedIn, async (req, res) => {

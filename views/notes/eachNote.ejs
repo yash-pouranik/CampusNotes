@@ -71,6 +71,8 @@
   <p><strong>Description:</strong></p>
   <p><%= note.description || 'No description provided.' %></p>
 
+  <p><strong>Semester:</strong> <%= note.semester %></p>
+
   <p style="display: flex; align-items: center;">
     <strong>Uploaded by:</strong> <%= note.uploadedBy?.name || note.uploadedBy?.username || "Unknown" %>
     <% if (note.uploadedBy?.roles?.isModerator) { %>
@@ -83,6 +85,8 @@
   </p>
 
   <p><strong>Downloads:</strong> <%= note.downloadCount %></p>
+
+ 
 
   <p><strong>Uploaded at:</strong> <%= note.createdAt ? note.createdAt.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Date not available' %>
 </p>

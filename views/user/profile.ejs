@@ -1,142 +1,217 @@
-
 <style>
   .profile-container {
-    max-width: 900px;
-    margin: 3rem auto;
-    padding: 2rem;
-    border-radius: 16px;
-    background-color: #ffffff;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    font-family: 'Segoe UI', sans-serif;
+    max-width: 1000px;
+    margin: 2rem auto;
+    border-radius: 20px;
+    overflow: hidden;
+    font-family: 'Poppins', sans-serif;
+    background: #fff;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
   }
 
+  /* ===== Top Banner ===== */
+  .profile-banner {
+    background: linear-gradient(135deg, #4f46e5, #3b82f6, #06b6d4);
+    height: 180px;
+    position: relative;
+  }
+
+  .profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 5px solid #fff;
+    background: #eee url('/images/default-avatar.png') center/cover no-repeat;
+    position: absolute;
+    bottom: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+  }
+
+  /* ===== Header Info ===== */
   .profile-header {
     text-align: center;
-    margin-bottom: 2rem;
+    margin-top: 80px;
+    padding: 0 1rem;
   }
 
   .profile-header h2 {
     font-size: 2rem;
-    color: #222;
+    font-weight: 700;
+    color: #111827;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
   }
 
   .profile-data {
-    text-align: center;
-    color: #555;
-    font-size: 1rem;
+    margin-top: 0.3rem;
+    color: #6b7280;
+    font-size: 0.95rem;
   }
 
+  .edit-btn {
+    margin-top: 0.8rem;
+    background: #2563eb;
+    color: #fff;
+    padding: 0.5rem 1.2rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: 0.3s;
+  }
+  .edit-btn:hover {
+    background: #1e40af;
+  }
+
+  /* ===== Stats Cards ===== */
   .stats {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     margin: 2rem 0;
-    gap: 1rem;
+    gap: 1.2rem;
   }
 
   .stat-card {
-    background-color: #f3f4f6;
-    padding: 1rem 2rem;
-    border-radius: 12px;
-    min-width: 120px;
+    flex: 1;
+    min-width: 140px;
+    background: linear-gradient(135deg, #f9fafb, #f3f4f6);
+    border-radius: 16px;
+    padding: 1.5rem;
     text-align: center;
     font-weight: 600;
-    color: #333;
+    color: #374151;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    transition: transform 0.25s, box-shadow 0.25s;
+  }
+  .stat-card span {
+    display: block;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 0.3rem;
+  }
+  .stat-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 24px rgba(0,0,0,0.1);
   }
 
+  /* ===== Social Links ===== */
+  .profile-section {
+    padding: 1.5rem 2rem;
+    background: #f9fafb;
+    border-radius: 14px;
+    margin: 2rem 1rem;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.05);
+  }
+
+  .profile-section h2 {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    color: #1f2937;
+  }
+
+  .profile-section p {
+    margin: 0.5rem 0;
+    font-size: 0.95rem;
+  }
+
+  .profile-section a {
+    color: #2563eb;
+    font-weight: 500;
+    text-decoration: none;
+  }
+  .profile-section a:hover {
+    text-decoration: underline;
+  }
+
+  /* ===== Notes Grid ===== */
   .notes-list {
-    margin-top: 2rem;
+    padding: 1rem 2rem 2rem;
+  }
+
+  .notes-list h3 {
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+    color: #111827;
   }
 
   .notes-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 1.5rem;
   }
 
   .note-card {
-    background-color: #e4e4e491;
+    background: #fff;
     padding: 1rem;
-    border-radius: 12px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-    text-align: center;
+    border-radius: 14px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+    transition: transform 0.25s, box-shadow 0.25s;
+  }
+  .note-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.1);
   }
 
   .note-preview {
     width: 100%;
-    max-height: 250px;
+    max-height: 200px;
     object-fit: contain;
-    margin-bottom: 0.5rem;
-    border-radius: 8px;
+    margin-bottom: 0.6rem;
+    border-radius: 10px;
+    background: #f3f4f6;
+  }
+
+  .note-title {
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.3rem;
+  }
+
+  .note-meta {
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin-bottom: 0.6rem;
   }
 
   .note-link {
     font-size: 0.9rem;
-    word-break: break-word;
-    color: #0a66c2;
+    font-weight: 500;
+    color: #2563eb;
     text-decoration: none;
   }
-
   .note-link:hover {
     text-decoration: underline;
   }
 
+  /* ===== Back Link ===== */
   .back-link {
     display: block;
-    margin-top: 3rem;
+    margin: 2rem auto 1rem;
     text-align: center;
-    color: #0a66c2;
-    font-weight: bold;
+    color: #2563eb;
+    font-weight: 600;
     text-decoration: none;
+    transition: color 0.3s;
   }
-
   .back-link:hover {
+    color: #1d4ed8;
     text-decoration: underline;
   }
 
-  .social-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    max-width: 400px;
-    background: #f8f9fa;
-    padding: 1rem;
-    border-radius: 10px;
-  }
-  .social-form input {
-    padding: 0.6rem;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-  }
-  .social-form button {
-    background: #2563eb;
-    color: white;
-    padding: 0.6rem;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-  }
-  .social-form button:hover {
-    background: #1d4ed8;
-  }
-
-
-
-  @media screen and (max-width: 600px) {
-    .profile-header h2 {
-      font-size: 1.5rem;
-    }
-
-    .stat-card {
-      padding: 0.8rem 1.5rem;
-    }
-  }
-
-  .operations{
-    position: relative;
-    left: 1rem;
+  @media (max-width: 600px) {
+    .profile-header h2 { font-size: 1.5rem; }
+    .stat-card { padding: 1rem; }
+    .profile-avatar { width: 90px; height: 90px; bottom: -45px; }
   }
 </style>
+
+
 
 <div class="profile-container">
   <div class="profile-header">

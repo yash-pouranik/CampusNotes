@@ -92,7 +92,7 @@
     background: linear-gradient(to right, #1f1f4d, #3a3a7e);
   }
 
-  /* Search form */
+  /* Search + filter form */
   .search-filter-form {
     display: flex;
     flex-wrap: wrap;
@@ -102,6 +102,7 @@
   }
 
   .search-filter-form input,
+  .search-filter-form select,
   .search-filter-form button {
     padding: 10px;
     border: 1px solid #ccc;
@@ -115,7 +116,7 @@
     cursor: pointer;
   }
 
-  /* Most Voted link styled as button */
+  /* Most Voted link */
   .most-voted-link {
     display: inline-block;
     margin-bottom: 25px;
@@ -145,19 +146,121 @@
       grid-template-columns: 1fr;
     }
   }
+
+  @media (max-width: 500px) {
+    .search-filter-form {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+    }
+
+    .search-filter-form input,
+    .search-filter-form select,
+    .search-filter-form button {
+      width: 100%;
+      font-size: 0.9rem;
+    }
+
+    .most-voted-link {
+      display: block;
+      text-align: center;
+      width: 100%;
+    }
+  }
+
+  /* Filters */
+  @media (min-width: 769px) {
+    .desktop-filters { display: flex; }
+    .filter-toggle-btn, .filter-sidebar { display: none; }
+  }
+
+  @media (max-width: 768px) {
+    .desktop-filters { display: none; }
+
+    .filter-toggle-btn {
+      display: block;
+      margin: 10px 0 20px 0;
+      padding: 10px 15px;
+      background: #2b2b6b;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    .filter-sidebar {
+      position: fixed;
+      top: 0;
+      left: -100%;
+      width: 75%;
+      height: 100%;
+      background: #fff;
+      z-index: 1000;
+      padding: 20px;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.2);
+      transition: left 0.3s ease;
+      overflow-y: auto;
+    }
+
+    .filter-sidebar.open { left: 0; }
+  }
 </style>
 
 <div class="explore-container">
   <h1 class="explore-heading">Explore All Notes</h1>
 
-  <form method="GET" action="/explore" class="search-filter-form">
-    <input type="text" name="q" placeholder="Search by title or subject..." value="<%= typeof query !== 'undefined' ? query : '' %>">
-    <button type="submit">Search</button>
+  <!-- Desktop Filters -->
+  <form method="GET" action="/explore" class="search-filter-form desktop-filters">
+    <input type="text" name="q" placeholder="Search by title or subject..."
+           value="<%= typeof query !== 'undefined' ? query : '' %>">
+
+    <select name="course">
+      <option value="">All Courses</option>
+      <% ["B.Tech CSE","B.Tech IT","B.Tech ECE","B.Tech ME","MBA","BBA","MCA","BCA"].forEach(c => { %>
+        <option value="<%= c %>" <%= course === c ? "selected" : "" %>><%= c %></option>
+      <% }) %>
+    </select>
+
+    <select name="semester">
+      <option value="">All Semesters</option>
+      <% ["I","II","III","IV","V","VI","VII","VIII","IX","X"].forEach(s => { %>
+        <option value="<%= s %>" <%= semester === s ? "selected" : "" %>><%= s %></option>
+      <% }) %>
+    </select>
+
+    <button type="submit">Apply Filters</button>
   </form>
 
-  <a href="/most-voted" class="most-voted-link">
-    Most Voted Notes
-  </a>
+  <!-- Mobile Toggle -->
+  <button class="filter-toggle-btn" onclick="toggleFilters()">☰ Filters</button>
+
+  <!-- Mobile Sidebar -->
+  <div class="filter-sidebar" id="filterSidebar">
+    <h3>Filters</h3>
+    <form method="GET" action="/explore" class="search-filter-form" style="flex-direction: column;">
+      <input type="text" name="q" placeholder="Search by title or subject..."
+             value="<%= typeof query !== 'undefined' ? query : '' %>">
+
+      <select name="course">
+        <option value="">All Courses</option>
+        <% ["B.Tech CSE","B.Tech IT","B.Tech ECE","B.Tech ME","MBA","BBA","MCA","BCA"].forEach(c => { %>
+          <option value="<%= c %>" <%= course === c ? "selected" : "" %>><%= c %></option>
+        <% }) %>
+      </select>
+
+      <select name="semester">
+        <option value="">All Semesters</option>
+        <% ["I","II","III","IV","V","VI","VII","VIII","IX","X"].forEach(s => { %>
+          <option value="<%= s %>" <%= semester === s ? "selected" : "" %>><%= s %></option>
+        <% }) %>
+      </select>
+
+      <button type="submit">Apply Filters</button>
+    </form>
+  </div>
+
+  <a href="/most-voted" class="most-voted-link">Most Voted Notes</a>
 
   <% if (notes.length === 0) { %>
     <p style="text-align: center; font-size: 1.1rem; color: #666;">No notes uploaded yet.</p>
@@ -169,12 +272,11 @@
           <p><strong>Subject:</strong> <%= note.subject?.name || 'N/A' %></p>
           <p><strong>Course:</strong> <%= note.course %></p>
 
-          <p style="display: flex; align-items: center;">
-            <strong>Uploaded by:</strong> <%= note.uploadedBy?.username || "Unknown" %> &nbsp;
+          <p><strong>Uploaded by:</strong> <%= note.uploadedBy?.username || "Unknown" %>
             <% if (note.uploadedBy?.roles?.isModerator) { %>
-              <img src="/images/blueCheckmark.svg" alt="Moderator" style="all: unset; width: 23px;">
+              <img src="/images/blueCheckmark.svg" alt="Moderator" width="20">
             <% } else if (note.uploadedBy?.roles?.isDev) { %>
-              <img src="/images/icons8-checkmark.svg" alt="Developer" style="all: unset; width: 23px;">
+              <img src="/images/icons8-checkmark.svg" alt="Developer" width="20">
             <% } else if (note.uploadedBy?.verification?.verified) { %>
               <span style="color: green; font-size: 0.8rem;">✔</span>
             <% } %>
@@ -188,3 +290,9 @@
     </div>
   <% } %>
 </div>
+
+<script>
+  function toggleFilters() {
+    document.getElementById('filterSidebar').classList.toggle('open');
+  }
+</script>
