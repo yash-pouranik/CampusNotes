@@ -20,7 +20,7 @@ router.get("/notes/:sec", async (req, res) => {
         }
 
         const notes = await Note.find()
-        .populate("uploadedBy");
+        .populate("uploadedBy", "username socialLinks");
 
         res.send(notes);
 

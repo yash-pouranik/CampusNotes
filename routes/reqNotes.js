@@ -4,6 +4,10 @@ const router = express.Router();
 const { isLoggedIn } = require("../middlewares");
 const RequestNote = require("../models/reqNotes");
 
+const { sendNewRequestMail } = require("../config/mailer");
+
+
+
 // GET /requestnotes
 router.get('/requestnotes', async (req, res) => {
   const requests = await RequestNote.find({})
@@ -24,6 +28,7 @@ router.get('/requestnotes', async (req, res) => {
 
 
 // POST /requestnotes (Create new request)
+// POST /requestnotes (Create new request)
 router.post('/requestnotes', isLoggedIn, async (req, res) => {
   try {
     const { content } = req.body;
@@ -37,9 +42,19 @@ router.post('/requestnotes', isLoggedIn, async (req, res) => {
       return res.redirect("/requestnotes");
     }
 
-    await RequestNote.create({ 
+    const newRequest = await RequestNote.create({ 
       user: req.user._id, 
       content: content.trim() 
+    });
+
+    // ✅ populate user data for email
+    await newRequest.populate("user", "username name email");
+
+    // 📩 send email to all users
+    sendNewRequestMail({
+      _id: newRequest._id,
+      content: newRequest.content,
+      postedBy: newRequest.user.username || newRequest.user.name,
     });
 
     req.flash("success", "Request posted successfully!");
@@ -50,6 +65,7 @@ router.post('/requestnotes', isLoggedIn, async (req, res) => {
     res.redirect("/requestnotes");
   }
 });
+
 
 
 // POST /requestnotes/:id/delete
