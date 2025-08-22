@@ -72,20 +72,32 @@ router.post("/upload", isLoggedIn, upload.single("file"), async (req, res) => {
       return res.redirect("/notes/upload");
     }
 
-    // ✅ only pdf
     if (req.file.mimetype !== "application/pdf") {
       return res.status(400).json({ success: false, error: "Only PDF files are allowed" });
     }
 
-    // continue saving note...
+    let subjectId;
+
+    if (subject === "other" && newSubject) {
+      // ✅ Agar naya subject aaya to DB me add karo
+      let created = await Subject.findOneAndUpdate(
+        { name: newSubject.trim() },
+        { name: newSubject.trim() },
+        { new: true, upsert: true } // create if not exists
+      );
+      subjectId = created._id;
+    } else {
+      subjectId = subject; // dropdown se aaya hua ObjectId
+    }
+
     const note = new Note({
       title,
       description,
-      subject: subject === "other" ? newSubject : subject,
+      subject: subjectId,
       course,
       semester,
       visibility,
-      fileUrl: req.file.path, // ya jo bhi path store karna hai
+      fileUrl: req.file.path,
       uploadedBy: req.user._id,
     });
 
@@ -98,9 +110,11 @@ router.post("/upload", isLoggedIn, upload.single("file"), async (req, res) => {
       return res.status(400).json({ success: false, error: "File must be less than 5MB" });
     }
     console.error(err);
+    console.log("yash")
     res.status(500).json({ success: false, error: "Something went wrong while uploading" });
   }
 });
+
 
 
 // most voted notes
