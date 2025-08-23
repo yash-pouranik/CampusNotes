@@ -1,10 +1,33 @@
+<link rel="stylesheet" href="/css/login.css">
 <style>
-
+  .g_id_signin div{
+    background-color: #0a66c2;
+    color: white;
+    border-radius: 5px;
+    transition: 0.5s;
+  }
+  .g_id_signin div:hover{
+    background-color: #0855a2;
+    color: white;
+    border-radius: 20px;
+  }
 </style>
 
-<link rel="stylesheet" href="/css/login.css">
 
 <section class="auth-section">
+
+  <!-- Google Sign-In -->
+  <div id="g_id_onload"
+       data-client_id="466885260272-86cp1p5tkpsspvrdp8n79h0gbfob48qq.apps.googleusercontent.com"
+       data-context="signin"
+       data-login_uri="http://localhost:3000/oauth2callback"
+       data-auto_select="true"
+       data-itp_support="true">
+  </div>
+  <div class="g_id_signin" data-type="standard"></div>
+
+  <p>or</p>
+
   <h2>Login to CampusNotes</h2>
   
   <form action="/login" method="POST">
@@ -12,57 +35,58 @@
     <input type="password" name="password" placeholder="Password" required />
     <button type="submit">Login</button>
   </form>
-  <span>Not a Member yet? Register <a href="/register-n">here</a></span>
-<hr>
-  <p>or</p>
 
-  <a href="/auth/linkedin" class="linkedin-login-btn">
-    <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="LinkedIn" width="20" style="vertical-align: middle; margin-right: 8px;">
-    Continue with LinkedIn
-  </a>
+  <span>Not a Member yet? Register <a href="/register-n">here</a></span>
+  
+
 </section>
 
 
+<!-- Google Identity Script -->
+<script src="https://accounts.google.com/gsi/client" async></script>
+
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const form = document.querySelector("form");
-    const email = form.querySelector("input[name='email']");
-    const password = form.querySelector("input[name='password']");
+  function decodeJWT(token) {
+    let base64Url = token.split(".")[1];
+    let base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    let jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split("")
+        .map(c => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+        .join("")
+    );
+    return JSON.parse(jsonPayload);
+  }
 
-    form.addEventListener("submit", (e) => {
-      let errors = [];
+  function handleCredentialResponse(response) {
+  console.log("Encoded JWT ID token:", response.credential);
+  const responsePayload = decodeJWT(response.credential);
+  console.log("Decoded JWT:", responsePayload);
 
-      // Email validation
-      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!email.value.trim()) {
-        errors.push("Email is required.");
-      } else if (!emailPattern.test(email.value)) {
-        errors.push("Enter a valid email address.");
-      }
-
-      // Password validation
-      if (!password.value.trim()) {
-        errors.push("Password is required.");
-      } else if (password.value.length < 4) {
-        errors.push("Password must be at least 4 characters long.");
-      }
-
-      if (errors.length > 0) {
-        e.preventDefault();
-
-        // remove old errors
-        form.querySelectorAll(".error-message").forEach(el => el.remove());
-
-        // show new errors
-        errors.forEach(msg => {
-          const err = document.createElement("div");
-          err.classList.add("error-message");
-          err.style.color = "red";
-          err.style.fontSize = "0.9rem";
-          err.textContent = msg;
-          form.insertBefore(err, form.firstChild);
-        });
+      // ✅ Send to backend
+    fetch("/oauth2callback", {
+      method: "POST",
+      body: JSON.stringify({ credential: response.credential }),
+      headers: { "Content-Type": "application/json" }
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        window.location.href = `/profile/${data.userId}`;
       }
     });
-  });
+  }
+
+
+
+  window.onload = function () {
+    google.accounts.id.initialize({
+      client_id: "466885260272-86cp1p5tkpsspvrdp8n79h0gbfob48qq.apps.googleusercontent.com",
+      callback: handleCredentialResponse
+    });
+    google.accounts.id.renderButton(
+      document.querySelector(".g_id_signin"),
+      { theme: "outline", size: "large" }
+    );
+  };
 </script>

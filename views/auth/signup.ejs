@@ -1,54 +1,118 @@
 <style>
-  /* Style all select elements */
-.auth-section select {
-  width: 100%;
-  padding: 10px 12px;
-  margin: 10px 0;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  background-color: #fff;
-  font-size: 1rem;
-  color: #333;
-  appearance: none; /* Remove default arrow */
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  transition: border 0.3s ease, box-shadow 0.3s ease;
-}
 
-/* On focus */
-.auth-section select:focus {
-  border-color: #2563EB; /* Blue 600 like your navbar */
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
-  outline: none;
-}
+  .auth-section {
+    max-width: 420px;
+    margin: 1px auto;
+    padding: 40px;
+    background: #fff;
+    border-radius: 12px;
 
-/* Optional: add custom arrow using background */
-.auth-section select {
-  background-image: url('data:image/svg+xml;utf8,<svg fill="%23333" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  background-size: 16px;
-}
+    text-align: center;
+  }
+
+  .auth-section h2 {
+    font-size: 1.8rem;
+    margin-bottom: 25px;
+  }
+
+  .auth-section form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .auth-section input,
+  .auth-section select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #333;
+    background-color: #fff;
+    transition: border 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .auth-section input:focus,
+  .auth-section select:focus {
+    border-color: #2563EB;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+    outline: none;
+  }
+
+  /* Custom arrow for select */
+  .auth-section select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%23333" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+  }
+
+  .auth-section button {
+    padding: 12px;
+    background-color: #2563EB;
+    color: #fff;
+    font-size: 1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+
+  .auth-section button:hover {
+    background-color: #1d4ed8;
+    transform: translateY(-2px);
+  }
+
+  .auth-section p {
+    margin: 20px 0 10px;
+    color: #555;
+  }
+
+  .g_id_signin div{
+    background-color: #0a66c2;
+    color: white;
+    border-radius: 5px;
+    transition: 0.5s;
+  }
+  .g_id_signin div:hover{
+    background-color: #0855a2;
+    color: white;
+    border-radius: 20px;
+  }
+
+
 
 </style>
 
-
-<link rel="stylesheet" href="/css/login.css">
-
 <section class="auth-section">
-  <h2>Sign Up for CampusNotes</h2>
+
+
+    <!-- Google Sign-In -->
+  <div id="g_id_onload"
+       data-client_id="466885260272-86cp1p5tkpsspvrdp8n79h0gbfob48qq.apps.googleusercontent.com"
+       data-context="signin"
+       data-login_uri="http://localhost:3000/oauth2callback"
+       data-auto_select="true"
+       data-itp_support="true">
+  </div>
+  <div class="g_id_signin" data-type="standard"></div>
+
+  <p>or</p>
+
+
+
+
+  <h2>Sign Up with CampusNotes</h2>
 
   <form action="/register" method="POST">
-    <!-- Username (required) -->
     <input type="text" name="username" placeholder="Username" required />
-
-    <!-- Full Name (optional) -->
     <input type="text" name="name" placeholder="Full Name" />
-
-    <!-- Email (required) -->
     <input type="email" name="email" placeholder="Email" required />
 
-    <!-- Course (required, must match schema enum) -->
     <select name="course" required>
       <option disabled selected>Select Course</option>
       <option value="B.Tech CSE">B.Tech CSE</option>
@@ -61,7 +125,6 @@
       <option value="BCA">BCA</option>
     </select>
 
-    <!-- Gender (required, must match schema enum) -->
     <select name="gender" required>
       <option disabled selected>Select Gender</option>
       <option value="He/Him">He/Him</option>
@@ -70,18 +133,61 @@
       <option value="Other">Other</option>
     </select>
 
-    <!-- Password (required) -->
     <input type="password" name="password" placeholder="Password" required />
-
-    <!-- Submit -->
     <button type="submit">Sign Up</button>
   </form>
 
-  <p>or</p>
 
-  <!-- LinkedIn OAuth -->
-  <a href="/auth/linkedin" class="linkedin-login-btn">
-    <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="LinkedIn" width="20" style="vertical-align: middle; margin-right: 8px;">
-    Sign Up with LinkedIn
-  </a>
+
+
 </section>
+
+
+<!-- Google Identity Script -->
+<script src="https://accounts.google.com/gsi/client" async></script>
+
+<script>
+  function decodeJWT(token) {
+    let base64Url = token.split(".")[1];
+    let base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    let jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split("")
+        .map(c => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+        .join("")
+    );
+    return JSON.parse(jsonPayload);
+  }
+
+  function handleCredentialResponse(response) {
+  console.log("Encoded JWT ID token:", response.credential);
+  const responsePayload = decodeJWT(response.credential);
+  console.log("Decoded JWT:", responsePayload);
+
+      // ✅ Send to backend
+    fetch("/oauth2callback", {
+      method: "POST",
+      body: JSON.stringify({ credential: response.credential }),
+      headers: { "Content-Type": "application/json" }
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        window.location.href = `/explore`;
+      }
+    });
+  }
+
+
+
+  window.onload = function () {
+    google.accounts.id.initialize({
+      client_id: "466885260272-86cp1p5tkpsspvrdp8n79h0gbfob48qq.apps.googleusercontent.com",
+      callback: handleCredentialResponse
+    });
+    google.accounts.id.renderButton(
+      document.querySelector(".g_id_signin"),
+      { theme: "outline", size: "large" }
+    );
+  };
+</script>

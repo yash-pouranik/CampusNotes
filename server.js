@@ -21,6 +21,8 @@ const {isModerator} = require("./middlewares")
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
 
 // **Important: Use express-ejs-layouts middleware before routes**
 app.use(expressLayouts);
@@ -61,6 +63,7 @@ app.use((req, res, next) => {
   res.locals.error_msg = req.flash("error");
   next();
 });
+
 
 
 
