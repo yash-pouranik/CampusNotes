@@ -1,4 +1,86 @@
 <style>
+  /* Avatar Wrapper */
+  .avatar-wrapper {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: -60px auto 0; /* overlaps banner */
+  }
+
+  .profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid #fff;
+    object-fit: cover;
+    background: #eee;
+    
+  }
+
+  .edit-avatar-btn {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+  .edit-avatar-btn:hover {
+    background: #1e40af;
+  }
+
+  /* Modal Overlay */
+  .avatar-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+  }
+
+  .avatar-modal-content {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 14px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+  }
+
+  .avatar-modal img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 1rem;
+  }
+
+  .close-modal {
+    margin-top: 1rem;
+    display: inline-block;
+    color: #ef4444;
+    cursor: pointer;
+    font-weight: 600;
+  }
+</style>
+
+
+
+
+
+<style>
   .profile-container {
     max-width: 1000px;
     margin: 2rem auto;
@@ -215,6 +297,14 @@
 
 <div class="profile-container">
   <div class="profile-header">
+    <div class="avatar-wrapper">
+      <img src="<%= user.avatar %>" alt="Profile Avatar" class="profile-avatar">
+      
+      <% if(currUser && currUser._id.toString() === user._id.toString()) { %>
+        <button class="edit-avatar-btn" onclick="openAvatarModal()">✎</button>
+      <% } %>
+    </div>
+    <br><br>
     <h2 style="display: flex; align-items: center !important; justify-content: center;">
       <%= user.username %>
             <% if (user.roles.isModerator) { %>
@@ -294,3 +384,29 @@
 
   <a href="/" class="back-link">← Back to Home</a>
 </div>
+
+
+<div id="avatarModal" class="avatar-modal" style="display:none;">
+  <div class="avatar-modal-content">
+    <h3>Edit Profile Picture</h3>
+    <img src="<%= user.avatar %>" alt="Current Avatar">
+    
+    <form action="/profile/avatar?_method=PUT" method="POST" enctype="multipart/form-data">
+      <input type="file" name="avatar" accept="image/*" required>
+      <br><br>
+      <button type="submit" class="edit-btn">Upload</button>
+    </form>
+    
+    <div class="close-modal" onclick="closeAvatarModal()">Cancel</div>
+  </div>
+</div>
+
+
+<script>
+  function openAvatarModal() {
+    document.getElementById("avatarModal").style.display = "flex";
+  }
+  function closeAvatarModal() {
+    document.getElementById("avatarModal").style.display = "none";
+  }
+</script>

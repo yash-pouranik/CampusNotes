@@ -3,6 +3,15 @@ const router = express.Router();
 const User = require("../models/user")
 const Note = require("../models/note")
 const {isLoggedIn} = require("../middlewares")
+const multer = require("multer");
+const { storage, cloudinary  } = require("../config/cloud");
+const upload = multer({ 
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 } // max 5MB
+});
+
+
+
 
 router.get("/profile/:id",  async (req, res, next) => {
   try {
@@ -98,6 +107,43 @@ router.put("/profile/:id/edit", isLoggedIn, async (req, res) => {
     console.error(err);
     req.flash("error", "Something went wrong");
     res.redirect(`/profile/${req.params.id}`);
+  }
+});
+
+router.put("/profile/avatar", isLoggedIn, upload.single("avatar"), async (req, res) => {
+  try {
+    if (!req.file) {
+      req.flash("error", "Please upload an image file");
+      return res.redirect("/profile");
+    }
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      req.flash("error", "User not found");
+      return res.redirect("/profile");
+    }
+
+    // ❌ delete old avatar from cloudinary (skip if it's dummy avatar)
+    if (user.avatar && !user.avatar.includes("dummy_profile")) {
+      try {
+        const parts = user.avatar.split("/");
+        const publicId = parts.slice(parts.indexOf("upload") + 1).join("/").split(".")[0];
+        await cloudinary.uploader.destroy(publicId, { resource_type: "image" });
+      } catch (err) {
+        console.warn("Cloudinary delete error:", err.message);
+      }
+    }
+
+    // ✅ save new avatar path from Cloudinary
+    user.avatar = req.file.path;
+    await user.save();
+
+    req.flash("success", "Avatar updated successfully!");
+    res.redirect(`/profile/${req.user._id}`);
+  } catch (err) {
+    console.error("Avatar update error:", err);
+    req.flash("error", "Something went wrong while updating avatar");
+    res.redirect("/profile");
   }
 });
 
