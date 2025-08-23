@@ -102,10 +102,10 @@
 
   <h2>Sign Up with CampusNotes</h2>
 
-  <form action="/register" method="POST">
+  <form id="loginForm" action="/register" method="POST">
     <input type="text" name="username" placeholder="Username" required />
     <input type="text" name="name" placeholder="Full Name" />
-    <input type="email" name="email" placeholder="Email" required />
+    <input type="email" name="email" placeholder="Email" id="emailInput" required />
 
     <select name="course" required>
       <option disabled selected>Select Course</option>
@@ -130,6 +130,13 @@
     <input type="password" name="password" placeholder="Password" required />
     <button type="submit">Sign Up</button>
   </form>
+
+  <script>
+  document.getElementById("loginForm").addEventListener("submit", function(e) {
+    let emailField = document.getElementById("emailInput");
+    emailField.value = emailField.value.toLowerCase().trim(); // lowercase + trim spaces
+  });
+</script>
 
 
 
