@@ -64,7 +64,7 @@
             <strong><%= user.username %></strong> (<%= user.course %>)  
           </div>
           <div>
-            <a href="<%= user.verificationDoc %>" target="_blank">View ID</a>
+            <a href="<%= user.verification.docUrl %>" target="_blank">View ID</a>
           </div>
           <form action="/admin/verify/<%= user._id %>" method="POST">
             <button type="submit">Verify</button>
