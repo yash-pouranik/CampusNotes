@@ -67,6 +67,9 @@ app.use((req, res, next) => {
 
 
 
+app.get('/health/campnotes', (req, res) => {
+  res.status(200).send('OK');
+});
 
 
 const authRoutes = require('./routes/auth');
