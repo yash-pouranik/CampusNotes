@@ -14,7 +14,7 @@ module.exports.sendNewRequestMail = async (requestData) => {
   try {
     // exclude the request poster
     const users = await User.find(
-      { _id: { $ne: requestData.user._id } },  // 👈 poster exclude
+      { _id: { $ne: requestData._id } },  // 👈 poster exclude
       "email"
     );
 
@@ -27,17 +27,31 @@ module.exports.sendNewRequestMail = async (requestData) => {
       bcc: emailList,
       subject: "📢 New Notes Request Posted!",
       html: `
-        <h2>New Request on CampusNotes</h2>
-        <p><strong>${requestData.user.username || requestData.user.name}</strong> requested:</p>
-        <blockquote>${requestData.content}</blockquote>
-        <br/>
-        <a href="https://campusnotes.com/requestnotes/${requestData._id}" 
-           style="background:#2563eb;color:#fff;padding:10px 16px;
-                  border-radius:6px;text-decoration:none;">
-          View Request
-        </a>
+        <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.5; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;">
+          <h2 style="color: #2563eb; text-align: center;">New Request on CampusNotes</h2>
+          
+          <p style="font-size: 16px;">
+            <strong>${requestData.user.username || requestData.user.name}</strong> has requested new notes:
+          </p>
+          
+          <div style="background: #fff; border-left: 4px solid #2563eb; padding: 12px 16px; margin: 16px 0; border-radius: 4px; font-style: italic;">
+            ${requestData.content}
+          </div>
+          
+          <div style="text-align: center; margin-top: 20px;">
+            <a href="https://campusnotes-uier.onrender.com/requestnotes" 
+              style="display: inline-block; background-color: #2563eb; color: #fff; padding: 12px 20px; border-radius: 6px; text-decoration: none; font-weight: bold;">
+              View Request
+            </a>
+          </div>
+          
+          <p style="font-size: 12px; color: #888; text-align: center; margin-top: 30px;">
+            You are receiving this email because you are subscribed to CampusNotes notifications.
+          </p>
+        </div>
       `
     });
+
 
     console.log("✅ Emails sent (excluding poster)");
   } catch (err) {

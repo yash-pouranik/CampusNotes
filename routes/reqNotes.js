@@ -43,7 +43,7 @@ router.post('/requestnotes', isLoggedIn, async (req, res) => {
     }
 
     const newRequest = await RequestNote.create({ 
-      user: req.user._id, 
+      user: req.user, 
       content: content.trim() 
     });
 
@@ -52,7 +52,8 @@ router.post('/requestnotes', isLoggedIn, async (req, res) => {
 
     // 📩 send email to all users
     sendNewRequestMail({
-      _id: newRequest._id,
+      _id: newRequest.user._id,
+      user: newRequest.user,
       content: newRequest.content,
       postedBy: newRequest.user.username || newRequest.user.name,
     });
