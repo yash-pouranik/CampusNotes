@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/user");
 
-router.get("/our-team", async (req, res) => {
+router.get("/bitbros/our-team", async (req, res) => {
   try {
     const teamMembers = await User.find({
       $or: [
@@ -21,5 +21,10 @@ router.get("/our-team", async (req, res) => {
     res.status(500).send("Error loading team");
   }
 });
+
+router.get("/bitbros/aboutus", (req, res) => {
+  res.render("team/aboutus", {title: "About Us | Campus Notes"});
+});
+
 
 module.exports = router;
