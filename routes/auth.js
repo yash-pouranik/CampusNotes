@@ -5,6 +5,8 @@ const User = require("../models/user")
 const {notLoggedIn} = require("../middlewares");
 const { OAuth2Client } = require("google-auth-library");
 
+const { sendOTP } = require("../config/mailer");
+
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -90,6 +92,127 @@ router.get('/logout', (req, res, next) => {
   req.logout(err => {
     if (err) return next(err); // handle error
     res.redirect('/login-n'); // redirect after logout
+  });
+});
+
+// forgot page
+router.get("/forgot", (req, res) => {
+  res.render("auth/forgot", { step: "email", title: "forgot password" });
+});
+
+
+
+// send otp
+router.post("/forgot/send-otp", async (req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res.render("auth/forgot", { 
+      step: "email",
+      flash: { type: "error", message: "Email not registered." },
+      title: "forgot password" 
+    });
+  }
+
+  const otp = Math.floor(100000 + Math.random() * 900000);
+  user.resetOtp = otp;
+  user.otpExpiry = Date.now() + 10 * 60 * 1000; // 10min
+  await user.save();
+
+  // TODO: nodemailer
+  console.log("OTP for", email, "is", otp);
+  sendOTP(email, otp);
+
+  res.render("auth/forgot", { 
+    step: "otp", 
+    email, 
+    flash: { type: "success", message: "OTP sent to your email." },
+    title: "forgot password" 
+  });
+});
+
+
+
+// verify otp + change password
+router.post("/forgot/verify", async (req, res) => {
+  const { email, otp, password, confirmPassword } = req.body;
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res.render("auth/forgot", { 
+      step: "email",
+      flash: { type: "error", message: "Invalid request." },
+      title: "forgot password"
+    });
+  }
+
+  if (password.trim() !== confirmPassword.trim()) {
+    return res.render("auth/forgot", { 
+      step: "otp", 
+      email,
+      flash: { type: "error", message: "Passwords do not match." },
+      title: "forgot password" 
+    });
+  }
+
+  if (
+    String(user.resetOtp) !== String(otp) ||
+    !user.otpExpiry ||
+    user.otpExpiry < Date.now()
+  ) {
+    return res.render("auth/forgot", { 
+      step: "otp", 
+      email,
+      flash: { type: "error", message: "Invalid or expired OTP." },
+      title: "forgot password"  
+    });
+  }
+
+  const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
+
+  if (!passwordRegex.test(req.body.password)) {
+    req.flash("error", "Password must be 8+ chars, include uppercase, number, and special character.");
+    return res.redirect("/forgot");
+  }
+
+
+  // 🚀 yaha plain-text set kar do, schema hook auto-hash karega
+  user.password = password;
+  user.resetOtp = undefined;
+  user.otpExpiry = undefined;
+  await user.save();
+
+  req.flash("success", "Password changed successfully, now login!");
+  res.redirect("/login-n");
+});
+
+
+
+// resend otp
+router.post("/forgot/resend", async (req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res.render("auth/forgot", { 
+      step: "email", 
+      flash: { type: "error", message: "Email not registered." },
+      title: "forgot password" 
+    });
+  }
+
+  const otp = Math.floor(100000 + Math.random() * 900000);
+  user.resetOtp = otp;
+  user.otpExpiry = Date.now() + 10 * 60 * 1000;
+  await user.save();
+
+  // TODO: nodemailer
+  console.log("Resent OTP for", email, "is", otp);
+
+  res.render("auth/forgot", { 
+    step: "otp", 
+    email, 
+    flash: { type: "success", message: "OTP resent successfully." },
+    title: "forgot password" 
   });
 });
 

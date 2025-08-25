@@ -61,6 +61,10 @@ const userSchema = new mongoose.Schema({
     isModerator: { type: Boolean, default: false },
     isDev: { type: Boolean, default: false }
   },
+  resetOtp: { type: String },
+  
+  otpExpiry: { type: Date },
+
   socialLinks: {
     linkedin: { type: String, default: null },
     github: { type: String, default: null }

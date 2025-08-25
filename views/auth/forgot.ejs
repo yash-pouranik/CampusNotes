@@ -1,0 +1,234 @@
+
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f9fafb;
+      color: #1a1a3d;
+      margin: 0;
+      padding: 0;
+    }
+    .auth-section {
+      max-width: 420px;
+      margin: 50px auto;
+      padding: 32px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0,0,0,.08);
+    }
+    .auth-section h2 {
+      margin: 0 0 6px;
+      font-size: 1.6rem;
+      text-align: center;
+    }
+    .sub {
+      text-align: center;
+      color: #6b7280;
+      margin-bottom: 22px;
+      font-size: .98rem;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    input, select {
+      width: 92.5%;
+      padding: 12px 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 1rem;
+      color: #1f2937;
+      background: #fff;
+      transition: border .2s ease, box-shadow .2s ease;
+    }
+    input:focus, select:focus {
+      border-color: #2563EB;
+      box-shadow: 0 0 0 3px rgba(37,99,235,.15);
+      outline: none;
+    }
+    .btn {
+      padding: 12px;
+      background: #2563EB;
+      color: #fff;
+      border: 0;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform .15s ease, background .2s ease;
+    }
+    .btn:hover { background: #1d4ed8; transform: translateY(-1px); }
+    .btn.secondary {
+      background: #eef2ff;
+      color: #1e40af;
+    }
+    .btn.secondary:hover { background: #e0e7ff; }
+    .muted {
+      color: #6b7280;
+      font-size: .9rem;
+      text-align: center;
+      margin-top: 10px;
+    }
+    .row {
+      display: flex; gap: 10px;
+    }
+    .row .flex-1 { flex: 1; }
+    .readonly-chip {
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 12px 14px;
+      color: #374151;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .alert { 
+      margin: 10px 0 14px; 
+      padding: 10px 12px; 
+      border-radius: 8px; 
+      font-size: .95rem; 
+    }
+    .alert.success { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
+    .alert.error { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+    a.inline { color: #2563EB; text-decoration: none; }
+    a.inline:hover { text-decoration: underline; }
+  </style>
+
+  <section class="auth-section">
+    <h2>Forgot Password</h2>
+    <p class="sub">Enter your registered email ID — Then OTP will be sent to ur email ID</p>
+
+    <% /* optional flash messages: pass { flash: { type: 'success'|'error', message: '...' } } */ %>
+    <% if (typeof flash !== 'undefined' && flash && flash.message) { %>
+      <div class="alert <%= flash.type === 'success' ? 'success' : 'error' %>">
+        <%= flash.message %>
+      </div>
+    <% } %>
+
+    <% if (step === 'otp') { %>
+      <!-- Step 2: Verify OTP + set new password -->
+      <div class="readonly-chip">
+        <span><strong>Email:</strong> <%= email %></span>
+        <a class="inline" href="/forgot">Change</a>
+      </div>
+
+      <form action="/forgot/verify" method="POST" autocomplete="off" novalidate>
+        <% if (typeof csrfToken !== 'undefined') { %>
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <% } %>
+        <input type="hidden" name="email" value="<%= email %>">
+
+        <input
+          type="text"
+          name="otp"
+          placeholder="Enter 6-digit OTP"
+          inputmode="numeric"
+          pattern="\\d{6}"
+          maxlength="6"
+          required
+        />
+
+        <input
+          type="password"
+          name="password"
+          placeholder="New Password (min 8 chars)"
+          minlength="8"
+          required
+        />
+
+        <input
+          type="password"
+          name="confirmPassword"
+          placeholder="Confirm New Password"
+          minlength="8"
+          required
+        />
+
+        <button class="btn" type="submit">Reset Password</button>
+      </form>
+
+      <form action="/forgot/resend" method="POST" class="row" style="margin-top:10px;">
+        <% if (typeof csrfToken !== 'undefined') { %>
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <% } %>
+        <input type="hidden" name="email" value="<%= email %>">
+        <button class="btn secondary flex-1" type="submit" id="resendBtn">Resend OTP</button>
+      </form>
+
+      <p class="muted">OTP galat ya expire? Resend karke naya OTP mang lein.</p>
+
+    <% } else { %>
+      <!-- Step 1: Ask for email -->
+      <form action="/forgot/send-otp" method="POST" autocomplete="off" novalidate>
+        <% if (typeof csrfToken !== 'undefined') { %>
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <% } %>
+
+        <input
+          type="email"
+          name="email"
+          placeholder="Registered Email"
+          value="<%= typeof email !== 'undefined' ? email : '' %>"
+          required
+        />
+
+        <button class="btn" type="submit">Send OTP</button>
+      </form>
+
+      <p class="muted"><a class="inline" href="/login-n">Back to Login</a></p>
+    <% } %>
+  </section>
+
+  <script>
+    // Optional: simple resend cooldown (disabled for 30s after click)
+    (function () {
+      var btn = document.getElementById('resendBtn');
+      if (!btn) return;
+
+      var cooldown = 30; // seconds
+      var timerId;
+
+      btn.addEventListener('click', function () {
+        // let server control actual rate-limit, this is just UX
+        setTimeout(function start() {
+          var remaining = cooldown;
+          btn.disabled = true;
+          var original = btn.textContent;
+          btn.textContent = 'Resend in ' + remaining + 's';
+
+          timerId = setInterval(function () {
+            remaining--;
+            if (remaining <= 0) {
+              clearInterval(timerId);
+              btn.disabled = false;
+              btn.textContent = original;
+            } else {
+              btn.textContent = 'Resend in ' + remaining + 's';
+            }
+          }, 1000);
+        }, 0);
+      });
+    })();
+  </script>
+
+<script>
+  const form = document.querySelector('form[action="/forgot/verify"]');
+  if (form) {
+    form.addEventListener('submit', function (e) {
+      const pwd = form.password.value;
+      const confirm = form.confirmPassword.value;
+
+      const regex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
+
+      if (!regex.test(pwd)) {
+        e.preventDefault();
+        alert("Password must be at least 8 characters long, include 1 uppercase, 1 number, and 1 special character.");
+        return;
+      }
+
+      if (pwd !== confirm) {
+        e.preventDefault();
+        alert("Passwords do not match.");
+      }
+    });
+  }
+</script>
+

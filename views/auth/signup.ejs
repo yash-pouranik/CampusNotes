@@ -192,3 +192,62 @@
     );
   };
 </script>
+
+
+<script>
+  document.getElementById("loginForm").addEventListener("submit", function (e) {
+    let emailField = document.getElementById("emailInput");
+    let username = this.username.value.trim();
+    let name = this.name.value.trim();
+    let password = this.password.value;
+    let course = this.course.value;
+    let gender = this.gender.value;
+
+    // ✅ Normalize email
+    emailField.value = emailField.value.toLowerCase().trim();
+
+    // Username check
+    if (username.length < 3) {
+      alert("⚠️ Username must be at least 3 characters.");
+      e.preventDefault();
+      return;
+    }
+
+    // Full name check
+    if (name && !/^[a-zA-Z\s]+$/.test(name)) {
+      alert("⚠️ Name can only contain letters and spaces.");
+      e.preventDefault();
+      return;
+    }
+
+    // Email format check
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(emailField.value)) {
+      alert("⚠️ Please enter a valid email address.");
+      e.preventDefault();
+      return;
+    }
+
+    // Password strength check
+    const passRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{6,}$/;
+    if (!passRegex.test(password)) {
+      alert("⚠️ Password must be at least 6 characters, include 1 uppercase, 1 lowercase and 1 number.");
+      e.preventDefault();
+      return;
+    }
+
+    // Course check
+    if (!course || course === "Select Course") {
+      alert("⚠️ Please select your course.");
+      e.preventDefault();
+      return;
+    }
+
+    // Gender check
+    if (!gender || gender === "Select Gender") {
+      alert("⚠️ Please select your gender.");
+      e.preventDefault();
+      return;
+    }
+  });
+</script>
