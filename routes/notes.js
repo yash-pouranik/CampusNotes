@@ -4,6 +4,7 @@ const router = express.Router();
 const Note = require("../models/note");
 const Subject = require("../models/subject")
 const {isLoggedIn, isModerator} = require("../middlewares");
+const { sendVerificationMail } = require("../config/mailer");
 const multer = require("multer");
 const { storage, cloudinary  } = require("../config/cloud");
 const upload = multer({ 
@@ -464,6 +465,7 @@ router.post('/admin/verify-notes', isModerator, async (req, res) => {
       }
       note.isVerified = true;
       await note.save();
+      sendVerificationMail(note.uploadedBy.email, "Accepted")
       req.flash("success", "Note verified successfully");
     }
 
@@ -476,6 +478,7 @@ router.post('/admin/verify-notes', isModerator, async (req, res) => {
         console.error("Cloudinary delete error:", cloudErr);
       }
       await Note.findByIdAndDelete(noteId);
+      sendVerificationMail(note.uploadedBy.email, "Rejected")
       req.flash("success", "Note rejected and deleted");
     }
 

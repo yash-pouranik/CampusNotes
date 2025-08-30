@@ -4,7 +4,8 @@ const multer = require("multer");
 const { storage } = require("../config/cloud");
 const upload = multer({ storage });
 const User = require("../models/user")
-const {isModerator, isLoggedIn} = require("../middlewares")
+const {isModerator, isLoggedIn} = require("../middlewares");
+const { json } = require("body-parser");
 
 
 
@@ -12,10 +13,18 @@ const {isModerator, isLoggedIn} = require("../middlewares")
 
 
 router.get("/verify", isLoggedIn, (req, res) => {
-  res.render("verify/form", { title: "Verify Account" });
+  if (!req.user.verification?.verified) {
+    res.render("verify/form", { title: "Verify Account" });
+  }
+  req.flash("success", "You are already verified!");
+  res.redirect("/explore");
 });
 
 router.post("/verify", isLoggedIn, upload.single("idProof"), async (req, res) => {
+  if (req.user.verification?.verified) {
+    req.flash("success", "You are already verified!");
+    res.redirect("/explore");
+  }
   const user = await User.findById(req.user._id);
   user.verification.docUrl = req.file.path;
   await user.save();
