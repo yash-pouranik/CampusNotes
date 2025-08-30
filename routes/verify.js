@@ -4,18 +4,18 @@ const multer = require("multer");
 const { storage } = require("../config/cloud");
 const upload = multer({ storage });
 const User = require("../models/user")
-const {isModerator} = require("../middlewares")
+const {isModerator, isLoggedIn} = require("../middlewares")
 
 
 
 
 
 
-router.get("/verify", (req, res) => {
+router.get("/verify", isLoggedIn, (req, res) => {
   res.render("verify/form", { title: "Verify Account" });
 });
 
-router.post("/verify", upload.single("idProof"), async (req, res) => {
+router.post("/verify", isLoggedIn, upload.single("idProof"), async (req, res) => {
   const user = await User.findById(req.user._id);
   user.verification.docUrl = req.file.path;
   await user.save();

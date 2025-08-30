@@ -26,5 +26,13 @@ router.get("/bitbros/aboutus", (req, res) => {
   res.render("team/aboutus", {title: "About Us | Campus Notes"});
 });
 
+router.get("/feedback", (req, res) => {
+  res.render("team/feedback", {title: "Feedback | CampusNotes"});
+})
+
+router.get("/faq", (req, res) => {
+  res.render("team/faq", { title: "FAQ | CampusNotes" });
+});
+
 
 module.exports = router;

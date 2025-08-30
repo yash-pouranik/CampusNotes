@@ -328,6 +328,12 @@
         </div>
       <% }) %>
     </div>
+    <div id="load-more-container" style="text-align:center; margin-top:20px;">
+      <% if (currentPage < totalPages) { %>
+        <button id="loadMoreBtn" class="view-link">Load More</button>
+      <% } %>
+    </div>
+
   <% } %>
 </div>
 
@@ -335,4 +341,48 @@
   function toggleFilters() {
     document.getElementById('filterSidebar').classList.toggle('open');
   }
+
+  let currentPage = <%= currentPage %>;
+const totalPages = <%= totalPages %>;
+const loadMoreBtn = document.getElementById("loadMoreBtn");
+const grid = document.querySelector(".note-grid");
+
+if (loadMoreBtn) {
+  loadMoreBtn.addEventListener("click", async () => {
+    currentPage++;
+    if (currentPage > totalPages) return;
+
+    const params = new URLSearchParams({
+      q: "<%= query || '' %>",
+      course: "<%= course || '' %>",
+      semester: "<%= semester || '' %>",
+      visibility: "<%= visibility || '' %>",
+      page: currentPage
+    });
+
+    const res = await fetch("/explore?" + params.toString(), {
+      headers: { "Accept": "application/json" }
+    });
+    const data = await res.json();
+
+    data.notes.forEach(note => {
+      const card = document.createElement("div");
+      card.className = "note-card";
+      card.innerHTML = `
+        <h3>${note.title}</h3>
+        <p><strong>Subject:</strong> ${note.subject?.name || 'N/A'}</p>
+        <p><strong>Course:</strong> ${note.course}</p>
+        <p><strong>Uploaded by:</strong> ${note.uploadedBy?.username || "Unknown"}</p>
+        <p><strong>Downloads:</strong> ${note.downloadCount}</p>
+        <time>${note.createdAt ? new Date(note.createdAt).toDateString() : 'Date not available'}</time>
+        <a href="/notes/${note._id}" class="view-link">📄 View Note</a>
+      `;
+      grid.appendChild(card);
+    });
+
+    if (currentPage >= totalPages) {
+      loadMoreBtn.style.display = "none";
+    }
+  });
+}
 </script>

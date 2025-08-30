@@ -1,245 +1,255 @@
 <style>
   body {
     font-family: 'Inter', sans-serif;
-    background: linear-gradient(135deg, #f0f4ff, #ffffff);
-    color: #333;
+    margin: 0;
+    background: #f9fafb;
+    color: #1f2937;
   }
 
+  /* HERO */
   .about-hero {
+    background: linear-gradient(135deg, #2563eb, #1e3a8a);
+    color: white;
     text-align: center;
-    padding: 60px 20px;
+    padding: 90px 20px 100px;
   }
-
   .about-hero h1 {
-    font-size: 2.8rem;
-    font-weight: 700;
-    color: #1d4ed8;
-    margin-bottom: 15px;
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 18px;
   }
-
   .about-hero p {
     font-size: 1.2rem;
-    color: #555;
-    max-width: 700px;
+    max-width: 720px;
     margin: 0 auto;
+    opacity: 0.9;
+    line-height: 1.6;
   }
 
-  .cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 24px;
-    margin: 50px auto;
-    max-width: 1000px;
+  /* HIGHLIGHTS */
+  .highlights {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 28px;
+    max-width: 1100px;
+    margin: -60px auto 60px;
     padding: 0 20px;
   }
-
-  .card {
+  .highlight {
+    flex: 1 1 240px;
     background: white;
-    border-radius: 16px;
-    padding: 28px 20px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+    border-radius: 20px;
+    padding: 30px 22px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
     text-align: center;
     transition: transform 0.25s ease, box-shadow 0.25s ease;
   }
-
-  .card:hover {
+  .highlight:hover {
     transform: translateY(-6px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    box-shadow: 0 10px 28px rgba(0,0,0,0.12);
   }
-
-  .card h3 {
-    margin-bottom: 10px;
+  .highlight h3 {
     font-size: 1.3rem;
+    margin-bottom: 8px;
     color: #2563eb;
   }
+  .highlight p {
+    font-size: 0.95rem;
+    color: #555;
+  }
 
-  .steps, .features {
-    background: #f9fafb;
-    padding: 50px 20px;
+  /* SECTIONS */
+  section {
+    padding: 70px 20px;
+  }
+  section h2 {
     text-align: center;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 40px;
+    color: #1e3a8a;
   }
 
-  .steps h2, .features h2 {
-    font-size: 1.8rem;
-    color: #1d4ed8;
-    margin-bottom: 20px;
+  /* HOW IT WORKS */
+  .steps {
+    background: #f0f4ff;
   }
-
-  .steps ol, .features ul {
-    max-width: 700px;
+  .steps-list {
+    max-width: 800px;
     margin: 0 auto;
-    text-align: left;
-    line-height: 1.7;
+    display: grid;
+    gap: 24px;
+  }
+  .step {
+    background: white;
+    padding: 18px 24px;
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
     font-size: 1.05rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .step span {
+    background: #2563eb;
+    color: white;
+    font-weight: 600;
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
   }
 
+  /* FEATURES GRID */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 28px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .feature {
+    background: white;
+    border-radius: 18px;
+    padding: 26px 22px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+    transition: transform 0.25s ease;
+  }
+  .feature:hover {
+    transform: translateY(-6px);
+  }
+  .feature h3 {
+    color: #2563eb;
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+  }
+  .feature p, .feature ul {
+    color: #444;
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  /* CTA */
   .cta {
     text-align: center;
-    margin: 50px 0;
+    padding: 70px 20px;
+    background: linear-gradient(135deg, #2563eb, #1e3a8a);
+    color: white;
   }
-
+  .cta h2 {
+    font-size: 2rem;
+    margin-bottom: 25px;
+  }
   .cta a {
     display: inline-block;
     padding: 14px 28px;
     margin: 10px;
-    background: linear-gradient(135deg, #2563eb, #1e3a8a);
-    color: #fff;
+    background: white;
+    color: #1e3a8a;
     border-radius: 10px;
-    text-decoration: none;
     font-weight: 600;
+    text-decoration: none;
     transition: transform 0.25s ease, background 0.25s ease;
   }
-
   .cta a:hover {
     transform: translateY(-3px);
-    background: linear-gradient(135deg, #1e3a8a, #2563eb);
+    background: #f3f4f6;
   }
+  @media (max-width: 600px) {
+  h1{
+    font-size: 2rem !important;
+  }
+}
 </style>
 
-<section class="about-hero">
+<!-- HERO -->
+<div class="about-hero">
   <h1>About CampusNotes</h1>
-  <p>CampusNotes is built by students, for students — a platform where knowledge flows freely and fairly. We make learning collaborative and accessible for everyone.</p>
-</section>
+  <p>A student-driven platform where knowledge flows freely. Upload, explore, and request notes — making learning collaborative and accessible for everyone.</p>
+</div>
 
-<div class="cards">
-  <div class="card">
+<!-- HIGHLIGHTS -->
+<div class="highlights">
+  <div class="highlight">
     <h3>📚 Easy Access</h3>
-    <p>All your notes in one place, organized and always available.</p>
+    <p>All notes in one place, organized and always available.</p>
   </div>
-  <div class="card">
+  <div class="highlight">
     <h3>👥 Community Driven</h3>
-    <p>Students helping students with real, practical notes.</p>
+    <p>Students helping students with practical notes.</p>
   </div>
-  <div class="card">
-    <h3>🎓 Course Wise</h3>
-    <p>Browse notes sorted by subject & course instantly.</p>
+  <div class="highlight">
+    <h3>✔ Verified Uploads</h3>
+    <p>Only verified students can upload, ensuring trust.</p>
   </div>
-  <div class="card">
-    <h3>⭐ Rankings</h3>
-    <p>Upvotes highlight the most useful and trusted notes.</p>
+  <div class="highlight">
+    <h3>⭐ Leaderboard</h3>
+    <p>Top contributors get recognized for their uploads.</p>
   </div>
 </div>
 
+<!-- HOW IT WORKS -->
 <section class="steps">
-  <h2>How it Works?</h2>
-  <ol>
-    <li>Upload your notes in seconds.</li>
-    <li>Admin reviews and approves for quality.</li>
-    <li>Notes become public for downloads & sharing.</li>
-  </ol>
+  <h2>How It Works</h2>
+  <div class="steps-list">
+    <div class="step"><span>1</span> Login and verify your account</div>
+    <div class="step"><span>2</span> Upload your notes in seconds</div>
+    <div class="step"><span>3</span> Admin reviews for quality</div>
+    <div class="step"><span>4</span> Notes become public for downloads & sharing</div>
+  </div>
 </section>
 
-<section class="features">
+<!-- FEATURES -->
+<section>
   <h2>Core Features</h2>
-  <div class="feature-grid">
-    <div class="feature-card">
+  <div class="features-grid">
+    <div class="feature">
       <h3>📤 Upload Notes</h3>
-      <p>Students can upload their notes in PDF format. Every upload goes through an <strong>Admin Review</strong> before becoming public.</p>
-      <ul>
-        <li>✅ If approved → visible to everyone</li>
-        <li>❌ If rejected → safely deleted</li>
-      </ul>
+      <p>Upload PDFs easily. Every upload is reviewed before going public.</p>
     </div>
-
-    <div class="feature-card">
+    <div class="feature">
       <h3>📥 Download & Request</h3>
-      <p>All students can easily download approved notes. If something is missing, they can <strong>request a note</strong> from the community.</p>
+      <p>Download approved notes. Missing something? Request it from peers.</p>
     </div>
-
-    <div class="feature-card">
+    <div class="feature">
+      <h3>📝 Request Notes</h3>
+      <p>Post a request and the community can respond by uploading it.</p>
+    </div>
+    <div class="feature">
       <h3>⭐ Ranking System</h3>
-      <p>Healthy competition through ranks:</p>
-      <ul>
-        <li>Notes uploaded</li>
-        <li>Upvotes received</li>
-      </ul>
-      <p>Motivates students to contribute and share knowledge.</p>
+      <p>Upvotes + uploads = Contributor leaderboard for recognition.</p>
     </div>
-
-    <div class="feature-card">
+    <div class="feature">
       <h3>👤 User Profiles</h3>
-      <p>Every student has a profile showing:</p>
-      <ul>
-        <li>Notes uploaded</li>
-        <li>Notes downloaded</li>
-      </ul>
+      <p>Profiles show uploaded & downloaded notes with social links.</p>
     </div>
-
-    <div class="feature-card">
+    <div class="feature">
       <h3>📂 Organized Notes</h3>
-      <p>Notes are categorized by <strong>Course, Semester, and Subject</strong>. Makes browsing and searching super simple.</p>
+      <p>Notes are sorted by Course, Semester, and Subject.</p>
     </div>
-
-    <div class="feature-card">
-      <h3>📱 Tech + Usability</h3>
-      <p>
-        ✔ Fully mobile-friendly <br>
-        ✔ Upload & download are smooth <br>
-        ✔ Notes open as proper PDFs
-      </p>
+    <div class="feature">
+      <h3>🔒 Secure & Reliable</h3>
+      <p>Password encryption + OTP reset keep accounts safe.</p>
+    </div>
+    <div class="feature">
+      <h3>📱 Mobile Friendly</h3>
+      <p>Upload & download smooth on all devices. Notes open as proper PDFs.</p>
     </div>
   </div>
 </section>
 
-<style>
-  .features {
-    background: #f0f4ff;
-    padding: 60px 20px;
-    text-align: center;
-  }
-
-  .features h2 {
-    font-size: 2rem;
-    color: #1d4ed8;
-    margin-bottom: 30px;
-  }
-
-  .feature-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 24px;
-    max-width: 1100px;
-    margin: 0 auto;
-  }
-
-  .feature-card {
-    background: white;
-    border-radius: 16px;
-    padding: 24px 20px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.07);
-    text-align: left;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-  }
-
-  .feature-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
-  }
-
-  .feature-card h3 {
-    font-size: 1.2rem;
-    color: #2563eb;
-    margin-bottom: 12px;
-  }
-
-  .feature-card ul {
-    margin-top: 10px;
-    padding-left: 18px;
-    color: #555;
-  }
-
-  .feature-card p {
-    color: #444;
-    line-height: 1.6;
-  }
-</style>
-
-
-<section class="cta">
+<!-- CTA -->
+<div class="cta">
+  <h2>Start Sharing Knowledge Today 🚀</h2>
   <a href="/upload">Upload Notes</a>
   <a href="/explore">Explore Notes</a>
-</section>
+  <a href="/requestnotes">Request Notes</a>
+</div>
 
-<p style="text-align:center; margin-bottom:40px;">
-  <strong>🚀 Built with ❤️ by Yash & Contributors</strong>
+<p style="text-align:center; padding: 20px 0;">
+  <strong>Made with ❤️ by Yash & Contributors</strong>
 </p>
