@@ -108,7 +108,7 @@ router.post("/upload", isLoggedIn, upload.single("file"), async (req, res) => {
 
   } catch (err) {
     if (err.code === "LIMIT_FILE_SIZE") {
-      return res.status(400).json({ success: false, error: "File must be less than 5MB" });
+      return res.status(400).json({ success: false, error: "File must be less than 15MB" });
     }
     console.error(err);
     console.log("yash")

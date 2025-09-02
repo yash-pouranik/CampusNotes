@@ -13,25 +13,31 @@ const upload = multer({
 
 
 
-router.get("/profile/:id",  async (req, res, next) => {
+router.get("/profile/:id", async (req, res, next) => {
   try {
-    const user = await User.findById(req.params.id).populate('notes');
+    const user = await User.findById(req.params.id);
+
     if (!user) {
       req.flash("error", "Something went wrong! try again later");
-      return next()
+      return next();
     }
 
-    const n = user.notes.length;
-    user.uploaded = n
+    // get all notes uploaded by user (verified + unverified)
+    const notes = await Note.find({ uploadedBy: user._id })
+      .populate("subject", "name");
+
+    // count uploaded
+    user.uploaded = notes.length;
 
     res.render("user/profile", {
       user,
+      notes, // 👈 send to EJS
       title: user.username || user.name || "Profile",
     });
   } catch (e) {
     console.error(e);
     req.flash("error", "Something went wrong! try again later");
-    return next()
+    return next();
   }
 });
 

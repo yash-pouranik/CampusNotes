@@ -19,94 +19,77 @@
 
 <link rel="stylesheet" href="/css/eachNoteCss.css">
 
-
-<section class="note-detail">
-  <h1 style="margin-top: 0;"><%= note.title %>
-  <% if (!note.isVerified) { %>
-    <span class="badge badge-warning">Unverified</span>
-  <% } %></h1>
-
-  <% 
-    const isPdf = note.fileUrl?.toLowerCase().endsWith(".pdf"); 
-    const isImage = /\.(jpg|jpeg|png|gif)$/i.test(note.fileUrl || "");
-  %>
-
-  <div class="preview-area" style="margin-top: 30px;">
-
-      <% if (!note.isVerified) { %>
-        <div class="flash flash-error">Wait or contact moderator inside /our-team(in footer-bottom) to be verified.</div>
-      <% } %>
-
-    <div class="preview" style="display: flex; align-items: center; justify-content: space-between;">
-      <h2 style="font-size: 1.4rem; margin-bottom: 15px; color: #2b2b6b;">Preview:</h2>
-      <% if(currUser && (
-        currUser._id.toString() === note.uploadedBy?._id?.toString() || 
-        currUser.roles?.isModerator
-      )) { %>
-        <div class="operations">
-          <a href="/notes/<%= note._id %>/edit" class="edit-btn">edit</a>
-          <form action="/notes/<%= note._id %>?_method=DELETE" method="POST" style="display:inline;">
-            <button type="submit" class="dlt-btn" onclick="return confirm('Are you sure you want to delete this note?');">
-              delete
-            </button>
+<section class="note-detail-container">
+  <div class="note-card">
+    <div class="note-card-header">
+      <div>
+        <h2 class="note-title"><%= note.title %></h2>
+        <% if(!note.isVerified) { %>
+          <span class="badge-unverified">Unverified</span>
+        <% } %>
+      </div>
+      <% if(currUser && (currUser._id.toString() === note.uploadedBy?._id?.toString() || currUser.roles?.isModerator)) { %>
+        <div class="owner-actions">
+          <a href="/notes/<%= note._id %>/edit" class="btn-edit" title="Edit">✏️</a>
+          <form action="/notes/<%= note._id %>?_method=DELETE" method="POST">
+            <button type="submit" class="btn-delete" title="Delete" onclick="return confirm('Delete this note?')">🗑️</button>
           </form>
-
         </div>
       <% } %>
     </div>
+    <div class="note-meta">
+      <span class="uploader">
+        <i class="fa fa-user"></i> <%= note.uploadedBy?.name || 'Unknown' %>
+        <% if (note.uploadedBy?.roles.isModerator) { %>
+            <img src="/images/blueCheckmark.svg" alt="Moderator" style="all: unset; width: 18px;">
+        <% } else if (note.uploadedBy?.roles.isDev) { %>
+            <img src="/images/icons8-checkmark.svg" alt="Developer" style="all: unset; width: 18px;">
+        <% } %>
+      </span>
 
-    <% if (isPdf) { %>
-      <iframe src="<%= note.fileUrl %>#toolbar=0" width="100%" height="300px" style="border: 1px solid #ccc; border-radius: 8px;"></iframe>
-    <% } else if (isImage) { %>
-      <img src="<%= note.fileUrl %>" alt="Note Image" style="max-width: 100%; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
-    <% } else { %>
-      <p style="color: #888;">No preview available for this file type.</p>
-    <% } %>
+      <span class="meta-info">
+        <span><i class="fa fa-calendar"></i> <%= note.createdAt?.toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}) %></span>
+        <span><i class="fa fa-download"></i> <%= note.downloadCount %> downloads</span>
+      </span>
+    </div>
+
+
+    <div class="note-main-content">
+      <div class="note-preview">
+        <% if(!note.isVerified) { %>
+          <div class="flash-error">
+            ⏳ Waiting for moderator approval. Contact <a href="/our-team">our team</a>.
+          </div>
+        <% } %>
+        <% if (note.fileUrl.toLowerCase().endsWith('.pdf')) { %>
+          <iframe src="<%= note.fileUrl %>#toolbar=0" class="note-preview-frame"></iframe>
+        <% } else if (/\.(jpg|jpeg|png|gif)$/i.test(note.fileUrl)) { %>
+          <img src="<%= note.fileUrl %>" class="note-preview-img">
+        <% } else { %>
+          <div class="no-preview-text">No preview available.</div>
+        <% } %>
+      </div>
+      <div class="note-info">
+        <div class="note-details">
+          <h4>Details</h4>
+          <ul>
+            <li><strong>Subject:</strong> <%= note.subject?.name || 'N/A' %></li>
+            <li><strong>Course:</strong> <%= note.course || 'N/A' %></li>
+            <li><strong>Semester:</strong> <%= note.semester || 'N/A' %></li>
+            <li><strong>Visibility:</strong> <%= note.visibility %></li>
+          </ul>
+        </div>
+        <div class="note-description">
+          <h4>Description</h4>
+          <p><%= note.description || 'No description provided.' %></p>
+        </div>
+        <div class="note-actions">
+          <a href="/notes/<%= note._id %>/download" class="btn-download">Download</a>
+          <form action="/notes/<%= note._id %>/upvote" method="POST">
+            <button class="btn-upvote">Upvote (<%= note.upvotes.length %>)</button>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
-
-  <p><strong>Subject:</strong> <%= note.subject?.name || 'N/A' %></p>
-  <p><strong>Course:</strong> <%= note.course || 'N/A' %></p>
-  <p><strong>Visibility:</strong> <%= note.visibility %></p>
-
-  <p><strong>Description:</strong></p>
-  <p><%= note.description || 'No description provided.' %></p>
-
-  <p><strong>Semester:</strong> <%= note.semester %></p>
-
-  <p style="display: flex; align-items: center;">
-    <strong>Uploaded by:</strong> <%= note.uploadedBy?.name || note.uploadedBy?.username || "Unknown" %>
-    <% if (note.uploadedBy?.roles?.isModerator) { %>
-      <img src="/images/blueCheckmark.svg" alt="Moderator" style="all: unset; width: 23px;">
-    <% } else if (note.uploadedBy?.roles?.isDev) { %>
-      <img src="/images/icons8-checkmark.svg" alt="Developer" style="all: unset; width: 23px;">
-    <% } else if (note.uploadedBy?.verification?.verified) { %>
-      <span style="color: green; font-size: 0.8rem;">✔</span>
-    <% } %>
-  </p>
-
-  <p><strong>Downloads:</strong> <%= note.downloadCount %></p>
-
- 
-
-  <p><strong>Uploaded at:</strong> <%= note.createdAt ? note.createdAt.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Date not available' %>
-</p>
-
-
-
-  <div class="action-buttons">
-  <a class="download-btn" href="/notes/<%= note._id %>/download" target="_blank">
-    📥 Download
-  </a>
-
-  <form action="/notes/<%= note._id %>/upvote" method="POST" style="display:inline;">
-    <button type="submit" class="upvote-btn">
-      👍 Upvote (<%= note.upvotes.length %>)
-    </button>
-  </form>
-</div>
-
-
-
-    
 </section>
-

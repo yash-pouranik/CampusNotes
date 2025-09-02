@@ -250,13 +250,26 @@
     <img src="<%= user.avatar %>" class="profile-avatar" alt="Profile Avatar">
 
     <% if(currUser && currUser._id.toString() === user._id.toString()) { %>
+      
       <button class="edit-avatar-btn" onclick="openAvatarModal()">✎</button>
     <% } %>
   </div>
-    <div class="username"><%= user.username %></div>
-    <div class="profile-email"><%= user.email %></div>
+    <div class="username"
+      style="display: flex;
+      justify-content: center;
+      align-items: center;"  
+    ><%= user.name %>
+                    <% if (user.roles.isModerator) { %>
+                  <img src="/images/blueCheckmark.svg" alt="Moderator" style="all: unset; width: 25px;">
+                <% } else if (user.roles.isDev) { %>
+                  <img src="/images/icons8-checkmark.svg" alt="Developer" style="all: unset; width: 25px;">
+                <% } else if (user.verification.verified) { %>
+                  <span style="color: green; font-size: 0.8rem;">✔</span>
+                <% } %>
+          </div>
 
     <% if(currUser && currUser._id.toString() === user._id.toString()) { %>
+      <div class="profile-email"><%= user.email %></div>
       <a href="/profile/<%= user._id %>/edit" class="edit-btn">Edit Profile</a>
     <% } %>
 
@@ -286,9 +299,9 @@
       <h2>Uploaded Notes</h2>
     </div>
 
-    <% if (user.notes.length > 0) { %>
+    <% if (notes.length > 0) { %>
       <div class="notes-grid">
-        <% user.notes.forEach(note => { %>
+        <% notes.forEach(note => { %>
           <div class="note-card">
             <% if (note.fileUrl.match(/\.(jpg|jpeg|png|webp|gif)$/i)) { %>
               <img class="note-preview" src="<%= note.fileUrl %>" alt="Note Preview">
@@ -297,8 +310,12 @@
             <% } else { %>
               <p>Preview not available</p>
             <% } %>
-            <div class="note-title"><%= note.title %></div>
-            <div class="note-meta"><%= note.subject %> — <%= note.course %></div>
+            <div class="note-title"><%= note.title %>
+              <% if(!note.isVerified) {%>
+                <span style="color: red;">&#9033;</span>
+              <% } %>
+            </div>
+            <div class="note-meta"><%= note.subject.name %> — <%= note.course %></div>
             <a href="/notes/<%= note._id %>" class="note-link">View Note</a>
           </div>
         <% }) %>

@@ -120,11 +120,11 @@
           <div class="user-details">
             <strong class="display-name" style="display: flex; align-items: center;"><%= user.name || user.username %>
                 <% if (user.roles.isModerator) { %>
-                  <img src="/images/blueCheckmark.svg" alt="Moderator" style="all: unset; width: 30px;">
+                  <img src="/images/blueCheckmark.svg" alt="Moderator" style="all: unset; width: 25px;">
                 <% } else if (user.roles.isDev) { %>
-                  <img src="/images/icons8-checkmark.svg" alt="Developer" style="all: unset; width: 30px;">
-                <% } else if (user.verified) { %>
-                  <span style="color: green; font-size: 0.8rem;">✔</span>
+                  <img src="/images/icons8-checkmark.svg" alt="Developer" style="all: unset; width: 25px;">
+                <% } else if (user.verification.verified) { %>
+                  <span style="color: green; font-size: 0.8rem;">&nbsp; ✔</span>
                 <% } %>
             </strong>
             <span class="username">@<%= user.username %></span> 
