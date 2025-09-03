@@ -246,3 +246,101 @@ body {
     min-width: 0;
   }
 }
+
+
+/* ===== Container ===== */
+.upload-form-container {
+  max-width: 650px;
+  margin: 60px auto;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
+  padding: 40px 50px;
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  color: #22223b;
+}
+
+.upload-form-container h2 {
+  font-size: 1.9rem;
+  font-weight: 700;
+  margin-bottom: 28px;
+  color: #2575fc;
+  text-align: center;
+}
+
+/* ===== Form Group ===== */
+.form-group {
+  margin-bottom: 22px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+  color: #4a4e69;
+}
+
+/* ===== Inputs, Select, Textarea ===== */
+.form-group input,
+.form-group textarea,
+.form-group select {
+  padding: 12px 14px;
+  border: 1px solid #d0d7e2;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  background: #f9fbfd;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  border-color: #2575fc;
+  background: #fff;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37, 117, 252, 0.2);
+}
+
+/* ===== Select Dropdown ===== */
+.form-group select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg fill='%232575fc' height='20' viewBox='0 0 24 24' width='20'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  cursor: pointer;
+}
+
+/* ===== Button ===== */
+.form-submit-btn {
+  width: 100%;
+  padding: 14px 18px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  color: #fff;
+  background: linear-gradient(90deg, #2575fc, #6a11cb);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.form-submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(37, 117, 252, 0.25);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .upload-form-container {
+    padding: 28px 20px;
+    margin: 30px 12px;
+  }
+
+  .upload-form-container h2 {
+    font-size: 1.6rem;
+  }
+}

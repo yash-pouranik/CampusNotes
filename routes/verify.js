@@ -3,7 +3,7 @@ const router = express.Router();
 const multer = require("multer");
 const { storage } = require("../config/cloud");
 const upload = multer({ storage });
-const User = require("../models/user")
+const User = require("../models/user");
 const {isModerator, isLoggedIn} = require("../middlewares");
 const { json } = require("body-parser");
 
@@ -14,7 +14,7 @@ const { json } = require("body-parser");
 
 router.get("/verify", isLoggedIn, (req, res) => {
   if (!req.user.verification?.verified) {
-    res.render("verify/form", { title: "Verify Account" });
+    return res.render("verify/form", { title: "Verify Account" });
   }
   req.flash("success", "You are already verified!");
   res.redirect("/explore");
