@@ -81,7 +81,6 @@
     font-weight: 700;
     font-size: 1.2rem;
     color: #111827;
-    display: block;
   }
 
   .profile-links {
@@ -274,7 +273,7 @@
     <% } %>
 
     <div class="stats">
-      <div class="stat-card">📤 Uploaded<br><span><%= user.uploaded %></span></div>
+      <div class="stat-card">Uploaded  &nbsp;&nbsp;<span><%= user.uploaded %></span></div>
     </div>
 
     <div class="profile-links">
@@ -303,19 +302,14 @@
       <div class="notes-grid">
         <% notes.forEach(note => { %>
           <div class="note-card">
-            <% if (note.fileUrl.match(/\.(jpg|jpeg|png|webp|gif)$/i)) { %>
-              <img class="note-preview" src="<%= note.fileUrl %>" alt="Note Preview">
-            <% } else if (note.fileUrl.match(/\.pdf$/i)) { %>
-              <iframe class="note-preview" src="<%= note.fileUrl %>"></iframe>
-            <% } else { %>
-              <p>Preview not available</p>
-            <% } %>
+            
             <div class="note-title"><%= note.title %>
               <% if(!note.isVerified) {%>
                 <span style="color: red;">&#9033;</span>
               <% } %>
             </div>
             <div class="note-meta"><%= note.subject.name %> — <%= note.course %></div>
+            <span class="note-meta"><%= note.downloadCount %> downloads</span><br>
             <a href="/notes/<%= note._id %>" class="note-link">View Note</a>
           </div>
         <% }) %>

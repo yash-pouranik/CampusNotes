@@ -6,7 +6,7 @@ const upload = multer({ storage });
 const User = require("../models/user");
 const {isModerator, isLoggedIn} = require("../middlewares");
 const { json } = require("body-parser");
-
+const {sendAccountVerificationMail} = require("../config/mailer")
 
 
 
@@ -44,13 +44,38 @@ router.get("/admin/verify-requests", isModerator, async (req, res) => {
 });
 
 router.post("/admin/verify/:id", isModerator, async (req, res) => {
-  await User.findByIdAndUpdate(req.params.id, { 
-    "verification.verified": true, 
-    "verification.verifiedAt": new Date()
-  });
-  req.flash("success", "User verified successfully!");
+  const { action } = req.body;
+  const userId = req.params.id;
+
+  let update = {};
+
+  if (action === "verify") {
+    update = {
+      "verification.verified": true,
+      "verification.verifiedAt": new Date()
+    };
+  } else if (action === "reject") {
+    update = {
+      "verification.verified": false,
+      "verification.rejectedAt": new Date(),
+      "verification.docUrl": null
+    };
+  }
+
+  const user = await User.findByIdAndUpdate(userId, update, { new: true });
+
+  if (action === "verify") {
+    sendAccountVerificationMail(user.email, "Verified");
+    req.flash("success", "User verified successfully!");
+  } else {
+    sendAccountVerificationMail(user.email, "Rejected");
+
+    req.flash("error", "User rejected!");
+  }
+
   res.redirect("/admin/verify-requests");
 });
+
 
 
 

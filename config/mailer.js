@@ -119,7 +119,7 @@ module.exports.sendVerificationMail = async (mail, status) => {
     }
 
     await transporter.sendMail({
-      from: '"CampusNotes" <yashpouranik1245@gmail.com>',
+      from: '"CampusNotes" <campusnotes@bitbros.in>',
       to: user.email,
       subject: `Your uploaded note is ${status}`,
       html: `
@@ -151,3 +151,51 @@ module.exports.sendVerificationMail = async (mail, status) => {
     console.error("❌ Error sending OTP:", err);
   }
 };
+
+
+module.exports.sendAccountVerificationMail = async (mail, status) => {
+  try {
+    // check user
+    const user = await User.findOne({ email: mail });
+
+    if (!user) {
+      console.log("⚠️ No user found with this email.");
+      return;
+    }
+
+    await transporter.sendMail({
+      from: '"CampusNotes" <campusnotes@bitbros.in>',
+      to: user.email,
+      subject: `Your Account is ${status}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.5; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;">
+          <h2 style="color: #2563eb; text-align: center;">Your Account verification.</h2>
+          
+          <p style="font-size: 16px;">
+            Hello <strong>${user.name || user.username || "User"}</strong>, your account is
+          </p>
+  
+          
+          <div style="background: #fff; border-left: 4px solid #2563eb; padding: 12px 16px; margin: 16px 0; border-radius: 4px; font-size: 20px; text-align: center; font-weight: bold; letter-spacing: 3px;">
+            ${status}
+          </div>
+          
+          <p style="font-size: 14px; color: #555;">
+            If Verified, then you are allowed to upload notes.
+            <br>
+            If not verified, and you think it is a mistake then mail send correct verificaition doc again or mail at campusnotes@bitbros.in 
+          </p>
+          
+          <p style="font-size: 12px; color: #888; text-align: center; margin-top: 30px;">
+            © ${new Date().getFullYear()} CampusNotes. All rights reserved.
+          </p>
+        </div>
+      `
+    });
+
+    console.log("veri mail successfully sent to", user.email);
+  } catch (err) {
+    console.error("❌ Error sending mail:", err);
+  }
+};
+

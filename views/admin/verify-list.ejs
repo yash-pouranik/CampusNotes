@@ -61,14 +61,21 @@
       <% unverifiedUsers.forEach(user => { %>
         <li class="verify-card">
           <div>
-            <strong><%= user.username %></strong> (<%= user.course %>)  
+            <strong><%= user.name %></strong> (<%= user.course %>)  
           </div>
           <div>
             <a href="<%= user.verification.docUrl %>" target="_blank">View ID</a>
           </div>
-          <form action="/admin/verify/<%= user._id %>" method="POST">
-            <button type="submit">Verify</button>
-          </form>
+          <div class="actions" style="display: flex;">
+            <form action="/admin/verify/<%= user._id %>" method="POST" style="margin-right: 2px;">
+              <button type="submit" name="action" value="reject" style="background-color: red;">Reject</button>
+            </form>
+
+            <form action="/admin/verify/<%= user._id %>" method="POST">
+              <button type="submit" name="action" value="verify">Verify</button>
+            </form>
+          </div>
+
         </li>
       <% }) %>
     </ul>

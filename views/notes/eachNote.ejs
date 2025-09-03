@@ -12,8 +12,9 @@
   margin-left: 0.5rem;
 }
 
-
-
+.note-meta a:hover{
+  text-decoration: 1px underline #007900 !important;
+}
 
 </style>
 
@@ -40,14 +41,16 @@
       <% } %>
     </div>
     <div class="note-meta">
-      <span class="uploader">
-        <i class="fa fa-user"></i> <%= note.uploadedBy?.name || 'Unknown' %>
-        <% if (note.uploadedBy?.roles.isModerator) { %>
-            <img src="/images/blueCheckmark.svg" alt="Moderator" style="all: unset; width: 18px;">
-        <% } else if (note.uploadedBy?.roles.isDev) { %>
-            <img src="/images/icons8-checkmark.svg" alt="Developer" style="all: unset; width: 18px;">
-        <% } %>
-      </span>
+      <a href="/profile/<%= note.uploadedBy?._id %>" style="text-decoration: none;">
+        <span class="uploader">
+          <i class="fa fa-user"></i> <%= note.uploadedBy?.name || 'Unknown' %>
+          <% if (note.uploadedBy?.roles.isModerator) { %>
+              <img src="/images/blueCheckmark.svg" alt="Moderator" style="all: unset; width: 18px;">
+          <% } else if (note.uploadedBy?.roles.isDev) { %>
+              <img src="/images/icons8-checkmark.svg" alt="Developer" style="all: unset; width: 18px;">
+          <% } %>
+        </span>
+      </a>
 
       <span class="meta-info">
         <span><i class="fa fa-calendar"></i> <%= note.createdAt?.toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}) %></span>
