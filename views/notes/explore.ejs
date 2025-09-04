@@ -330,11 +330,11 @@
           <p><strong>Subject:</strong> <%= note.subject?.name || 'N/A' %></p>
           <p><strong>Course:</strong> <%= note.course %></p>
 
-          <p><strong>Uploaded by:</strong> <%= note.uploadedBy?.username || "Unknown" %>
+          <p style="display: flex; align-items: center;"><strong>Uploaded by:</strong> <%= note.uploadedBy?.username || "Unknown" %>
             <% if (note.uploadedBy?.roles?.isModerator) { %>
-              <img src="/images/blueCheckmark.svg" alt="Moderator" width="20">
+              <img src="/images/blueCheckmark.svg" alt="Moderator" width="15">
             <% } else if (note.uploadedBy?.roles?.isDev) { %>
-              <img src="/images/icons8-checkmark.svg" alt="Developer" width="20">
+              <img src="/images/icons8-checkmark.svg" alt="Developer" width="15">
             <% } else if (note.uploadedBy?.verification?.verified) { %>
               <span style="color: green; font-size: 0.8rem;">✔</span>
             <% } %>
@@ -386,17 +386,30 @@ if (loadMoreBtn) {
     data.notes.forEach(note => {
       const card = document.createElement("div");
       card.className = "note-card";
+
+      // uploaded by logic
+      let uploadedBy = note.uploadedBy?.username || "Unknown";
+      if (note.uploadedBy?.roles?.isModerator) {
+        uploadedBy += ` <img src="/images/blueCheckmark.svg" alt="Moderator" width="15">`;
+      } else if (note.uploadedBy?.roles?.isDev) {
+        uploadedBy += ` <img src="/images/icons8-checkmark.svg" alt="Developer" width="15">`;
+      } else if (note.uploadedBy?.verification?.verified) {
+        uploadedBy += ` <span style="color: green; font-size: 0.8rem;">✔</span>`;
+      }
+
       card.innerHTML = `
         <h3>${note.title}</h3>
         <p><strong>Subject:</strong> ${note.subject?.name || 'N/A'}</p>
         <p><strong>Course:</strong> ${note.course}</p>
-        <p><strong>Uploaded by:</strong> ${note.uploadedBy?.username || "Unknown"}</p>
-        <p><strong>Downloads:</strong> ${note.downloadCount}</p>
+        <p style="display: flex; align-items: center;"><strong>Uploaded by:</strong> ${uploadedBy}</p>
+        <p style="display: flex; align-items: center;"><strong>Downloads:</strong> ${note.downloadCount}</p>
         <time>${note.createdAt ? new Date(note.createdAt).toDateString() : 'Date not available'}</time>
         <a href="/notes/${note._id}" class="view-link">📄 View Note</a>
       `;
+
       grid.appendChild(card);
     });
+
 
     if (currentPage >= totalPages) {
       loadMoreBtn.style.display = "none";
