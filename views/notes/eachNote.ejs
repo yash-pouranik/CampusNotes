@@ -32,10 +32,10 @@
         <% } %>
       </div>
       <% if(currUser && (currUser._id.toString() === note.uploadedBy?._id?.toString() || currUser.roles?.isModerator)) { %>
-        <div class="owner-actions">
-          <a href="/notes/<%= note._id %>/edit" class="btn-edit" title="Edit">✏️</a>
+        <div class="owner-actions" style="display: flex; align-items: center;">
+          <a href="/notes/<%= note._id %>/edit" class="btn-edit" title="Edit"><i class="fa-regular fa-pen-to-square"></i></a>
           <form action="/notes/<%= note._id %>?_method=DELETE" method="POST">
-            <button type="submit" class="btn-delete" title="Delete" onclick="return confirm('Delete this note?')">🗑️</button>
+            <button type="submit" style="color: #ff0000;" class="btn-delete" title="Delete" onclick="return confirm('Delete this note?')"><i class="fa-solid fa-delete-left"></i></button>
           </form>
         </div>
       <% } %>
@@ -43,7 +43,7 @@
     <div class="note-meta">
       <a href="/profile/<%= note.uploadedBy?._id %>" style="text-decoration: none;">
         <span class="uploader">
-          <i class="fa fa-user"></i> <%= note.uploadedBy?.name || 'Unknown' %>
+           <%= note.uploadedBy?.name || 'Unknown' %>
           <% if (note.uploadedBy?.roles.isModerator) { %>
               <img src="/images/blueCheckmark.svg" alt="Moderator" style="all: unset; width: 18px;">
           <% } else if (note.uploadedBy?.roles.isDev) { %>
@@ -91,7 +91,7 @@
         <div class="note-actions">
           <a href="/notes/<%= note._id %>/download" class="btn-download">Download</a>
           <form action="/notes/<%= note._id %>/upvote" method="POST">
-            <button class="btn-upvote">Upvote (<%= note.upvotes.length %>)</button>
+            <button class="btn-upvote"><i class="fa-solid fa-upload fa-bounce"></i>Upvote (<%= note.upvotes.length %>)</button>
           </form>
         </div>
       </div>
