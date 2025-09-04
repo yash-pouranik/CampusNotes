@@ -420,7 +420,8 @@ router.delete("/notes/:id", isLoggedIn, async (req, res) => {
 router.get('/admin/verify-notes', isModerator, async (req, res) => {
   try {
     const unverifiedNotes = await Note.find({ isVerified: false })
-      .populate('uploadedBy', 'username email roles');
+      .populate('uploadedBy', 'username email roles')
+      .populate("subject", "name");
 
     res.render('admin/verifyNotes', {
       title: "Verify Notes | Admin",

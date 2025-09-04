@@ -101,7 +101,7 @@
       <% unverifiedNotes.forEach(note => { %>
         <div class="note-card">
           <h3><%= note.title %></h3>
-          <p><strong>Subject:</strong> <%= note.subject %></p>
+          <p><strong>Subject:</strong> <%= note.subject.name %></p>
           <p><strong>Uploaded by:</strong> <%= note.uploadedBy?.username || 'Unknown' %></p>
 
           <!-- View Button -->
