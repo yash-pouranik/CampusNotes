@@ -23,7 +23,7 @@ module.exports.sendNewRequestMail = async (requestData) => {
     if (!emailList.length) return console.log("⚠️ No users to mail.");
 
     await transporter.sendMail({
-      from: '"CampusNotes" <yashpouranik1245@gmail.com>',
+      from: '"CamousNotes" <campusnotes@bitbros.in>',
       bcc: emailList,
       subject: "📢 New Notes Request Posted!",
       html: `
@@ -71,7 +71,7 @@ module.exports.sendOTP = async (mail, otp) => {
     }
 
     await transporter.sendMail({
-      from: '"CampusNotes" <yashpouranik1245@gmail.com>',
+      from: '"CamousNotes" <campusnotes@bitbros.in>',
       to: user.email,  // ✅ bcc ki zarurat nahi yaha
       subject: "📢 OTP for Password Reset!",
       html: `
@@ -164,7 +164,7 @@ module.exports.sendAccountVerificationMail = async (mail, status) => {
     }
 
     await transporter.sendMail({
-      from: '"CampusNotes" <campusnotes@bitbros.in>',
+      from: '"CamousNotes" <campusnotes@bitbros.in>',
       to: user.email,
       subject: `Your Account is ${status}`,
       html: `

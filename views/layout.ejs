@@ -6,12 +6,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/x-icon" href="/images/CAMPUSNOTES_LOGO.png">
 
-
-  <title><%= title %></title>
+  <title><%= typeof title !== 'undefined' ? title : 'Campus Notes - SVVV Notes' %></title>
   <link href="https://fonts.googleapis.com/css2?family=Urbanist&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/css/styles.css" />
   <link rel="stylesheet" href="/css/footer_nav.css" />
   
+  <meta name="description" content="<%= typeof description !== 'undefined' ? description : 'A SVVV (Shri Vaishnav Vidhyapeeth Vishwavidhyalaya) student-driven platform for sharing and accessing college notes, study materials, and academic resources. Join our community to upload and download free notes.' %>">
+
   <!-- AOS CSS -->
   <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
   <meta name="google-site-verification" content="o5KNQ9R-ummCVpBGTiPWtBLvDPdVm-uxMuIQXmj3mlU" />

@@ -100,7 +100,7 @@ app.get("/", async (req, res) => {
     ]);
 
     res.render("home/index", {
-      title: "CampusNotes",
+      title: "CampusNotes | Your Campus, Your Notes - SVVV",
       topContributors
     });
   } catch (err) {

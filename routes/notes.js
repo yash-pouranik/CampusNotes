@@ -261,7 +261,8 @@ router.get("/explore", async (req, res) => {
       visibility,
       currentPage: page,
       totalPages,
-      title: "Explore | CampusNotes",
+      title: "Explore Notes at SVVV | CampusNotes",
+      description: "Browse and download free notes for B.Tech CSE, BBA, and other courses at Shri Vaishnav Vidyapeeth Vishwavidyalaya (SVVV). Search and filter by subject, course, and semester.",
     });
   } catch (err) {
     console.error("❌ Explore Error:", err);
