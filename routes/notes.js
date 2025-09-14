@@ -5,12 +5,35 @@ const Note = require("../models/note");
 const Subject = require("../models/subject")
 const {isLoggedIn, isModerator} = require("../middlewares");
 const { sendVerificationMail } = require("../config/mailer");
-const multer = require("multer");
-const { storage, cloudinary  } = require("../config/cloud");
-const upload = multer({ 
-  storage,
-  limits: { fileSize: 30 * 1024 * 1024 } // max 15MB
+// const multer = require("multer");
+const { cloudinary  } = require("../config/cloud");
+
+
+// const upload = multer({ 
+//   storage,
+//   limits: { fileSize: 30 * 1024 * 1024 } // max 15MB
+// });
+
+// ===== to generate signature
+router.get("/api/upload-signature", isLoggedIn, (req, res) => {
+  const timestamp = Math.round((new Date).getTime() / 1000);
+
+  const paramsToSign = {
+  timestamp,
+  folder: "campusNotes"
+};
+
+const signature = cloudinary.utils.api_sign_request(
+  paramsToSign,
+  process.env.CLOUD_API_SECRET
+);
+
+  res.json({ timestamp, signature });
 });
+
+
+
+
 
 
 
@@ -50,7 +73,10 @@ router.get("/upload", isLoggedIn, async (req, res) => {
       title: "Upload Notes",
       subjects,
       courses,
-      semester
+      semester,
+      // Ye do lines add karein
+      "process.env.CLOUD_NAME": process.env.CLOUD_NAME,
+      "process.env.CLOUD_API_KEY": process.env.CLOUD_API_KEY
     });
   } catch (err) {
     console.error(err);
@@ -64,31 +90,25 @@ router.get("/upload", isLoggedIn, async (req, res) => {
 
 
 
-router.post("/upload", isLoggedIn, upload.single("file"), async (req, res) => {
+router.post("/upload", isLoggedIn, async (req, res) => {
   try {
-    const { title, description, subject, course, visibility, newSubject, semester } = req.body;
+    const { title, description, subject, course, visibility, newSubject, semester, fileUrl } = req.body;
 
-    if (!req.file) {
-      req.flash("error", "Please upload a PDF file less than 5MB");
-      return res.redirect("/notes/upload");
+    // fileUrl aana zaroori hai
+    if (!fileUrl) {
+      return res.status(400).json({ success: false, error: "File URL is missing." });
     }
-
-    if (req.file.mimetype !== "application/pdf") {
-      return res.status(400).json({ success: false, error: "Only PDF files are allowed" });
-    }
-
+    
     let subjectId;
-
     if (subject === "other" && newSubject) {
-      // ✅ Agar naya subject aaya to DB me add karo
       let created = await Subject.findOneAndUpdate(
         { name: newSubject.trim() },
         { name: newSubject.trim() },
-        { new: true, upsert: true } // create if not exists
+        { new: true, upsert: true }
       );
       subjectId = created._id;
     } else {
-      subjectId = subject; // dropdown se aaya hua ObjectId
+      subjectId = subject;
     }
 
     const note = new Note({
@@ -98,7 +118,7 @@ router.post("/upload", isLoggedIn, upload.single("file"), async (req, res) => {
       course,
       semester,
       visibility,
-      fileUrl: req.file.path,
+      fileUrl: fileUrl, // Yahan Cloudinary se mila URL save hoga
       uploadedBy: req.user._id,
     });
 
@@ -107,12 +127,8 @@ router.post("/upload", isLoggedIn, upload.single("file"), async (req, res) => {
     res.json({ success: true, redirectUrl: "/explore" });
 
   } catch (err) {
-    if (err.code === "LIMIT_FILE_SIZE") {
-      return res.status(400).json({ success: false, error: "File must be less than 15MB" });
-    }
     console.error(err);
-    console.log("yash")
-    res.status(500).json({ success: false, error: "Something went wrong while uploading" });
+    res.status(500).json({ success: false, error: "Something went wrong while saving the note." });
   }
 });
 

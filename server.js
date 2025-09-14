@@ -81,8 +81,9 @@ const companyRoutes = require("./routes/company")
 const apiR = require("./routes/api")
 
 
+// Corrected code for server.js
+app.use('/', notesRoutes); // This line now comes first
 app.use('/api', apiR);
-app.use('/', notesRoutes);
 app.use('/', authRoutes);
 app.use('/', userRoutes);
 app.use("/", reqNotes)

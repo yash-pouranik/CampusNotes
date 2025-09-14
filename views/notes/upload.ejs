@@ -135,23 +135,26 @@ progress::-moz-progress-bar {
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
-
 <script>
   const fileInput = document.getElementById("file");
   const fileError = document.getElementById("fileError");
   const form = document.getElementById("uploadForm");
-
   const progressContainer = document.getElementById("progressContainer");
   const progressBar = document.getElementById("progressBar");
   const progressText = document.getElementById("progressText");
 
-  // Subject toggle
+  // Aapke Cloudinary details - Inko aap EJS variables se bhi pass kar sakte hain for security
+  const CLOUD_NAME = "<%= process.env.CLOUD_NAME %>"; // IMPORTANT: Backend se pass karein
+  const API_KEY = "<%= process.env.CLOUD_API_KEY %>";   // IMPORTANT: Backend se pass karein
+  const UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/raw/upload`;
+
+  // Subject toggle logic (waise hi rahega)
   document.getElementById("subject").addEventListener("change", function() {
     document.getElementById("newSubjectGroup").style.display =
       this.value === "other" ? "block" : "none";
   });
 
-  // File validation
+  // File validation logic (waise hi rahega)
   fileInput.addEventListener("change", function() {
     fileError.style.display = "none";
     const file = this.files[0];
@@ -164,47 +167,77 @@ progress::-moz-progress-bar {
       return;
     }
 
-    if (file.size > 30 * 1024 * 1024) {
-      fileError.textContent = "❌ File must be less than 10MB. Compress it.";
+    if (file.size > 30 * 1024 * 1024) { // 30MB limit
+      fileError.textContent = "❌ File must be less than 30MB.";
       fileError.style.display = "block";
       this.value = "";
       return;
     }
   });
 
-
-
-  
-  // Submit with progress bar
-  form.addEventListener("submit", function(e) {
+  // ===== NAYA UPLOAD LOGIC =====
+  form.addEventListener("submit", async function(e) {
     e.preventDefault();
-    if (fileError.style.display === "block") return;
+    if (fileError.style.display === "block" || !fileInput.files[0]) {
+        alert("Please select a valid PDF file.");
+        return;
+    }
 
-    const formData = new FormData(form);
     progressContainer.style.display = "flex";
 
-    axios.post("/upload", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-      onUploadProgress: function(progressEvent) {
-        const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-        progressBar.value = percent;
-        progressText.innerText = percent + "%";
+    try {
+      // 1. Backend se signature fetch karein
+      const signatureResponse = await axios.get("/api/upload-signature", {
+        withCredentials: true 
+      });
+      const { signature, timestamp } = signatureResponse.data;
+      
+      const file = fileInput.files[0];
+      const formDataForCloudinary = new FormData();
+      formDataForCloudinary.append("file", file);
+  formDataForCloudinary.append("api_key", API_KEY);
+  formDataForCloudinary.append("timestamp", timestamp);
+  formDataForCloudinary.append("signature", signature);
+  formDataForCloudinary.append("folder", "campusNotes");
+
+
+
+      // 2. File ko સીધા Cloudinary par upload karein
+      const cloudinaryResponse = await axios.post(UPLOAD_URL, formDataForCloudinary, {
+        headers: { "Content-Type": "multipart/form-data" },
+        onUploadProgress: function(progressEvent) {
+          const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          progressBar.value = percent;
+          progressText.innerText = percent + "%";
+        }
+      });
+      
+      const uploadedFileUrl = cloudinaryResponse.data.secure_url;
+
+      // 3. Cloudinary URL aur baaki form data ko apne server par bhejein
+      const noteDetails = {
+        title: form.title.value,
+        description: form.description.value,
+        subject: form.subject.value,
+        newSubject: form.newSubject.value,
+        course: form.course.value,
+        semester: form.semester.value,
+        visibility: form.visibility.value,
+        fileUrl: uploadedFileUrl
+      };
+
+      const saveNoteResponse = await axios.post("/upload", noteDetails);
+      
+      // 4. Success hone par user ko redirect karein
+      if(saveNoteResponse.data.success) {
+        alert("Upload successful! Note has been sent for verification.");
+        window.location.href = saveNoteResponse.data.redirectUrl;
       }
-    })
-    .then(res => {
-      alert("Upload successful! and sent for verification to the moderators.");
-      form.reset();
-      progressContainer.style.display = "none";
-      progressBar.value = 0;
-      progressText.innerText = "0%";
 
-      // ✅ redirect after success
-      window.location.href = "/explore"; 
-    })
-
-    .catch(err => {
+    } catch (err) {
+      console.error("Upload failed:", err);
       alert("❌ Upload failed: " + (err.response?.data?.error || err.message));
       progressContainer.style.display = "none";
-    });
+    }
   });
 </script>
