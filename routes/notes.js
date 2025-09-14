@@ -117,7 +117,6 @@ router.post("/upload", isLoggedIn, async (req, res) => {
       subject: subjectId,
       course,
       semester,
-      visibility,
       fileUrl: fileUrl, // Yahan Cloudinary se mila URL save hoga
       uploadedBy: req.user._id,
     });

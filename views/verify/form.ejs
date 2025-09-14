@@ -1,62 +1,116 @@
 <link rel="stylesheet" href="/css/form.css" />
-
 <style>
-  .auth-section {
-    max-width: 450px;
-    margin: 40px auto;
-    background: #f9f9f9;
-    padding: 30px;
+  .verify-container {
+    max-width: 550px;
+    margin: 60px auto;
+    padding: 40px;
+    background: #fff;
     border-radius: 12px;
-    box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
     text-align: center;
   }
-
-  .auth-section h2 {
+  .verify-container h2 {
+    color: #1e3a8a;
     margin-bottom: 15px;
-    font-size: 24px;
   }
-
-  .auth-section p {
-    margin-bottom: 20px;
-    color: #555;
+  #question-text {
+    font-size: 1.1rem;
+    font-style: italic;
+    color: #333;
+    background-color: #f9fafb;
+    padding: 20px;
+    border-radius: 8px;
+    min-height: 50px;
+    margin: 25px 0;
   }
-
-  .auth-section input[type="file"] {
-    margin-bottom: 20px;
+  #answer-input {
+    width: 95%;
+    padding: 12px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
   }
-
-  .auth-section button {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 10px 20px;
+  #submit-answer-btn {
+    margin-top: 20px;
+    padding: 12px 25px;
+    font-size: 1rem;
     font-weight: bold;
-    border-radius: 6px;
+    color: #fff;
+    background-color: #2563eb;
+    border: none;
+    border-radius: 8px;
     cursor: pointer;
+    transition: background-color 0.3s;
   }
-
-  .auth-section button:hover {
-    background-color: #45a049;
+  #submit-answer-btn:hover {
+    background-color: #1d4ed8;
   }
-
-  .note {
-    font-size: 0.9em;
-    color: #888;
-    margin-top: 10px;
+  .response-message {
+    margin-top: 15px;
+    font-weight: bold;
+  }
+  .success {
+    color: #16a34a;
+  }
+  .error {
+    color: #dc2626;
   }
 </style>
 
+<div class="verify-container">
+  <h2>Campus Trivia Verification 🧠</h2>
+  <p>To prove you're an SVVV student, please answer the following question:</p>
+  <p>(answer only in lowercase without spaces, all together.)</p>
 
+  <p id="question-text">Loading question...</p>
 
-<section class="auth-section">
-  <h2>Verify Your Account</h2>
-
-  <p class="dept-note-highlight">Please upload a valid student or faculty ID. Our team will review it shortly.</p>
-
-  <form action="/verify" method="POST" enctype="multipart/form-data">
-    <input type="file" name="idProof" accept="image/*,.pdf" required />
-    <button type="submit">Submit for Verification</button>
+  <form id="trivia-form">
+    <input type="text" id="answer-input" placeholder="Your answer here..." required autocomplete="off">
+    <button type="submit" id="submit-answer-btn">Submit Answer</button>
   </form>
+  
+  <p id="response-message" class="response-message"></p>
+</div>
 
-  <p class="note">Only verified users can upload notes.</p>
-</section>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+  const questionText = document.getElementById('question-text');
+  const triviaForm = document.getElementById('trivia-form');
+  const answerInput = document.getElementById('answer-input');
+  const responseMessage = document.getElementById('response-message');
+
+  // 1. Page load hone par question fetch karein
+  window.addEventListener('load', async () => {
+    try {
+      const res = await axios.get('/api/trivia-question');
+      questionText.textContent = res.data.question;
+      console.log(res.data.question);
+    } catch (err) {
+      questionText.textContent = 'Could not load question. You might be already verified or not logged in.';
+      document.getElementById('submit-answer-btn').disabled = true;
+      console.log(questionText);
+    }
+  });
+
+  // 2. Form submit hone par answer verify karein
+  triviaForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const userAnswer = answerInput.value;
+    responseMessage.textContent = ''; // Clear previous messages
+
+    try {
+      const res = await axios.post('/api/verify-trivia', { answer: userAnswer });
+      if (res.data.success) {
+        responseMessage.className = 'response-message success';
+        responseMessage.textContent = '✅ Correct! You are now verified. Redirecting...';
+        // Redirect to profile page after 2 seconds
+        setTimeout(() => {
+          window.location.href = '/explore';
+        }, 2000);
+      }
+    } catch (err) {
+      responseMessage.className = 'response-message error';
+      responseMessage.textContent = `❌ ${err.response.data.error || 'Something went wrong.'}`;
+    }
+  });
+</script>
