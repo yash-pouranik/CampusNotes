@@ -3,12 +3,15 @@ const nodemailer = require("nodemailer");
 const User = require("../models/user");
 
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false,
   auth: {
     user: process.env.USER_EMAIL,
     pass: process.env.EMAIL_PASS,
   },
 });
+
 
 module.exports.sendNewRequestMail = async (requestData) => {
   try {

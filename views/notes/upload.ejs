@@ -160,7 +160,7 @@ progress::-moz-progress-bar {
       return;
     }
 
-    if (file.size > 30 * 1024 * 1024) { // 30MB limit
+    if (file.size > 20 * 1024 * 1024) { // 30MB limit
       fileError.textContent = "❌ File must be less than 30MB.";
       fileError.style.display = "block";
       this.value = "";
