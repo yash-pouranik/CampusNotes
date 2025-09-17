@@ -79,10 +79,12 @@ const verifyRRoute = require("./routes/verify");
 const reqNotes = require("./routes/reqNotes");
 const companyRoutes = require("./routes/company")
 const apiR = require("./routes/api")
+const dash = require("./routes/adminRoutes");
 
 
 // Corrected code for server.js
 app.use('/', notesRoutes); // This line now comes first
+app.use('/dashboard', dash);
 app.use('/api', apiR);
 app.use('/', authRoutes);
 app.use('/', userRoutes);

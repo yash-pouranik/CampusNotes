@@ -1,0 +1,257 @@
+<style>
+    /* === GLOBAL THEME === */
+:root {
+  --primary: #2563eb;
+  --primary-dark: #1e40af;
+  --bg: #f9fafb;
+  --sidebar-bg: #1e293b;
+  --card-bg: #ffffff;
+  --border: #e2e8f0;
+  --text: #111827;
+  --muted: #64748b;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --radius: 12px;
+  --transition: all 0.25s ease;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Inter", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* === LAYOUT === */
+.dashboard {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* --- Sidebar --- */
+.sidebar {
+  width: 240px;
+  background: var(--sidebar-bg);
+  color: #fff;
+  padding: 20px;
+}
+
+.sidebar h2 {
+  margin-bottom: 30px;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.sidebar ul {
+  list-style: none;
+}
+
+.sidebar ul li {
+  padding: 12px 15px;
+  margin-bottom: 10px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.sidebar ul li:hover,
+.sidebar ul li.active {
+  background: var(--primary);
+}
+
+/* --- Main Area --- */
+.main {
+  flex: 1;
+  padding: 25px;
+}
+
+/* --- Header --- */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.header h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+
+.header .profile {
+  background: var(--primary);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+}
+
+/* --- Stats Grid --- */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.card {
+  background: var(--card-bg);
+  padding: 20px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+  text-align: center;
+}
+
+.card h3 {
+  font-size: 1rem;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.card p {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: var(--primary-dark);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.15);
+}
+
+/* --- Tables --- */
+.tables {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 25px;
+}
+
+.table-card {
+  background: var(--card-bg);
+  padding: 20px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.table-card h2 {
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+  color: var(--primary-dark);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 12px 15px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+
+th {
+  background: #f1f5f9;
+  font-weight: 600;
+  color: #334155;
+}
+
+tr:hover td {
+  background: rgba(37, 99, 235, 0.05);
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  .dashboard {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    display: flex;
+    overflow-x: auto;
+  }
+  .sidebar ul {
+    display: flex;
+    gap: 10px;
+  }
+  .main {
+    padding: 15px;
+  }
+}
+
+</style>
+
+
+
+<div class="dashboard">
+
+
+  <!-- Main Content -->
+  <main class="main">
+    <header class="header">
+      <h1>Admin Dashboard</h1>
+      <div class="profile">Hi, <%= currUser.name %></div>
+    </header>
+
+    <!-- Stats Grid -->
+    <section class="stats">
+      <div class="card">
+        <h3>Total Users</h3>
+        <p><%= totalUsers %></p>
+      </div>
+      <div class="card">
+        <h3>Total Notes</h3>
+        <p><%= totalNotes %></p>
+      </div>
+      <div class="card">
+        <h3>Total Downloads</h3>
+        <p><%= totalDownloads %></p>
+      </div>
+    </section>
+
+    <!-- Tables Section -->
+    <section class="tables">
+      <div class="table-card">
+        <h2>Top 5 Most Downloaded Notes</h2>
+        <table>
+          <tr><th>Title</th><th>Downloads</th><th>Course</th><th>Semester</th></tr>
+          <% topNotes.forEach(note => { %>
+            <tr>
+              <td><%= note.title %></td>
+              <td><%= note.downloadCount %></td>
+              <td><%= note.course %></td>
+              <td><%= note.semester %></td>
+            </tr>
+          <% }) %>
+        </table>
+      </div>
+
+      <div class="table-card">
+        <h2>Semester-wise Notes</h2>
+        <table>
+          <tr><th>Semester</th><th>Total Notes</th></tr>
+          <% semesterWise.forEach(row => { %>
+            <tr><td><%= row._id %></td><td><%= row.notes %></td></tr>
+          <% }) %>
+        </table>
+      </div>
+
+      <div class="table-card">
+        <h2>Course-wise Notes</h2>
+        <table>
+          <tr><th>Course</th><th>Total Notes</th></tr>
+          <% courseWise.forEach(row => { %>
+            <tr><td><%= row._id %></td><td><%= row.notes %></td></tr>
+          <% }) %>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>

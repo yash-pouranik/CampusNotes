@@ -33,8 +33,9 @@ background: white;
         <a href="/explore" class="nav-a">Explore</a>
         <a href="/upload" class="nav-a">Upload</a>
         <a href="/most-voted" class="nav-a">Most Voted Notes</a>
-        <% if(currUser.roles.isModerator) {%>
+        <% if(currUser.roles.isModerator || currUser.roles.isDev) {%>
           <a href="/admin/verify-notes" class="nav-a">Verify Notes</a>
+          <a href="/dashboard" class="nav-a">Admin Dashboard</a>
 
         <% } %>
         <a href="/logout" class="nav-a">Logout</a>
