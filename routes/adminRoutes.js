@@ -3,6 +3,7 @@ const express = require("express");
 const router = express.Router();
 const Note = require("../models/note"); // adjust path
 const User = require("../models/user");
+const DownloadLog = require("../models/downloadLog"); // Import DownloadLog model
 const {isLoggedIn, isModerator} = require("../middlewares");
 
 
@@ -15,11 +16,14 @@ router.get("/", isLoggedIn, isModerator, async (req, res) => {
     // 2. Total notes
     const totalNotes = await Note.countDocuments();
 
-    // 3. Total downloads
+    // 3. Total downloads (from notes)
     const totalDownloadsAgg = await Note.aggregate([
       { $group: { _id: null, total: { $sum: "$downloadCount" } } }
     ]);
     const totalDownloads = totalDownloadsAgg[0]?.total || 0;
+    
+    // New: Get total unique downloads from DownloadLog collection
+    const totalUniqueDownloads = await DownloadLog.countDocuments();
 
     // 4. Top 5 most downloaded notes
     const topNotes = await Note.find()
@@ -43,6 +47,7 @@ router.get("/", isLoggedIn, isModerator, async (req, res) => {
       totalUsers,
       totalNotes,
       totalDownloads,
+      totalUniqueDownloads, // Pass the new data to the template
       topNotes,
       semesterWise,
       courseWise

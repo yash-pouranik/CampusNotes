@@ -3,8 +3,7 @@ const path = require("path");
 const expressLayouts = require("express-ejs-layouts");
 const flash = require("connect-flash");
 const methodOverride = require('method-override');
-
-
+const cookieParser = require('cookie-parser'); // Require cookie-parser
 
 const app = express();
 const session = require('express-session');
@@ -22,6 +21,7 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(cookieParser()); // Use cookie-parser middleware
 
 
 // **Important: Use express-ejs-layouts middleware before routes**
@@ -122,7 +122,7 @@ app.get("/", async (req, res) => {
 //404
 // 404 Page Not Found handler
 app.use((req, res) => {
-  res.status(404).render("errors/404", { 
+  res.status(404).render("errors/404", {
     title: "Page Not Found | CampusNotes",
   });
 });

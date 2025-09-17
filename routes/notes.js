@@ -3,6 +3,7 @@ const mongoose = require("mongoose")
 const router = express.Router();
 const Note = require("../models/note");
 const Subject = require("../models/subject")
+const DownloadLog = require("../models/downloadLog");
 const {isLoggedIn, isModerator} = require("../middlewares");
 const { sendVerificationMail } = require("../config/mailer");
 // const multer = require("multer");
@@ -177,6 +178,7 @@ router.get("/notes/:nid", async (req, res) => {
 });
 
 //download
+//download
 router.get("/notes/:nid/download", async (req, res) => {
   try {
     const note = await Note.findById(req.params.nid);
@@ -184,21 +186,32 @@ router.get("/notes/:nid/download", async (req, res) => {
       return res.status(404).send("Note not found");
     }
 
-    // Increment downloads
-        console.log(note)
+    // Total download count hamesha badhayein
     note.downloadCount = (note.downloadCount || 0) + 1;
-    console.log(note)
     await note.save();
 
+    // Unique download tracking
+    let downloaderId = req.cookies.downloaderId;
+    if (!downloaderId) {
+      downloaderId = new mongoose.Types.ObjectId().toString();
+      res.cookie('downloaderId', downloaderId, { maxAge: 365 * 24 * 60 * 60 * 1000, httpOnly: true }); // 1 saal ki cookie
+    }
 
-    // Redirect to actual file URL
+    // Check karein ki is user ne ye note pehle download kiya hai ya nahi
+    const existingLog = await DownloadLog.findOne({ note: note._id, downloaderId: downloaderId });
+
+    if (!existingLog) {
+      // Agar nahi kiya hai to ek naya log banayein
+      await DownloadLog.create({ note: note._id, downloaderId: downloaderId });
+    }
+
+    // File par redirect karein
     return res.redirect(note.fileUrl);
   } catch (err) {
     console.error(err);
     return res.status(500).send("Something went wrong");
   }
 });
-
 
 
 
