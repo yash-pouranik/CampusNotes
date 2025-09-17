@@ -42,7 +42,7 @@ module.exports.sendNewRequestMail = async (requestData) => {
           </div>
           
           <div style="text-align: center; margin-top: 20px;">
-            <a href="https://campusnotes-uier.onrender.com/requestnotes" 
+            <a href="https://campusnotes.bitbros.in/requestnotes" 
               style="display: inline-block; background-color: #2563eb; color: #fff; padding: 12px 20px; border-radius: 6px; text-decoration: none; font-weight: bold;">
               View Request
             </a>
