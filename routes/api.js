@@ -81,7 +81,7 @@ router.post("/verify-trivia", isLoggedIn, async (req, res) => {
     return res.json({ success: true, message: "Verification successful!" });
   } else {
     // If incorrect, send an error message
-    return res.status(400).json({ error: "Incorrect answer. Please try again." });
+    return res.status(400).json({ error: "Incorrect answer. Please try again. OR if you are facing any issue mail to: campusnotes@bitbros.in" });
   }
 });
 
