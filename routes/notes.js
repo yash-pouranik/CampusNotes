@@ -178,7 +178,7 @@ router.get("/notes/:nid", async (req, res) => {
 });
 
 //download
-//download
+
 router.get("/notes/:nid/download", async (req, res) => {
   try {
     const note = await Note.findById(req.params.nid);
@@ -190,28 +190,40 @@ router.get("/notes/:nid/download", async (req, res) => {
     note.downloadCount = (note.downloadCount || 0) + 1;
     await note.save();
 
-    // Unique download tracking
+    // Unique download tracking (cookie)
     let downloaderId = req.cookies.downloaderId;
     if (!downloaderId) {
       downloaderId = new mongoose.Types.ObjectId().toString();
-      res.cookie('downloaderId', downloaderId, { maxAge: 365 * 24 * 60 * 60 * 1000, httpOnly: true }); // 1 saal ki cookie
+      res.cookie("downloaderId", downloaderId, {
+        maxAge: 365 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+      });
     }
 
-    // Check karein ki is user ne ye note pehle download kiya hai ya nahi
-    const existingLog = await DownloadLog.findOne({ note: note._id, downloaderId: downloaderId });
+    // IP address
+    const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+
+    // Check karein ki is user ne pehle download kiya ya nahi
+    const existingLog = await DownloadLog.findOne({
+      note: note._id,
+      downloaderId: downloaderId,
+    });
 
     if (!existingLog) {
-      // Agar nahi kiya hai to ek naya log banayein
-      await DownloadLog.create({ note: note._id, downloaderId: downloaderId });
+      await DownloadLog.create({
+        note: note._id,
+        downloaderId,
+        ip,
+      });
     }
 
-    // File par redirect karein
     return res.redirect(note.fileUrl);
   } catch (err) {
     console.error(err);
     return res.status(500).send("Something went wrong");
   }
 });
+
 
 
 

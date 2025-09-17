@@ -95,7 +95,7 @@ body {
 /* --- Stats Grid --- */
 .stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 20px;
   margin-bottom: 30px;
 }
@@ -207,7 +207,6 @@ tr:hover td {
     <p><%= totalUsers %></p>
   </div>
   <div class="card">
- 
     <h3>Total Notes</h3>
     <p><%= totalNotes %></p>
   </div>
@@ -219,7 +218,16 @@ tr:hover td {
     <h3>Total Unique Downloads</h3>
     <p><%= totalUniqueDownloads %></p>
   </div>
+  <div class="card">
+    <h3>Unique Sessions</h3>
+    <p><%= uniqueSessions %></p>
+  </div>
+  <div class="card">
+    <h3>Unique IPs</h3>
+    <p><%= uniqueIps %></p>
+  </div>
 </section>
+
 
     <!-- Tables Section -->
     <section class="tables">

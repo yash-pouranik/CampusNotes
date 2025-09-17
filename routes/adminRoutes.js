@@ -37,6 +37,13 @@ router.get("/", isLoggedIn, isModerator, async (req, res) => {
       { $sort: { _id: 1 } }
     ]);
 
+      // Unique sessions (kitne alag users ne kuch bhi download kiya)
+      const uniqueSessions = (await DownloadLog.distinct("downloaderId")).length;
+
+      // Unique IPs
+      const uniqueIps = (await DownloadLog.distinct("ip")).length;
+
+
     // 6. Course-wise note count
     const courseWise = await Note.aggregate([
       { $group: { _id: "$course", notes: { $sum: 1 } } },
@@ -47,11 +54,14 @@ router.get("/", isLoggedIn, isModerator, async (req, res) => {
       totalUsers,
       totalNotes,
       totalDownloads,
-      totalUniqueDownloads, // Pass the new data to the template
+      totalUniqueDownloads,
+      uniqueSessions,
+      uniqueIps,
       topNotes,
       semesterWise,
       courseWise
     });
+
   } catch (err) {
     console.error(err);
     res.status(500).send("Server Error");

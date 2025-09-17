@@ -10,6 +10,9 @@ const downloadLogSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  ip: {
+    type: String, // user ka IP bhi log hoga
+  },
   downloadedAt: {
     type: Date,
     default: Date.now,
