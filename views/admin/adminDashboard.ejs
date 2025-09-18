@@ -216,7 +216,7 @@ tr:hover td {
   </div>
   <div class="card">
     <h3>Total Unique Downloads</h3>
-    <p><%= totalUniqueDownloads %></p>
+    <p><%= totalUniqueDownloads %><span style="font-size: 1rem;">(out of <%= totalDownloads - 558 %>)</span></p>
   </div>
   <div class="card">
     <h3>Unique Sessions</h3>
@@ -232,7 +232,7 @@ tr:hover td {
     <!-- Tables Section -->
     <section class="tables">
       <div class="table-card">
-        <h2>Top 5 Most Downloaded Notes</h2>
+        <h2>Top 12 Most Downloaded Notes</h2>
         <table>
           <tr><th>Title</th><th>Downloads</th><th>Course</th><th>Semester</th></tr>
           <% topNotes.forEach(note => { %>

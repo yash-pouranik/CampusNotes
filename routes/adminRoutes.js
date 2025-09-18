@@ -28,7 +28,7 @@ router.get("/", isLoggedIn, isModerator, async (req, res) => {
     // 4. Top 5 most downloaded notes
     const topNotes = await Note.find()
       .sort({ downloadCount: -1 })
-      .limit(5)
+      .limit(12)
       .select("title downloadCount course semester");
 
     // 5. Semester-wise note count
