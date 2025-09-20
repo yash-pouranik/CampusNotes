@@ -1,69 +1,76 @@
 // adminRoutes.js
 const express = require("express");
 const router = express.Router();
-const Note = require("../models/note"); // adjust path
+const Note = require("../models/note");
 const User = require("../models/user");
-const DownloadLog = require("../models/downloadLog"); // Import DownloadLog model
-const {isLoggedIn, isModerator} = require("../middlewares");
-
+const DownloadLog = require("../models/downloadLog");
+const RequestNote = require("../models/reqNotes");
+const { isLoggedIn, isModerator } = require("../middlewares");
 
 // Admin Dashboard Data
 router.get("/", isLoggedIn, isModerator, async (req, res) => {
   try {
-    // 1. Total users
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+    // === Core Stats ===
     const totalUsers = await User.countDocuments();
-
-    // 2. Total notes
     const totalNotes = await Note.countDocuments();
-
-    // 3. Total downloads (from notes)
     const totalDownloadsAgg = await Note.aggregate([
-      { $group: { _id: null, total: { $sum: "$downloadCount" } } }
+      { $group: { _id: null, total: { $sum: "$downloadCount" } } },
     ]);
     const totalDownloads = totalDownloadsAgg[0]?.total || 0;
-    
-    // New: Get total unique downloads from DownloadLog collection
+    const downloadsLast7Days = await DownloadLog.countDocuments({ downloadedAt: { $gte: sevenDaysAgo } });
+
+    // === Unique Traffic Stats ===
     const totalUniqueDownloads = await DownloadLog.countDocuments();
+    const uniqueSessions = (await DownloadLog.distinct("downloaderId")).length;
+    const uniqueIps = (await DownloadLog.distinct("ip")).length;
 
-    // 4. Top 5 most downloaded notes
-    const topNotes = await Note.find()
-      .sort({ downloadCount: -1 })
-      .limit(12)
-      .select("title downloadCount course semester");
-
-    // 5. Semester-wise note count
-    const semesterWise = await Note.aggregate([
-      { $group: { _id: "$semester", notes: { $sum: 1 } } },
-      { $sort: { _id: 1 } }
+    // === User Engagement ===
+    const newSignups = await User.countDocuments({ createdAt: { $gte: sevenDaysAgo } });
+    const verifiedUsers = await User.countDocuments({ "verification.verified": true });
+    const unverifiedUsers = totalUsers - verifiedUsers;
+    const topContributors = await User.aggregate([
+        { $project: { name: 1, username: 1, avatar: 1, notesCount: { $size: "$notes" } } },
+        { $sort: { notesCount: -1 } },
+        { $limit: 3 }
     ]);
 
-      // Unique sessions (kitne alag users ne kuch bhi download kiya)
-      const uniqueSessions = (await DownloadLog.distinct("downloaderId")).length;
-
-      // Unique IPs
-      const uniqueIps = (await DownloadLog.distinct("ip")).length;
-
-
-    // 6. Course-wise note count
+    // === Content & Moderation ===
+    const notesPendingVerification = await Note.countDocuments({ isVerified: false });
+    const newNoteUploads = await Note.countDocuments({ createdAt: { $gte: sevenDaysAgo } });
+    const topNotes = await Note.find({})
+      .sort({ downloadCount: -1 })
+      .limit(5)
+      .select("title course downloadCount");
     const courseWise = await Note.aggregate([
-      { $group: { _id: "$course", notes: { $sum: 1 } } },
-      { $sort: { notes: -1 } }
+        { $group: { _id: "$course", notes: { $sum: 1 } } },
+        { $sort: { notes: -1 } },
     ]);
 
     res.render("admin/adminDashboard", {
+      // Core Stats
       totalUsers,
       totalNotes,
       totalDownloads,
+      downloadsLast7Days,
+      // Unique Traffic
       totalUniqueDownloads,
       uniqueSessions,
       uniqueIps,
+      // User Engagement
+      newSignups,
+      verifiedUsers,
+      unverifiedUsers,
+      topContributors,
+      // Content & Moderation
+      notesPendingVerification,
+      newNoteUploads,
       topNotes,
-      semesterWise,
-      courseWise
+      courseWise,
     });
-
   } catch (err) {
-    console.error(err);
+    console.error("Admin Dashboard Error:", err);
     res.status(500).send("Server Error");
   }
 });

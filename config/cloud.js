@@ -1,34 +1,29 @@
 const cloudinary = require("cloudinary").v2;
-const { CloudinaryStorage } = require("multer-storage-cloudinary");
-const path = require("path");
 
-cloudinary.config({
-    cloud_name: process.env.CLOUD_NAME,
-    api_key: process.env.CLOUD_API_KEY,
-    api_secret: process.env.CLOUD_API_SECRET,
-});
-
-
-
-
-const storage = new CloudinaryStorage({
-  cloudinary,
-  params: async (req, file) => {
-    const ext = path.extname(file.originalname); // e.g. ".pdf"
-    const name = path.basename(file.originalname, ext);
-
-    return {
-      folder: "campusNotes",
-      resource_type: "raw",
-      public_id: `${name}-${Date.now()}${ext}`, // ✅ extension preserve
-    };
+const accounts = [
+  {
+    cloud_name: process.env.CLOUD1_NAME,
+    api_key: process.env.CLOUD1_KEY,
+    api_secret: process.env.CLOUD1_SECRET
   },
-});
+  {
+    cloud_name: process.env.CLOUD2_NAME,
+    api_key: process.env.CLOUD2_KEY,
+    api_secret: process.env.CLOUD2_SECRET
+  },
+  {
+    cloud_name: process.env.CLOUD3_NAME,
+    api_key: process.env.CLOUD3_KEY,
+    api_secret: process.env.CLOUD3_SECRET
+  }
+];
 
+let currentIndex = 0;
 
-
-
-module.exports = {
-    cloudinary,
-    storage
+function getNextAccount() {
+  const account = accounts[currentIndex];
+  currentIndex = (currentIndex + 1) % accounts.length;
+  return account;
 }
+
+module.exports = { cloudinary, getNextAccount };

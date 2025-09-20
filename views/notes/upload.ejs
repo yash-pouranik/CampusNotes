@@ -136,18 +136,13 @@ progress::-moz-progress-bar {
   const progressBar = document.getElementById("progressBar");
   const progressText = document.getElementById("progressText");
 
-  // Aapke Cloudinary details - Inko aap EJS variables se bhi pass kar sakte hain for security
-  const CLOUD_NAME = "<%= process.env.CLOUD_NAME %>"; // IMPORTANT: Backend se pass karein
-  const API_KEY = "<%= process.env.CLOUD_API_KEY %>";   // IMPORTANT: Backend se pass karein
-  const UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/raw/upload`;
-
   // Subject toggle logic (waise hi rahega)
   document.getElementById("subject").addEventListener("change", function() {
     document.getElementById("newSubjectGroup").style.display =
       this.value === "other" ? "block" : "none";
   });
 
-  // File validation logic (waise hi rahega)
+  // File validation logic
   fileInput.addEventListener("change", function() {
     fileError.style.display = "none";
     const file = this.files[0];
@@ -179,35 +174,35 @@ progress::-moz-progress-bar {
     progressContainer.style.display = "flex";
 
     try {
-      // 1. Backend se signature fetch karein
-      const signatureResponse = await axios.get("/api/upload-signature", {
-        withCredentials: true 
-      });
-      const { signature, timestamp } = signatureResponse.data;
-      
+      // 1. Backend se signature + creds lao
+      const sigRes = await axios.get("/api/upload-signature");
+      const { signature, timestamp, cloudName, apiKey } = sigRes.data;
+
+      // 2. Upload URL runtime pe banao
+      const UPLOAD_URL = `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`;
+
       const file = fileInput.files[0];
-      const formDataForCloudinary = new FormData();
-      formDataForCloudinary.append("file", file);
-  formDataForCloudinary.append("api_key", API_KEY);
-  formDataForCloudinary.append("timestamp", timestamp);
-  formDataForCloudinary.append("signature", signature);
-  formDataForCloudinary.append("folder", "campusNotes");
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("api_key", apiKey);
+      formData.append("timestamp", timestamp);
+      formData.append("signature", signature);
+      formData.append("folder", "campusNotes");
 
-
-
-      // 2. File ko સીધા Cloudinary par upload karein
-      const cloudinaryResponse = await axios.post(UPLOAD_URL, formDataForCloudinary, {
+      // 3. File Cloudinary par bhejo
+      const cloudRes = await axios.post(UPLOAD_URL, formData, {
         headers: { "Content-Type": "multipart/form-data" },
-        onUploadProgress: function(progressEvent) {
-          const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+        onUploadProgress: (e) => {
+          const percent = Math.round((e.loaded * 100) / e.total);
           progressBar.value = percent;
           progressText.innerText = percent + "%";
         }
       });
-      
-      const uploadedFileUrl = cloudinaryResponse.data.secure_url;
+      console.log(cloudName);
 
-      // 3. Cloudinary URL aur baaki form data ko apne server par bhejein
+      const uploadedFileUrl = cloudRes.data.secure_url;
+
+      // 4. Server ko details bhejo
       const noteDetails = {
         title: form.title.value,
         description: form.description.value,
@@ -220,9 +215,8 @@ progress::-moz-progress-bar {
 
       const saveNoteResponse = await axios.post("/upload", noteDetails);
       
-      // 4. Success hone par user ko redirect karein
       if(saveNoteResponse.data.success) {
-        alert("Upload successful! Note has been sent for verification.");
+        alert("✅ Upload successful! Note has been sent for verification.");
         window.location.href = saveNoteResponse.data.redirectUrl;
       }
 

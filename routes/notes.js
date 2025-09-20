@@ -7,7 +7,7 @@ const DownloadLog = require("../models/downloadLog");
 const {isLoggedIn, isModerator} = require("../middlewares");
 const { sendVerificationMail } = require("../config/mailer");
 // const multer = require("multer");
-const { cloudinary  } = require("../config/cloud");
+const { cloudinary, getNextAccount } = require("../config/cloud");
 
 
 // const upload = multer({ 
@@ -17,21 +17,21 @@ const { cloudinary  } = require("../config/cloud");
 
 // ===== to generate signature
 router.get("/api/upload-signature", isLoggedIn, (req, res) => {
-  const timestamp = Math.round((new Date).getTime() / 1000);
+  const account = getNextAccount();
 
-  const paramsToSign = {
-  timestamp,
-  folder: "campusNotes"
-};
+  const timestamp = Math.round(Date.now() / 1000);
+  const signature = cloudinary.utils.api_sign_request(
+    { timestamp, folder: "campusNotes" },
+    account.api_secret
+  );
 
-const signature = cloudinary.utils.api_sign_request(
-  paramsToSign,
-  process.env.CLOUD_API_SECRET
-);
-
-  res.json({ timestamp, signature });
+  res.json({
+    signature,
+    timestamp,
+    cloudName: account.cloud_name,
+    apiKey: account.api_key
+  });
 });
-
 
 
 
@@ -427,11 +427,23 @@ router.delete("/notes/:id", isLoggedIn, async (req, res) => {
       return res.redirect(`/notes/${note._id}`);
     }
 
-    // ✅ delete file from Cloudinary
+    // ✅ Corrected Cloudinary delete logic
     if (note.fileUrl) {
-      const urlParts = note.fileUrl.split('/');
-      const publicIdWithFolder = urlParts.slice(urlParts.indexOf('upload') + 1).join('/').split('.')[0];
-      await cloudinary.uploader.destroy(publicIdWithFolder, { resource_type: "raw" });
+      try {
+        const urlParts = note.fileUrl.split('/');
+        const uploadIndex = urlParts.indexOf('upload');
+        if (uploadIndex > -1 && urlParts.length > uploadIndex + 2) {
+          const resourceType = urlParts[uploadIndex - 1]; // This will be 'image', 'raw', etc.
+          const publicIdWithFolder = urlParts.slice(uploadIndex + 2).join('/').split('.')[0];
+          
+          if (resourceType && publicIdWithFolder) {
+            await cloudinary.uploader.destroy(publicIdWithFolder, { resource_type: resourceType });
+          }
+        }
+      } catch (cloudErr) {
+        console.warn("Cloudinary delete error:", cloudErr.message);
+        // It's a good practice to log the error but not block the note deletion from the DB.
+      }
     }
 
     // ✅ user.notes array se bhi remove karo
