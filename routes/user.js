@@ -65,15 +65,18 @@ router.get("/rankings", async (req, res) => {
 router.get("/profile/:id/edit", isLoggedIn,  async (req, res) => {
   try {
     if (req.user._id.toString() !== req.params.id && !req.user.roles.isModerator) {
+      console.log("YOU R NOT AUTHORIZED");
       req.flash("error", "Not authorized to edit this profile");
       return res.redirect(`/profile/${req.params.id}`);
     }
 
-    const user = await User.findById(req.params.id).populate('notes');
+    const user = await User.findById(req.params.id);
     if (!user) {
-      return res.send("User does not exist");
+      console.log("YOU R NOT AUTHORIZED");
+      return res.send("User does not exist - 2");
     }
 
+    console.log("YOU R NOT AUTHORIZED - 3", user);
     res.render("user/editProfile", {
       user,
       title: user.username || user.name || "EDIT",

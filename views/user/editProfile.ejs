@@ -1,6 +1,6 @@
 <link rel="stylesheet" href="/css/login.css">
 
-<% if (currUser && currUser._id.toString() === user._id.toString()) { %>
+<% if (currUser && (currUser._id.toString() === user._id.toString() || currUser.roles.isModerator)) { %>
 <section class="auth-section">
   <h2>Edit Profile</h2>
 
