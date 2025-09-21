@@ -1,5 +1,5 @@
 body {
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Urbanist', sans-serif !important;
   margin: 0;
   padding: 0;
 }
