@@ -179,7 +179,7 @@ progress::-moz-progress-bar {
       const { signature, timestamp, cloudName, apiKey } = sigRes.data;
 
       // 2. Upload URL runtime pe banao
-      const UPLOAD_URL = `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`;
+      const UPLOAD_URL = `https://api.cloudinary.com/v1_1/${cloudName}/raw/upload`;
 
       const file = fileInput.files[0];
       const formData = new FormData();
