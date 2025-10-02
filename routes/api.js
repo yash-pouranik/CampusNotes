@@ -6,6 +6,86 @@ const User = require("../models/user");
 const Subject = require("../models/subject");
 const { isLoggedIn, isModerator } = require("../middlewares");
 const triviaQuestions = require("../config/trivia"); 
+const axios = require('axios');
+const pdf = require('pdf-parse');
+
+
+// Add the Gemini AI setup
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro"});
+
+
+// This is our new AI route
+router.post("/notes/:id/ask", async (req, res) => {
+    try {
+        const note = await Note.findById(req.params.id);
+        if (!note) {
+            return res.status(404).json({ error: "Note not found." });
+        }
+
+        // Get the user's question from the request, default to "summarize"
+        const userQuestion = req.body.question || "Summarize this document in 5 bullet points.";
+
+        // 1. Download the PDF file from Cloudinary
+        const response = await axios.get(note.fileUrl, {
+            responseType: 'arraybuffer'
+        });
+        const pdfBuffer = response.data;
+
+        // 2. Extract text from the PDF buffer
+        const data = await pdf(pdfBuffer);
+        const documentText = data.text;
+
+        // 3. Create the prompt for the Gemini API
+        const prompt = `Based on the following document, please answer the user's question. Document Content: "${documentText}". Question: "${userQuestion}"`;
+
+        // 4. Call the Gemini API and get the response
+        const result = await model.generateContent(prompt);
+        const aiResponse = await result.response;
+        const text = aiResponse.text();
+
+        // 5. Send the AI's answer back to the frontend
+        res.json({ answer: text });
+
+    } catch (error) {
+        console.error("AI Route Error:", error);
+        res.status(500).json({ error: "Something went wrong while asking the AI." });
+    }
+});
+
+
+router.get("/notes/:id/check-pdf", async (req, res) => {
+    try {
+        const note = await Note.findById(req.params.id);
+        if (!note) {
+            return res.status(404).json({ error: "Note not found." });
+        }
+
+        // PDF download karein
+        const response = await axios.get(note.fileUrl, {
+            responseType: 'arraybuffer'
+        });
+        const pdfBuffer = response.data;
+
+        // PDF se text nikalne ki koshish karein
+        const data = await pdf(pdfBuffer);
+        const documentText = data.text.trim();
+
+        // Check karein ki text hai ya nahi (100 characters se zyada)
+        if (documentText.length > 100) {
+            res.json({ isTyped: true });
+        } else {
+            res.json({ isTyped: false });
+        }
+
+    } catch (error) {
+        console.error("PDF Check Error:", error);
+        res.status(500).json({ error: "Could not check PDF type." });
+    }
+});
+
+
 
 
 router.get("/notes/:sec", async (req, res) => {

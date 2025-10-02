@@ -1,26 +1,314 @@
+<link rel="stylesheet" href="/css/eachNoteCss.css?v=03">
 <style>
   body {
-    background: linear-gradient(to right, #f8f9fa, #eef1f7);
+    background: linear-gradient(120deg, #192643 0%, #192643 100%);
+    margin: 0;
+    color: #22223b;
   }
-
-  .badge-warning {
-  background-color: #ff5900;
-  color: white;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  margin-left: 0.5rem;
+  .note-detail-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 40px 0;
+  }
+  .note-card {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(44, 62, 80, 0.12);
+    max-width: 950px;
+    width: 100%;
+    padding: 36px 40px 32px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+  .note-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 18px;
+  }
+  .note-title {
+    font-size: 2.3rem;
+    font-weight: 700;
+    margin: 0;
+    color: #2575fc;
+    letter-spacing: 1px;
+  }
+  .badge-unverified {
+    background: #ff5f2e;
+    color: #fff;
+    padding: 5px 14px;
+    border-radius: 12px;
+    font-weight: 600;
+    margin-left: 12px;
+    font-size: 1rem;
+    vertical-align: middle;
+  }
+  .owner-actions {
+    display: flex;
+    gap: 12px;
+  }
+  .btn-edit, .btn-delete {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 8px;
+    transition: background 0.2s;
+  }
+  .btn-delete{
+    color: red;
+  }
+  .btn-edit:hover { background: #e3fcec; }
+  .btn-delete:hover { background: #ffeaea; }
+  .note-meta {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    font-size: 1rem;
+    color: #4a4e69;
+    flex-wrap: wrap;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+  .note-meta .uploader {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #22223b;
+    gap: 8px;
+  }
+  .note-meta .role-badge {
+    vertical-align: middle;
+    width: 20px;
+    height: 20px;
+    margin-left: 4px;
+  }
+  .note-meta .meta-info {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    font-size: 0.95rem;
+    color: #6b6f85;
+  }
+  .note-meta .meta-info i {
+    color: #2575fc;
+    margin-right: 5px;
+  }
+  .note-main-content {
+    display: flex;
+    gap: 36px;
+    flex-wrap: wrap;
+  }
+  .note-preview {
+    flex: 1 1 380px;
+    min-width: 320px;
+    max-width: 480px;
+    background: #f7faff;
+    border-radius: 14px;
+    padding: 18px;
+    box-shadow: 0 4px 18px rgba(44,62,80,0.07);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 320px;
+  }
+  .note-preview-frame {
+    width: 100%;
+    height: 500px;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(44,62,80,0.09);
+    margin-top: 8px;
+    border: 1px solid #e5e7eb;
+  }
+  .note-preview-img {
+    width: 100%;
+    max-height: 500px;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(44,62,80,0.09);
+    margin-top: 8px;
+    border: 1px solid #e5e7eb;
+  }
+  .no-preview-text {
+    text-align: center;
+    font-style: italic;
+    color: #888;
+    margin-top: 40px;
+  }
+  .flash-error {
+    background: #ffe5e5;
+    color: #b91c1c;
+    padding: 12px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    border-left: 5px solid #ef4444;
+    font-weight: 500;
+    width: 100%;
+  }
+  .note-info {
+    flex: 1 1 320px;
+    min-width: 280px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .note-details, .note-description {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 18px 20px;
+    box-shadow: 0 2px 8px rgba(44,62,80,0.06);
+    margin-bottom: 10px;
+  }
+  .note-details h4, .note-description h4 {
+    margin: 0 0 10px 0;
+    color: #2575fc;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+  .note-details ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .note-details li {
+    margin-bottom: 7px;
+    font-size: 1rem;
+  }
+  .note-description p {
+    margin: 0;
+    color: #22223b;
+    font-size: 1rem;
+  }
+  .note-actions {
+    display: flex;
+    gap: 18px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+  .btn-download, .btn-upvote {
+    padding: 12px 26px;
+    border-radius: 10px;
+    font-weight: 600;
+    background: linear-gradient(90deg, #2575fc, #6a11cb);
+    color: #fff;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.08rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .btn-download:hover, .btn-upvote:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(44,62,80,0.13);
+    background: linear-gradient(90deg, #6a11cb, #2575fc);
+  }
+  .ai-assistant-container {
+  background: #e6f0ff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(1, 89, 178, 0.008);
+  padding: 28px 24px 22px 24px;
+  margin-top: 32px;
+  margin-bottom: 10px;
+  display: block;
 }
 
-.note-meta a:hover{
-  text-decoration: 1px underline #007900 !important;
+.ai-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
 }
 
+.ai-header-icon {
+  font-size: 2rem;
+  background: linear-gradient(90deg, #2575fc, #6a11cb);
+  color: #fff;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ai-header h4 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #2575fc;
+  font-weight: 700;
+}
+
+.ai-btn {
+  background: linear-gradient(90deg, #192643, #192643);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 22px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 12px;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+
+.ai-btn:hover {
+  background: linear-gradient(90deg, #58189c, #0e3880);
+  box-shadow: 0 4px 16px rgba(44,62,80,0.13);
+}
+
+.ai-output {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+  font-size: 1rem;
+  color: #22223b;
+  min-height: 38px;
+  box-shadow: 0 1px 4px rgba(44,62,80,0.06);
+}
+
+.form-group {
+  display: flex;
+  padding-left: 10px;
+  border-left: solid 1px #192643;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.form-group input[type="text"] {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 7px;
+  border: 1px solid #d1d5db;
+  font-size: 1rem;
+  background: #fff;
+  transition: border 0.2s;
+}
+
+.form-group input[type="text"]:focus {
+  border: 1.5px solid #2575fc;
+  outline: none;
+}
+  @media (max-width: 1100px) {
+    .note-card {
+      padding: 24px 10px;
+    }
+    .note-main-content {
+      flex-direction: column;
+      gap: 24px;
+    }
+    .note-preview, .note-info {
+      max-width: 100%;
+      min-width: 0;
+    }
+  }
 </style>
-
-<link rel="stylesheet" href="/css/eachNoteCss.css?v=02
-">
-
 
 <section class="note-detail-container">
   <div class="note-card">
@@ -32,32 +320,31 @@
         <% } %>
       </div>
       <% if(currUser && (currUser._id.toString() === note.uploadedBy?._id?.toString() || currUser.roles?.isModerator)) { %>
-        <div class="owner-actions" style="display: flex; align-items: center;">
+        <div class="owner-actions">
           <a href="/notes/<%= note._id %>/edit" class="btn-edit" title="Edit"><i class="fa-regular fa-pen-to-square"></i></a>
           <form action="/notes/<%= note._id %>?_method=DELETE" method="POST">
-            <button type="submit" style="color: #ff0000;" class="btn-delete" title="Delete" onclick="return confirm('Delete this note?')"><i class="fa-solid fa-delete-left"></i></button>
+            <button type="submit" class="btn-delete" title="Delete" onclick="return confirm('Delete this note?')"><i class="fa-solid fa-delete-left"></i></button>
           </form>
         </div>
       <% } %>
     </div>
+
     <div class="note-meta">
       <a href="/profile/<%= note.uploadedBy?._id %>" style="text-decoration: none;">
         <span class="uploader">
-           <%= note.uploadedBy?.name || 'Unknown' %>
+          <%= note.uploadedBy?.name || 'Unknown' %>
           <% if (note.uploadedBy?.roles.isModerator) { %>
-              <img src="/images/blueCheckmark.svg" alt="Moderator" style="all: unset; width: 18px;">
+            <img src="/images/blueCheckmark.svg" alt="Moderator" class="role-badge">
           <% } else if (note.uploadedBy?.roles.isDev) { %>
-              <img src="/images/icons8-checkmark.svg" alt="Developer" style="all: unset; width: 18px;">
+            <img src="/images/icons8-checkmark.svg" alt="Developer" class="role-badge">
           <% } %>
         </span>
       </a>
-
       <span class="meta-info">
         <span><i class="fa fa-calendar"></i> <%= note.createdAt?.toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}) %></span>
         <span><i class="fa fa-download"></i> <%= note.downloadCount %> downloads</span>
       </span>
     </div>
-
 
     <div class="note-main-content">
       <div class="note-preview">
@@ -89,12 +376,108 @@
           <p><%= note.description || 'No description provided.' %></p>
         </div>
         <div class="note-actions">
-          <a href="/notes/<%= note._id %>/download" class="btn-download">Download</a>
+          <a href="/notes/<%= note._id %>/download" class="btn-download">📥 Download</a>
           <form action="/notes/<%= note._id %>/upvote" method="POST">
-            <button class="btn-upvote"><i class="fa-solid fa-upload fa-bounce"></i>Upvote (<%= note.upvotes.length %>)</button>
+            <button class="btn-upvote">👍 Upvote (<%= note.upvotes.length %>)</button>
           </form>
         </div>
       </div>
     </div>
+
+    <div id="handwritten-notice" style="display: none; margin-top: 30px; background: #fef3c7; color: #92400e; border-left: 5px solid #f59e0b; padding: 1rem 1.5rem; border-radius: 6px;">
+      <h4 style="margin: 0 0 10px 0;">🤖 AI Assistant Notice</h4>
+      <p style="margin: 0;">The AI Assistant feature is not available for handwritten notes at the moment. It only works with typed (digital) PDFs.</p>
+    </div>
+
+    <div class="ai-assistant-container">
+      <div class="ai-header">
+        <div class="ai-header-icon">🤖</div>
+        <h4>AI Assistant</h4>
+      </div>
+      <button id="summarize-btn" class="ai-btn">✨ Generate Smart Summary</button>
+      <div id="summary-output" class="ai-output">Click the button to get a summary...</div>
+      <div class="form-group">
+        <label for="ai-question" style="font-weight: 600; font-size: 0.95rem; color: #222;">Ask Anything from this Note</label>
+        <input type="text" id="ai-question" placeholder="e.g., Explain paging in OS?">
+        <button id="ask-ai-btn" class="ai-btn">Ask AI</button>
+      </div>
+      <div id="answer-output" class="ai-output">Your answer will appear here...</div>
+    </div>
   </div>
 </section>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
+
+<script>
+    const summarizeBtn = document.getElementById('summarize-btn');
+    const summaryOutput = document.getElementById('summary-output');
+    const askAiBtn = document.getElementById('ask-ai-btn');
+    const aiQuestionInput = document.getElementById('ai-question');
+    const answerOutput = document.getElementById('answer-output');
+    const noteId = "<%= note._id %>";
+
+
+    const aiContainer = document.querySelector('.ai-assistant-container');
+    const handwrittenNotice = document.getElementById('handwritten-notice');
+    const converter = new showdown.Converter();
+
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        try {
+            const res = await axios.get(`/api/notes/${noteId}/check-pdf`);
+            if (res.data.isTyped) {
+                aiContainer.style.display = 'block'; // AI wala section dikhayein
+            } else {
+                handwrittenNotice.style.display = 'block'; // Handwritten wala message dikhayein
+                aiContainer.style.display = 'none'; // AI wala section chupa dein
+            }
+        } catch (error) {
+            console.error("Could not check PDF type", error);
+            // Agar check fail ho to AI section chupa dein
+            handwrittenNotice.style.display = 'block';
+            handwrittenNotice.querySelector('p').textContent = 'Could not determine PDF type. AI Assistant is unavailable.';
+            aiContainer.style.display = 'none';
+        }
+    });
+
+
+
+    // --- Summarize Button Logic ---
+    summarizeBtn.addEventListener('click', async () => {
+        summaryOutput.innerHTML = '🧠 Thinking... generating summary...';
+        summarizeBtn.disabled = true;
+        try {
+            const response = await axios.post(`/api/notes/${noteId}/ask`, {
+                question: "Summarize this document in 5 key bullet points."
+            });
+            summaryOutput.innerHTML = converter.makeHtml(response.data.answer); 
+        } catch (error) {
+            summaryOutput.textContent = 'Sorry, an error occurred while generating the summary.';
+            console.error(error);
+        } finally {
+            summarizeBtn.disabled = false;
+        }
+    });
+
+    // --- Ask Question Button Logic ---
+    askAiBtn.addEventListener('click', async () => {
+        const question = aiQuestionInput.value;
+        if (!question) {
+            alert('Please enter a question.');
+            return;
+        }
+
+        answerOutput.innerHTML = '🧠 Thinking... finding an answer...';
+        askAiBtn.disabled = true;
+        try {
+            const response = await axios.post(`/api/notes/${noteId}/ask`, { question: question });
+            answerOutput.innerHTML = converter.makeHtml(response.data.answer);
+        } catch (error) {
+            answerOutput.textContent = 'Sorry, an error occurred while getting the answer.';
+            console.error(error);
+        } finally {
+            askAiBtn.disabled = false;
+        }
+    });
+</script>
