@@ -17,7 +17,7 @@ const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro"});
 
 
 // This is our new AI route
-router.post("/notes/:id/ask", async (req, res) => {
+router.post("/notes/:id/ask", isLoggedIn, async (req, res) => {
     try {
         const note = await Note.findById(req.params.id);
         if (!note) {
