@@ -2,12 +2,10 @@
 
 module.exports.isLoggedIn = (req, res, next) => {
   if (!req.isAuthenticated()) {
-    // Check if it's an API request (sent by axios/fetch)
+    
     if (req.xhr || req.headers.accept.indexOf('json') > -1) {
-      // If it is, send a 401 error with a JSON message
       return res.status(401).json({ error: "You must be logged in." });
     } else {
-      // Otherwise, for regular page loads, redirect to the login page
       req.flash("error", "you must be logged in!");
       return res.redirect("/login-n");
     }

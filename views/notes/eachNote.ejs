@@ -450,11 +450,17 @@
         try {
             const response = await axios.post(`/api/notes/${noteId}/ask`, {
                 question: "Summarize this document in 5 key bullet points."
-            });
+            }, { withCredentials: true });
             summaryOutput.innerHTML = converter.makeHtml(response.data.answer); 
         } catch (error) {
-            summaryOutput.textContent = 'Sorry, an error occurred while generating the summary.';
             console.error(error);
+            // ✅ YEH BADLAV KAREIN
+            if (error.response && error.response.status === 401) {
+                // Agar user logged in nahi hai, to use login page par bhejein
+                window.location.href = '/login-n';
+            } else {
+                summaryOutput.textContent = 'Sorry, an error occurred while generating the summary.';
+            }
         } finally {
             summarizeBtn.disabled = false;
         }
@@ -471,11 +477,17 @@
         answerOutput.innerHTML = '🧠 Thinking... finding an answer...';
         askAiBtn.disabled = true;
         try {
-            const response = await axios.post(`/api/notes/${noteId}/ask`, { question: question });
+            const response = await axios.post(`/api/notes/${noteId}/ask`, { question: question }, { withCredentials: true });
             answerOutput.innerHTML = converter.makeHtml(response.data.answer);
         } catch (error) {
-            answerOutput.textContent = 'Sorry, an error occurred while getting the answer.';
-            console.error(error);
+             console.error(error);
+            // ✅ YEH BADLAV BHI KAREIN
+            if (error.response && error.response.status === 401) {
+                // Agar user logged in nahi hai, to use login page par bhejein
+                window.location.href = '/login-n';
+            } else {
+                answerOutput.textContent = 'Sorry, an error occurred while getting the answer.';
+            }
         } finally {
             askAiBtn.disabled = false;
         }
