@@ -56,12 +56,12 @@ router.get("/auth/linkedin", (req, res) => {
 
 
 router.get("/login-n", notLoggedIn, (req, res) => {
-    res.render("auth/login", {title: "Login | campusnotes"});
+    res.render("auth/login", {title: "Login | campusnotes", showAds: false});
 })
 
 
 router.get("/register-n", notLoggedIn, (req, res) => {
-    res.render("auth/signup", {title: "Signup | campusnotes"});
+    res.render("auth/signup", {title: "Signup | campusnotes", showAds: false});
 })
 
 
@@ -97,7 +97,7 @@ router.get('/logout', (req, res, next) => {
 
 // forgot page
 router.get("/forgot", (req, res) => {
-  res.render("auth/forgot", { step: "email", title: "forgot password" });
+  res.render("auth/forgot", { step: "email", title: "forgot password", showAds: false});
 });
 
 
