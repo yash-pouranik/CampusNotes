@@ -14,7 +14,7 @@ const {sendAccountVerificationMail} = require("../config/mailer")
 
 router.get("/verify", isLoggedIn, (req, res) => {
   if (!req.user.verification?.verified) {
-    return res.render("verify/form", { title: "Verify Account" });
+  return res.render("verify/form", { title: "Verify Account", showAds: false });
   }
   req.flash("success", "You are already verified!");
   res.redirect("/explore");
