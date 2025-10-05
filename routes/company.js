@@ -14,8 +14,7 @@ router.get("/bitbros/our-team", async (req, res) => {
 
     res.render("team/our-team", {
       title: "Our Team | CampusNotes",
-      teamMembers,
-      showAds: false
+      teamMembers
     });
   } catch (err) {
     console.error(err);
@@ -23,12 +22,12 @@ router.get("/bitbros/our-team", async (req, res) => {
   }
 });
 
-router.get("/feedback", (req, res) => {
-  res.render("team/feedback", {title: "Feedback | CampusNotes", showAds: false});
-})
+router.get("/bitbros/aboutus", (req, res) => {
+  res.render("team/aboutus", {title: "About Us | Campus Notes"});
+});
 
 router.get("/feedback", (req, res) => {
-  res.render("team/feedback", {title: "Feedback | CampusNotes"});
+  res.render("team/feedback", {title: "Feedback | CampusNotes", showAds: false});
 })
 
 router.get("/faq", (req, res) => {
