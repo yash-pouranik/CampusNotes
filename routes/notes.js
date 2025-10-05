@@ -169,7 +169,26 @@ router.get("/notes/:nid", async (req, res) => {
       return res.redirect("/explore");
     }
 
-    res.render("notes/eachNote", { note: file, title: `${file.title} | campusnotes` });
+    console.log(file.subject.name);
+    const subId = file.subject._id;
+    
+    console.log(file.semester)
+    const fileSemester = file.semester;
+
+    const limit = 30
+
+    const subjectNotes = await Note.find({ subject: subId })
+    .populate("subject", "name")
+    .populate("uploadedBy", "username name roles verification")
+    .sort({ createdAt: -1 }) // newest first
+
+    const semNotes = await Note.find({ semester: fileSemester })
+    .populate("subject", "name")
+    .populate("uploadedBy", "username name roles verification")
+    .sort({ createdAt: -1 }) // newest first
+
+
+    res.render("notes/eachNote", { note: file, subjectNotes, semNotes, title: `${file.title} | campusnotes` });
   } catch (e) {
     console.error(e);
     req.flash("error", "Server Error")

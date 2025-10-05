@@ -124,9 +124,9 @@ app.get("/", async (req, res) => {
 app.use((req, res) => {
   res.status(404).render("errors/404", {
     title: "Page Not Found | CampusNotes",
+    showAds: false
   });
 });
-
 
 
 

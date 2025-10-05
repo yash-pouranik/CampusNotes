@@ -1,388 +1,62 @@
 <link rel="stylesheet" href="/css/eachNoteCss.css?v=03">
-<style>
-  body {
-    background: linear-gradient(120deg, #192643 0%, #192643 100%);
-    margin: 0;
-    color: #22223b;
-  }
-  .note-detail-container {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    min-height: 100vh;
-    padding: 40px 0;
-  }
-  .note-card {
-    background: #fff;
-    border-radius: 18px;
-    box-shadow: 0 8px 32px rgba(44, 62, 80, 0.12);
-    max-width: 950px;
-    width: 100%;
-    padding: 36px 40px 32px 40px;
-    display: flex;
-    flex-direction: column;
-    gap: 28px;
-  }
-  .note-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 16px;
-    border-bottom: 1px solid #e5e7eb;
-    padding-bottom: 18px;
-  }
-  .note-title {
-    font-size: 2.3rem;
-    font-weight: 700;
-    margin: 0;
-    color: #2575fc;
-    letter-spacing: 1px;
-  }
-  .badge-unverified {
-    background: #ff5f2e;
-    color: #fff;
-    padding: 5px 14px;
-    border-radius: 12px;
-    font-weight: 600;
-    margin-left: 12px;
-    font-size: 1rem;
-    vertical-align: middle;
-  }
-  .owner-actions {
-    display: flex;
-    gap: 12px;
-  }
-  .btn-edit, .btn-delete {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    padding: 6px 10px;
-    border-radius: 8px;
-    transition: background 0.2s;
-  }
-  .btn-delete{
-    color: red;
-  }
-  .btn-edit:hover { background: #e3fcec; }
-  .btn-delete:hover { background: #ffeaea; }
-  .note-meta {
-    display: flex;
-    align-items: center;
-    gap: 28px;
-    font-size: 1rem;
-    color: #4a4e69;
-    flex-wrap: wrap;
-    margin-top: 10px;
-    margin-bottom: 10px;
-  }
-  .note-meta .uploader {
-    display: flex;
-    align-items: center;
-    font-weight: 600;
-    font-size: 1.1rem;
-    color: #22223b;
-    gap: 8px;
-  }
-  .note-meta .role-badge {
-    vertical-align: middle;
-    width: 20px;
-    height: 20px;
-    margin-left: 4px;
-  }
-  .note-meta .meta-info {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    font-size: 0.95rem;
-    color: #6b6f85;
-  }
-  .note-meta .meta-info i {
-    color: #2575fc;
-    margin-right: 5px;
-  }
-  .note-main-content {
-    display: flex;
-    gap: 36px;
-    flex-wrap: wrap;
-  }
-  .note-preview {
-    flex: 1 1 380px;
-    min-width: 320px;
-    max-width: 480px;
-    background: #f7faff;
-    border-radius: 14px;
-    padding: 18px;
-    box-shadow: 0 4px 18px rgba(44,62,80,0.07);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 320px;
-  }
-  .note-preview-frame {
-    width: 100%;
-    height: 500px;
-    border-radius: 10px;
-    box-shadow: 0 2px 12px rgba(44,62,80,0.09);
-    margin-top: 8px;
-    border: 1px solid #e5e7eb;
-  }
-  .note-preview-img {
-    width: 100%;
-    max-height: 500px;
-    border-radius: 10px;
-    box-shadow: 0 2px 12px rgba(44,62,80,0.09);
-    margin-top: 8px;
-    border: 1px solid #e5e7eb;
-  }
-  .no-preview-text {
-    text-align: center;
-    font-style: italic;
-    color: #888;
-    margin-top: 40px;
-  }
-  .flash-error {
-    background: #ffe5e5;
-    color: #b91c1c;
-    padding: 12px;
-    border-radius: 12px;
-    margin-bottom: 15px;
-    border-left: 5px solid #ef4444;
-    font-weight: 500;
-    width: 100%;
-  }
-  .note-info {
-    flex: 1 1 320px;
-    min-width: 280px;
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-  }
-  .note-details, .note-description {
-    background: #f8f9fa;
-    border-radius: 10px;
-    padding: 18px 20px;
-    box-shadow: 0 2px 8px rgba(44,62,80,0.06);
-    margin-bottom: 10px;
-  }
-  .note-details h4, .note-description h4 {
-    margin: 0 0 10px 0;
-    color: #2575fc;
-    font-size: 1.1rem;
-    font-weight: 600;
-  }
-  .note-details ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  .note-details li {
-    margin-bottom: 7px;
-    font-size: 1rem;
-  }
-  .note-description p {
-    margin: 0;
-    color: #22223b;
-    font-size: 1rem;
-  }
-  .note-actions {
-    display: flex;
-    gap: 18px;
-    margin-top: 10px;
-    flex-wrap: wrap;
-  }
-  .btn-download, .btn-upvote {
-    padding: 12px 26px;
-    border-radius: 10px;
-    font-weight: 600;
-    background: linear-gradient(90deg, #2575fc, #6a11cb);
-    color: #fff;
-    text-decoration: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1.08rem;
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  .btn-download:hover, .btn-upvote:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(44,62,80,0.13);
-    background: linear-gradient(90deg, #6a11cb, #2575fc);
-  }
-  .ai-assistant-container {
-  background: #e6f0ff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(1, 89, 178, 0.008);
-  padding: 28px 24px 22px 24px;
-  margin-top: 32px;
-  margin-bottom: 10px;
-  display: block;
-}
 
-.ai-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 18px;
-}
-
-.ai-header-icon {
-  font-size: 2rem;
-  background: linear-gradient(90deg, #2575fc, #6a11cb);
-  color: #fff;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.ai-header h4 {
-  margin: 0;
-  font-size: 1.25rem;
-  color: #2575fc;
-  font-weight: 700;
-}
-
-.ai-btn {
-  background: linear-gradient(90deg, #192643, #192643);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 10px 22px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  margin-bottom: 12px;
-  transition: background 0.2s, box-shadow 0.2s;
-}
-
-.ai-btn:hover {
-  background: linear-gradient(90deg, #58189c, #0e3880);
-  box-shadow: 0 4px 16px rgba(44,62,80,0.13);
-}
-
-.ai-output {
-  background: #ffffff;
-  border-radius: 8px;
-  padding: 14px 16px;
-  margin-bottom: 18px;
-  font-size: 1rem;
-  color: #22223b;
-  min-height: 38px;
-  box-shadow: 0 1px 4px rgba(44,62,80,0.06);
-}
-
-.form-group {
-  display: flex;
-  padding-left: 10px;
-  border-left: solid 1px #192643;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-.form-group input[type="text"] {
-  flex: 1;
-  padding: 8px 12px;
-  border-radius: 7px;
-  border: 1px solid #d1d5db;
-  font-size: 1rem;
-  background: #fff;
-  transition: border 0.2s;
-}
-
-.form-group input[type="text"]:focus {
-  border: 1.5px solid #2575fc;
-  outline: none;
-}
-  @media (max-width: 1100px) {
-    .note-card {
-      padding: 24px 10px;
-    }
-    .note-main-content {
-      flex-direction: column;
-      gap: 24px;
-    }
-    .note-preview, .note-info {
-      max-width: 100%;
-      min-width: 0;
-    }
-  }
-</style>
 
 <section class="note-detail-container">
-  <div class="note-card">
-    <div class="note-card-header">
-      <div>
-        <h2 class="note-title"><%= note.title %></h2>
-        <% if(!note.isVerified) { %>
-          <span class="badge-unverified">Unverified</span>
-        <% } %>
-      </div>
-      <% if(currUser && (currUser._id.toString() === note.uploadedBy?._id?.toString() || currUser.roles?.isModerator)) { %>
-        <div class="owner-actions">
-          <a href="/notes/<%= note._id %>/edit" class="btn-edit" title="Edit"><i class="fa-regular fa-pen-to-square"></i></a>
-          <form action="/notes/<%= note._id %>?_method=DELETE" method="POST">
-            <button type="submit" class="btn-delete" title="Delete" onclick="return confirm('Delete this note?')"><i class="fa-solid fa-delete-left"></i></button>
-          </form>
-        </div>
-      <% } %>
-    </div>
+  <div class="note-card-new">
 
-    <div class="note-meta">
-      <a href="/profile/<%= note.uploadedBy?._id %>" style="text-decoration: none;">
-        <span class="uploader">
-          <%= note.uploadedBy?.name || 'Unknown' %>
+    <header class="new-header">
+      <h1 class="new-title"><%= note.title %></h1>
+      <div class="new-meta">
+        <a href="/profile/<%= note.uploadedBy?._id %>" class="uploader-link">
+          <span class="uploader-name"><%= note.uploadedBy?.name || 'Unknown' %></span>
           <% if (note.uploadedBy?.roles.isModerator) { %>
             <img src="/images/blueCheckmark.svg" alt="Moderator" class="role-badge">
-          <% } else if (note.uploadedBy?.roles.isDev) { %>
-            <img src="/images/icons8-checkmark.svg" alt="Developer" class="role-badge">
           <% } %>
-        </span>
+        </a>
+        <span class="meta-dot">·</span>
+        <span class="meta-date"><%= note.createdAt?.toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}) %></span>
+        <span class="meta-dot">·</span>
+        <span class="meta-down"><%= note.downloadCount %> <i class="fa-solid fa-download"></i></span>
+      </div>
+    </header>
+
+    <div class="action-bar">
+      <a href="/notes/<%= note._id %>/download" class="btn-action btn-download-new">
+        <i class="fa-solid fa-download"></i>
       </a>
-      <span class="meta-info">
-        <span><i class="fa fa-calendar"></i> <%= note.createdAt?.toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}) %></span>
-        <span><i class="fa fa-download"></i> <%= note.downloadCount %> downloads</span>
-      </span>
+      <form action="/notes/<%= note._id %>/upvote" method="POST" style="margin: 0;" style="width: 100%;">
+        <button class="btn-action btn-upvote-new">
+          <i class="fa-solid fa-thumbs-up"></i> 
+          <span><%= note.upvotes.length %></span>
+        </button>
+      </form>
     </div>
 
-    <div class="note-main-content">
-      <div class="note-preview">
-        <% if(!note.isVerified) { %>
-          <div class="flash-error">
-            ⏳ Waiting for moderator approval. Contact <a href="/bitbros/our-team">our team</a>.
-          </div>
-        <% } %>
-        <% if (note.fileUrl.toLowerCase().endsWith('.pdf')) { %>
-          <iframe src="<%= note.fileUrl %>#toolbar=0" class="note-preview-frame"></iframe>
-        <% } else if (/\.(jpg|jpeg|png|gif)$/i.test(note.fileUrl)) { %>
-          <img src="<%= note.fileUrl %>" class="note-preview-img">
-        <% } else { %>
-          <div class="no-preview-text">No preview available.</div>
-        <% } %>
-      </div>
-      <div class="note-info">
-        <div class="note-details">
-          <h4>Details</h4>
-          <ul>
-            <li><strong>Subject:</strong> <%= note.subject?.name || 'N/A' %></li>
-            <li><strong>Course:</strong> <%= note.course || 'N/A' %></li>
-            <li><strong>Semester:</strong> <%= note.semester || 'N/A' %></li>
-            <li><strong>Visibility:</strong> <%= note.visibility %></li>
-          </ul>
-        </div>
-        <div class="note-description">
-          <h4>Description</h4>
-          <p><%= note.description || 'No description provided.' %></p>
-        </div>
-        <div class="note-actions">
-          <a href="/notes/<%= note._id %>/download" class="btn-download">📥 Download</a>
-          <form action="/notes/<%= note._id %>/upvote" method="POST">
-            <button class="btn-upvote">👍 Upvote (<%= note.upvotes.length %>)</button>
-          </form>
-        </div>
-      </div>
+    <div class="note-preview-new">
+      <% if (note.fileUrl.toLowerCase().endsWith('.pdf')) { %>
+        <iframe src="<%= note.fileUrl %>#toolbar=0" class="note-preview-frame-new"></iframe>
+      <% } else if (/\.(jpg|jpeg|png|gif)$/i.test(note.fileUrl)) { %>
+        <img src="<%= note.fileUrl %>" class="note-preview-frame-new">
+      <% } else { %>
+        <div class="no-preview-text">No preview available.</div>
+      <% } %>
     </div>
+    
+    <details class="details-collapsible">
+      <summary class="details-summary">
+        View Details & Description
+      </summary>
+      <div class="details-content">
+        <ul>
+          <li><strong>Subject:</strong> <%= note.subject?.name || 'N/A' %></li>
+          <li><strong>Course:</strong> <%= note.course || 'N/A' %></li>
+          <li><strong>Semester:</strong> <%= note.semester || 'N/A' %></li>
+        </ul>
+        <p class="description-text">
+          <%= note.description || 'No description provided.' %>
+        </p>
+      </div>
+    </details>
 
     <div id="handwritten-notice" style="display: none; margin-top: 30px; background: #fef3c7; color: #92400e; border-left: 5px solid #f59e0b; padding: 1rem 1.5rem; border-radius: 6px;">
       <h4 style="margin: 0 0 10px 0;">🤖 AI Assistant Notice</h4>
@@ -391,8 +65,8 @@
 
     <div class="ai-assistant-container">
       <div class="ai-header">
-        <div class="ai-header-icon">🤖</div>
-        <h4>AI Assistant</h4>
+        <div class="ai-header-icon"><img src="/images/ai_f.png" alt="" class="ai-header-icon"></div>
+        <h4>VOLT AI</h4>
       </div>
       <button id="summarize-btn" class="ai-btn">✨ Generate Smart Summary</button>
       <div id="summary-output" class="ai-output">Click the button to get a summary...</div>
@@ -403,7 +77,48 @@
       </div>
       <div id="answer-output" class="ai-output">Your answer will appear here...</div>
     </div>
+
   </div>
+</section>
+<hr>
+<section class="recommendedNotes" style="color: white;">
+  <div class="subjects" style="margin-bottom: 2rem;">
+    <h1>More in <%= note.subject.name %></h1>
+    <% if (subjectNotes.length === 0) { %>
+      <p style="text-align: center; font-size: 1.1rem; color: #666;">No SVVV notes uploaded yet.</p>
+    <% } else { %>
+      <div class="note-grid">
+      <% subjectNotes.forEach(note => { %>
+          <div class="note-grid-card"> 
+            <h3 style="margin: 0;"><%= note.title %></h3>
+            <p><strong>Subject:</strong> <%= note.subject?.name || 'N/A' %></p>
+            <p><strong><i class="fa-solid fa-download"></i></strong> <%= note.downloadCount %></p>
+            <a href="/notes/<%= note._id %>" class="view-link">📄 View Note</a>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+  <hr>
+  <div class="semester">
+    <h1>More in Semester - <%= note.semester %></h1>
+    <% if (semNotes.length === 0) { %>
+      <p style="text-align: center; font-size: 1.1rem; color: #666;">No SVVV notes uploaded yet.</p>
+    <% } else { %>
+      <div class="note-grid">
+      <% semNotes.forEach(note => { %>
+          <div class="note-grid-card"> 
+            <h3 style="margin: 0;"><%= note.title %></h3>
+            <p><strong>Subject:</strong> <%= note.subject?.name || 'N/A' %></p>
+            <p><strong><i class="fa-solid fa-download"></i></strong> <%= note.downloadCount %></p>
+            <a href="/notes/<%= note._id %>" class="view-link">📄 View Note</a>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+  </div>
+
 </section>
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>

@@ -1,56 +1,240 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"/>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"/>
 
 <style>
   :root {
-    --primary: #4f46e5; --primary-light: #e0e7ff; --bg: #f3f4f6;
-    --card-bg: #ffffff; --text-dark: #111827; --text-light: #6b7280;
-    --border: #e5e7eb; --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+    --primary: #4f46e5;
+    --primary-light: #e0e7ff;
+    --bg: #f3f4f6;
+    --card-bg: #ffffff;
+    --text-dark: #111827;
+    --text-light: #6b7280;
+    --border: #e5e7eb;
+    --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
     --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
-    --radius: 12px; --transition: all 0.25s ease-in-out;
+    --radius: 12px;
+    --transition: all 0.25s ease-in-out;
   }
-  .dashboard-body { background-color: var(--bg); color: var(--text-dark); font-family: "Inter", Arial, sans-serif; }
-  .dashboard-container { padding: 1.5rem; max-width: 1600px; margin: auto; }
-  .dashboard-header { margin-bottom: 1.5rem; }
-  .dashboard-header h1 { font-size: 1.8rem; font-weight: 700; }
-  .section-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-dark); }
-  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
-  .stat-card { background: var(--card-bg); padding: 1.5rem; border-radius: var(--radius); box-shadow: var(--shadow); transition: var(--transition); }
-  .stat-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
-  .stat-card .header { display: flex; justify-content: space-between; align-items: center; color: var(--text-light); font-size: 0.9rem; margin-bottom: 0.75rem; }
-  .stat-card .value { font-size: 2.25rem; font-weight: 700; }
-  .stat-card .footer { font-size: 0.8rem; color: var(--text-light); margin-top: 1rem; }
-  .green { color: #10b981; } .red { color: #ef4444; }
-  .dashboard-main-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; }
-  .table-card, .sidebar-card { background: var(--card-bg); padding: 1.5rem; border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 1.5rem; }
-  .card-header { font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem; }
-  
-  /* === FIX FOR RESPONSIVE TABLES === */
+
+  /* ========================================== */
+  /* 1. GLOBAL STRUCTURE */
+  /* ========================================== */
+  .dashboard-body {
+    background-color: var(--bg);
+    color: var(--text-dark);
+    font-family: "Inter", Arial, sans-serif;
+    min-height: 100vh;
+  }
+  .dashboard-container {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: auto;
+  }
+
+  /* ========================================== */
+  /* 2. HEADER & TITLES */
+  /* ========================================== */
+  .dashboard-header {
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+  .dashboard-header h1 {
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: var(--primary);
+  }
+  .section-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin: 2rem 0 1rem;
+    color: var(--text-dark);
+    border-bottom: 2px solid var(--primary-light);
+    padding-bottom: 0.5rem;
+  }
+
+  /* ========================================== */
+  /* 4. STAT CARDS */
+  /* ========================================== */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 1.5rem;
+  }
+  .stat-card {
+    background: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+  }
+  .stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+  }
+  .stat-card .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-light);
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+  }
+  .stat-card .value {
+    font-size: 2rem;
+    font-weight: 700;
+  }
+  .stat-card .footer {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin-top: 0.8rem;
+  }
+  .green { color: #10b981; }
+  .red { color: #ef4444; }
+
+  /* ========================================== */
+  /* 5. MAIN LAYOUT & CARDS */
+  /* ========================================== */
+  .dashboard-main-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+  .table-card, .sidebar-card {
+    background: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 1.5rem; /* Add margin for stacking on mobile */
+  }
+  .card-header {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text-dark);
+  }
+
+  /* ========================================== */
+  /* 6. TABLE STYLES (THE FIX) */
+  /* ========================================== */
   .table-wrapper {
-    overflow-x: auto;
+    overflow-x: auto; /* This is the key fix */
   }
+  .dashboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 500px; /* Ensures table has a minimum width before scrolling */
+  }
+  .dashboard-table th,
+  .dashboard-table td {
+    padding: 12px 15px; /* Added more horizontal padding */
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    font-size: 0.9rem;
+    white-space: nowrap;
+  }
+  .dashboard-table th {
+    color: var(--text-light);
+    font-weight: 600;
+  }
+  .dashboard-table tr:hover {
+    background-color: #f8f9fa; /* Lighter hover for better readability */
+  }
+
+  /* ========================================== */
+  /* 7. CHARTS */
+  /* ========================================== */
+  .chart-container {
+    width: 100%;
+    height: 250px; /* A bit more space for the chart */
+  }
+
+  /* ========================================== */
+  /* 8. RESPONSIVE DESIGN */
+  /* ========================================== */
   
-  .dashboard-table { width: 100%; border-collapse: collapse; }
-  .dashboard-table th, .dashboard-table td { padding: 12px; border-bottom: 1px solid var(--border); text-align: left; font-size: 0.9rem; white-space: nowrap; }
-  .dashboard-table th { font-weight: 600; color: var(--text-light); }
-  .dashboard-table td { color: #334155; }
-  .dashboard-table tr:last-child td { border-bottom: none; }
-  .dashboard-table tr:hover { background-color: #f8f9fa; }
-  .chart-container { height: 250px; display: flex; justify-content: center; align-items: center; }
-  .contributor-list .contributor { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
-  .contributor-list img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
-  .contributor-list .name { font-weight: 600; }
-  .contributor-list .uploads { color: var(--text-light); font-size: 0.85rem; }
-  @media (max-width: 1024px) { .dashboard-main-grid { grid-template-columns: 1fr; } }
+  /* For Tablets and smaller laptops */
+  @media (max-width: 1024px) {
+    .dashboard-main-grid {
+      grid-template-columns: 1fr; /* Stack columns on tablets */
+    }
+    .dashboard-container {
+      padding: 1.5rem;
+    }
+  }
+
+  /* For Mobile Phones */
+  @media (max-width: 600px) {
+    .dashboard-container {
+      padding: 1rem;
+    }
+    .dashboard-header h1 {
+      font-size: 1.5rem;
+    }
+    .section-title {
+      font-size: 1.1rem;
+    }
+    .card-header {
+      font-size: 1.1rem;
+    }
+    .stat-card {
+      padding: 1rem;
+    }
+    .stat-card .value {
+      font-size: 1.8rem;
+    }
+    .dashboard-table th,
+    .dashboard-table td {
+      padding: 10px 12px;
+      font-size: 0.85rem;
+    }
+  }
+
+  /* ========================================== */
+/* 6. TABLE STYLES (REVISED FIX) */
+/* ========================================== */
+
+/* This wrapper div is the key. It will contain the wide table and scroll. */
+.table-wrapper {
+  overflow-x: auto; /* This creates the horizontal scrollbar */
+  width: 100%;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
+
+.dashboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 500px; /* Forces the table to be wide, triggering the scrollbar */
+}
+
+.dashboard-table th,
+.dashboard-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  font-size: 0.9rem;
+  white-space: nowrap; /* Prevents text in cells from wrapping */
+}
+
+.dashboard-table th {
+  color: var(--text-light);
+  font-weight: 600;
+}
+
+.dashboard-table tr:hover {
+  background-color: #f8f9fa;
+}
 </style>
 
 <div class="dashboard-body">
   <div class="dashboard-container">
-    <header class="dashboard-header"><h1>Admin Dashboard</h1></header>
-    
+    <header class="dashboard-header">
+      <h1>Admin Dashboard</h1>
+    </header>
+
     <h2 class="section-title">Core Metrics</h2>
     <section class="stats-grid">
       <div class="stat-card">
@@ -77,25 +261,26 @@
 
     <h2 class="section-title">Traffic Analysis</h2>
     <section class="stats-grid">
-        <div class="stat-card">
-            <div class="header"><span>Unique Downloads</span><i class="fas fa-user-check"></i></div>
-            <p class="value"><%= totalUniqueDownloads %><span style="font-size: 1rem;">(out of <%= totalDownloads - 558 %>)</span></p>
-        </div>
-        <div class="stat-card">
-            <div class="header"><span>Unique Sessions</span><i class="fas fa-street-view"></i></div>
-            <p class="value"><%= uniqueSessions %></p>
-        </div>
-        <div class="stat-card">
-            <div class="header"><span>Unique IPs</span><i class="fas fa-network-wired"></i></div>
-            <p class="value"><%= uniqueIps %></p>
-        </div>
+      <div class="stat-card">
+        <div class="header"><span>Unique Downloads</span><i class="fas fa-user-check"></i></div>
+        <p class="value"><%= totalUniqueDownloads %> <span style="font-size: 1rem;">(of <%= totalDownloads - 558 %>)</span></p>
+      </div>
+      <div class="stat-card">
+        <div class="header"><span>Unique Sessions</span><i class="fas fa-street-view"></i></div>
+        <p class="value"><%= uniqueSessions %></p>
+      </div>
+      <div class="stat-card">
+        <div class="header"><span>Unique IPs</span><i class="fas fa-network-wired"></i></div>
+        <p class="value"><%= uniqueIps %></p>
+      </div>
     </section>
 
     <div class="dashboard-main-grid">
       <main class="main-content">
         <section class="table-card">
           <h2 class="card-header">Top 5 Most Downloaded Notes</h2>
-          <div class="table-wrapper"> <table class="dashboard-table">
+          <div class="table-wrapper">
+            <table class="dashboard-table">
               <thead><tr><th>Title</th><th>Downloads</th><th>Course</th></tr></thead>
               <tbody>
                 <% topNotes.forEach(note => { %>
@@ -105,7 +290,6 @@
             </table>
           </div>
         </section>
-        
       </main>
 
       <aside class="right-sidebar">
@@ -113,10 +297,10 @@
           <h2 class="card-header">User Verification</h2>
           <div class="chart-container"><canvas id="userVerificationChart"></canvas></div>
         </section>
-        
         <section class="sidebar-card">
           <h2 class="card-header">Notes by Course</h2>
-           <div class="table-wrapper"> <table class="dashboard-table">
+          <div class="table-wrapper">
+            <table class="dashboard-table">
               <tbody>
                 <% courseWise.forEach(row => { %>
                   <tr><td><%= row._id %></td><td><%= row.notes %> notes</td></tr>
@@ -131,22 +315,23 @@
 </div>
 
 <script>
-    const ctx = document.getElementById('userVerificationChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Verified', 'Unverified'],
-            datasets: [{
-                data: [<%= verifiedUsers %>, <%= unverifiedUsers %>],
-                backgroundColor: ['#4f46e5', '#e5e7eb'],
-                borderColor: '#ffffff',
-                borderWidth: 4
-            }]
-        },
-        options: {
-            responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { position: 'bottom' } },
-            cutout: '70%'
-        }
-    });
+const ctx = document.getElementById('userVerificationChart').getContext('2d');
+new Chart(ctx, {
+  type: 'doughnut',
+  data: {
+    labels: ['Verified', 'Unverified'],
+    datasets: [{
+      data: [<%= verifiedUsers %>, <%= unverifiedUsers %>],
+      backgroundColor: ['#4f46e5', '#e5e7eb'],
+      borderWidth: 4,
+      borderColor: '#fff'
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom' } },
+    cutout: '70%'
+  }
+});
 </script>
