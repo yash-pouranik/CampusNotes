@@ -33,7 +33,7 @@ router.get("/", isLoggedIn, isModerator, async (req, res) => {
     const LastDownloads = await DownloadLog.find()
     .populate("note")
     .sort({ downloadedAt: -1 })
-    .limit(30);
+    .limit(10);
 
     // === User Engagement ===
     const newSignups = await User.countDocuments({ createdAt: { $gte: sevenDaysAgo } });
@@ -50,7 +50,7 @@ router.get("/", isLoggedIn, isModerator, async (req, res) => {
     const newNoteUploads = await Note.countDocuments({ createdAt: { $gte: sevenDaysAgo } });
     const topNotes = await Note.find({})
       .sort({ downloadCount: -1 })
-      .limit(20)
+      .limit(12)
       .select("title course downloadCount");
     const courseWise = await Note.aggregate([
         { $group: { _id: "$course", notes: { $sum: 1 } } },
