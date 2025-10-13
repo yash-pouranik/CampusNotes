@@ -7,6 +7,7 @@ const cookieParser = require('cookie-parser'); // Require cookie-parser
 
 const app = express();
 const session = require('express-session');
+const MongoStore = require('connect-mongo'); // <-- YEH LINE ADD KAREIN
 const passport = require('passport');
 require('dotenv').config();
 require('./config/passport'); // path to the passport file
@@ -46,6 +47,14 @@ app.use(session({
   secret: process.env.SECRET,
   resave: false,
   saveUninitialized: true,
+  
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGODB_URI, // Yeh aapke .env file se connection string le lega
+    collectionName: 'sessions', // MongoDB mein collection ka naam
+    ttl: 14 * 24 * 60 * 60 // Session kab tak store rahe (7 din)
+  }),
+  // =======================================
+
   cookie: {
     maxAge: 7 * 24 * 60 * 60 * 1000  // 7 days in milliseconds
   }

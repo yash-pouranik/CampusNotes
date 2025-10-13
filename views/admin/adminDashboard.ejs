@@ -1,337 +1,472 @@
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"/>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-light: #c7d2fe;
+            --secondary-color: #10b981;
+            --danger-color: #ef4444;
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"/>
+            /* Light Mode Variables */
+            --bg-color: #f3f4f6;
+            --card-bg-color: #ffffff;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+        }
 
-<style>
-  :root {
-    --primary: #4f46e5;
-    --primary-light: #e0e7ff;
-    --bg: #f3f4f6;
-    --card-bg: #ffffff;
-    --text-dark: #111827;
-    --text-light: #6b7280;
-    --border: #e5e7eb;
-    --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
-    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
-    --radius: 12px;
-    --transition: all 0.25s ease-in-out;
-  }
+        /* Dark Mode Variables */
+        body.dark-mode {
+            --bg-color: #111827;
+            --card-bg-color: #1f2937;
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --border-color: #374151;
+        }
 
-  /* ========================================== */
-  /* 1. GLOBAL STRUCTURE */
-  /* ========================================== */
-  .dashboard-body {
-    background-color: var(--bg);
-    color: var(--text-dark);
-    font-family: "Inter", Arial, sans-serif;
-    min-height: 100vh;
-  }
-  .dashboard-container {
-    padding: 2rem;
-    max-width: 1400px;
-    margin: auto;
-  }
+        /* ========================================== */
+        /* 1. GLOBAL & LAYOUT */
+        /* ========================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-  /* ========================================== */
-  /* 2. HEADER & TITLES */
-  /* ========================================== */
-  .dashboard-header {
-    margin-bottom: 1.5rem;
-    text-align: center;
-  }
-  .dashboard-header h1 {
-    font-size: 1.9rem;
-    font-weight: 700;
-    color: var(--primary);
-  }
-  .section-title {
-    font-size: 1.3rem;
-    font-weight: 600;
-    margin: 2rem 0 1rem;
-    color: var(--text-dark);
-    border-bottom: 2px solid var(--primary-light);
-    padding-bottom: 0.5rem;
-  }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: "Inter", Arial, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
 
-  /* ========================================== */
-  /* 4. STAT CARDS */
-  /* ========================================== */
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-    gap: 1.5rem;
-  }
-  .stat-card {
-    background: var(--card-bg);
-    padding: 1.5rem;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    transition: var(--transition);
-  }
-  .stat-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
-  }
-  .stat-card .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: var(--text-light);
-    margin-bottom: 0.5rem;
-    font-size: 0.95rem;
-  }
-  .stat-card .value {
-    font-size: 2rem;
-    font-weight: 700;
-  }
-  .stat-card .footer {
-    font-size: 0.85rem;
-    color: var(--text-light);
-    margin-top: 0.8rem;
-  }
-  .green { color: #10b981; }
-  .red { color: #ef4444; }
+        .dashboard-container {
+            padding: 1.5rem 2rem;
+            max-width: 1600px;
+            margin: auto;
+        }
 
-  /* ========================================== */
-  /* 5. MAIN LAYOUT & CARDS */
-  /* ========================================== */
-  .dashboard-main-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 1.5rem;
-    margin-top: 2rem;
-  }
-  .table-card, .sidebar-card {
-    background: var(--card-bg);
-    padding: 1.5rem;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    margin-bottom: 1.5rem; /* Add margin for stacking on mobile */
-  }
-  .card-header {
-    font-size: 1.2rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-    color: var(--text-dark);
-  }
+        /* ========================================== */
+        /* 2. HEADER */
+        /* ========================================== */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
 
-  /* ========================================== */
-  /* 6. TABLE STYLES (THE FIX) */
-  /* ========================================== */
-  .table-wrapper {
-    overflow-x: auto; /* This is the key fix */
-  }
-  .dashboard-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 500px; /* Ensures table has a minimum width before scrolling */
-  }
-  .dashboard-table th,
-  .dashboard-table td {
-    padding: 12px 15px; /* Added more horizontal padding */
-    border-bottom: 1px solid var(--border);
-    text-align: left;
-    font-size: 0.9rem;
-    white-space: nowrap;
-  }
-  .dashboard-table th {
-    color: var(--text-light);
-    font-weight: 600;
-  }
-  .dashboard-table tr:hover {
-    background-color: #f8f9fa; /* Lighter hover for better readability */
-  }
+        .dashboard-header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .theme-switch {
+            background-color: var(--card-bg-color);
+            border: 1px solid var(--border-color);
+            padding: 0.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.2s ease;
+        }
+        .theme-switch:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
 
-  /* ========================================== */
-  /* 7. CHARTS */
-  /* ========================================== */
-  .chart-container {
-    width: 100%;
-    height: 250px; /* A bit more space for the chart */
-  }
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 2.5rem 0 1rem;
+            color: var(--text-secondary);
+        }
 
-  /* ========================================== */
-  /* 8. RESPONSIVE DESIGN */
-  /* ========================================== */
-  
-  /* For Tablets and smaller laptops */
-  @media (max-width: 1024px) {
-    .dashboard-main-grid {
-      grid-template-columns: 1fr; /* Stack columns on tablets */
-    }
-    .dashboard-container {
-      padding: 1.5rem;
-    }
-  }
+        /* ========================================== */
+        /* 3. STAT CARDS */
+        /* ========================================== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+        }
 
-  /* For Mobile Phones */
-  @media (max-width: 600px) {
-    .dashboard-container {
-      padding: 1rem;
-    }
-    .dashboard-header h1 {
-      font-size: 1.5rem;
-    }
-    .section-title {
-      font-size: 1.1rem;
-    }
-    .card-header {
-      font-size: 1.1rem;
-    }
-    .stat-card {
-      padding: 1rem;
-    }
-    .stat-card .value {
-      font-size: 1.8rem;
-    }
-    .dashboard-table th,
-    .dashboard-table td {
-      padding: 10px 12px;
-      font-size: 0.85rem;
-    }
-  }
+        .stat-card {
+            background: var(--card-bg-color);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            transition: all 0.25s ease-in-out;
+            display: flex;
+            align-items: flex-start;
+        }
 
-  /* ========================================== */
-/* 6. TABLE STYLES (REVISED FIX) */
-/* ========================================== */
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .stat-card .icon {
+            flex-shrink: 0;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.2rem;
+        }
+        .stat-card:nth-child(1) .icon { background-color: #e0e7ff; color: #4338ca; }
+        .stat-card:nth-child(2) .icon { background-color: #d1fae5; color: #047857; }
+        .stat-card:nth-child(3) .icon { background-color: #cffafe; color: #0891b2; }
+        .stat-card:nth-child(4) .icon { background-color: #fee2e2; color: #b91c1c; }
+        .stat-card:nth-child(5) .icon { background-color: #fef3c7; color: #b45309; }
+        .stat-card:nth-child(6) .icon { background-color: #e0e7ff; color: #4338ca; }
+        .stat-card:nth-child(7) .icon { background-color: #d1fae5; color: #047857; }
+        
+        .stat-card .info .label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
 
-/* This wrapper div is the key. It will contain the wide table and scroll. */
-.table-wrapper {
-  overflow-x: auto; /* This creates the horizontal scrollbar */
-  width: 100%;
-  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-}
+        .stat-card .info .value {
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1;
+        }
 
-.dashboard-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 500px; /* Forces the table to be wide, triggering the scrollbar */
-}
+        .stat-card .info .footer {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.8rem;
+        }
+        .green { color: var(--secondary-color); font-weight: 500;}
+        .red { color: var(--danger-color); font-weight: 500;}
 
-.dashboard-table th,
-.dashboard-table td {
-  padding: 12px 15px;
-  border-bottom: 1px solid var(--border);
-  text-align: left;
-  font-size: 0.9rem;
-  white-space: nowrap; /* Prevents text in cells from wrapping */
-}
+        /* ========================================== */
+        /* 4. MAIN LAYOUT & CARDS */
+        /* ========================================== */
+        .dashboard-main-grid {
+            display: grid;
+            grid-template-columns: 2.5fr 1fr;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
 
-.dashboard-table th {
-  color: var(--text-light);
-  font-weight: 600;
-}
+        .content-card {
+            background: var(--card-bg-color);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+        }
 
-.dashboard-table tr:hover {
-  background-color: #f8f9fa;
-}
-</style>
+        .card-header {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
 
-<div class="dashboard-body">
-  <div class="dashboard-container">
-    <header class="dashboard-header">
-      <h1>Admin Dashboard</h1>
-    </header>
+        /* ========================================== */
+        /* 5. TABLE STYLES */
+        /* ========================================== */
+        .table-wrapper {
+            overflow-x: auto;
+        }
 
-    <h2 class="section-title">Core Metrics</h2>
-    <section class="stats-grid">
-      <div class="stat-card">
-        <div class="header"><span>Total Users</span><i class="fas fa-users"></i></div>
-        <p class="value"><%= totalUsers %></p>
-        <p class="footer"><span class="green">+<%= newSignups %></span> in last 7 days</p>
-      </div>
-      <div class="stat-card">
-        <div class="header"><span>Total Notes</span><i class="fas fa-file-alt"></i></div>
-        <p class="value"><%= totalNotes %></p>
-        <p class="footer"><span class="green">+<%= newNoteUploads %></span> in last 7 days</p>
-      </div>
-      <div class="stat-card">
-        <div class="header"><span>Total Downloads</span><i class="fas fa-download"></i></div>
-        <p class="value"><%= totalDownloads %></p>
-        <p class="footer"><span class="green">+<%= downloadsLast7Days %></span> in last 7 days</p>
-      </div>
-      <div class="stat-card">
-        <div class="header"><span>Pending Notes</span><i class="fas fa-tasks"></i></div>
-        <p class="value red"><%= notesPendingVerification %></p>
-        <p class="footer">Awaiting review</p>
-      </div>
-    </section>
+        .dashboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .dashboard-table th,
+        .dashboard-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: left;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+        .dashboard-table th {
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+        .dashboard-table tbody tr {
+            transition: background-color 0.2s ease;
+        }
+        .dashboard-table tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+        body.dark-mode .dashboard-table tbody tr:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        .dashboard-table tbody tr:last-child td {
+            border-bottom: none;
+        }
 
-    <h2 class="section-title">Traffic Analysis</h2>
-    <section class="stats-grid">
-      <div class="stat-card">
-        <div class="header"><span>Unique Downloads</span><i class="fas fa-user-check"></i></div>
-        <p class="value"><%= totalUniqueDownloads %> <span style="font-size: 1rem;">(of <%= totalDownloads - 558 %>)</span></p>
-      </div>
-      <div class="stat-card">
-        <div class="header"><span>Unique Sessions</span><i class="fas fa-street-view"></i></div>
-        <p class="value"><%= uniqueSessions %></p>
-      </div>
-      <div class="stat-card">
-        <div class="header"><span>Unique IPs</span><i class="fas fa-network-wired"></i></div>
-        <p class="value"><%= uniqueIps %></p>
-      </div>
-    </section>
+        /* ========================================== */
+        /* 6. CHARTS & SIDEBAR LISTS */
+        /* ========================================== */
+        .chart-container {
+            width: 100%;
+            height: 250px;
+        }
+        .activity-list {
+            list-style: none;
+        }
+        .activity-list li {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.9rem;
+        }
+        .activity-list li:last-child {
+            border-bottom: none;
+        }
+        .activity-list li .icon {
+            margin-right: 1rem;
+            color: var(--text-secondary);
+        }
 
-    <div class="dashboard-main-grid">
-      <main class="main-content">
-        <section class="table-card">
-          <h2 class="card-header">Top 5 Most Downloaded Notes</h2>
-          <div class="table-wrapper">
-            <table class="dashboard-table">
-              <thead><tr><th>Title</th><th>Downloads</th><th>Course</th></tr></thead>
-              <tbody>
-                <% topNotes.forEach(note => { %>
-                <tr><td><%= note.title %></td><td><%= note.downloadCount %></td><td><%= note.course %></td></tr>
-                <% }) %>
-              </tbody>
-            </table>
-          </div>
+        /* ========================================== */
+        /* 7. RESPONSIVE DESIGN */
+        /* ========================================== */
+        @media (max-width: 1024px) {
+            .dashboard-main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width: 600px) {
+            .dashboard-container {
+                padding: 1rem;
+            }
+            .dashboard-header h1 {
+                font-size: 1.5rem;
+            }
+            .stat-card {
+                padding: 1rem;
+            }
+            .stat-card .info .value {
+                font-size: 1.75rem;
+            }
+        }
+        
+    </style>
+</head>
+<body class=""> <div class="dashboard-container">
+        <header class="dashboard-header">
+            <h1>Admin Dashboard</h1>
+            <button class="theme-switch" id="theme-toggle" title="Toggle dark mode">
+                <i class="fas fa-moon"></i>
+            </button>
+        </header>
+
+        <h2 class="section-title">Core Metrics</h2>
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="icon"><i class="fas fa-users"></i></div>
+                <div class="info">
+                    <p class="label">Total Users</p>
+                    <p class="value"><%= totalUsers %></p>
+                    <p class="footer"><span class="green">+<%= newSignups %></span> in last 7 days</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon"><i class="fas fa-file-alt"></i></div>
+                <div class="info">
+                    <p class="label">Total Notes</p>
+                    <p class="value"><%= totalNotes %></p>
+                    <p class="footer"><span class="green">+<%= newNoteUploads %></span> in last 7 days</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon"><i class="fas fa-download"></i></div>
+                <div class="info">
+                    <p class="label">Total Downloads</p>
+                    <p class="value"><%= totalDownloads %></p>
+                    <p class="footer"><span class="green">+<%= downloadsLast7Days %></span> in last 7 days</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon"><i class="fas fa-tasks"></i></div>
+                <div class="info">
+                    <p class="label">Pending Notes</p>
+                    <p class="value red"><%= notesPendingVerification %></p>
+                    <p class="footer">Awaiting review</p>
+                </div>
+            </div>
         </section>
-      </main>
 
-      <aside class="right-sidebar">
-        <section class="sidebar-card">
-          <h2 class="card-header">User Verification</h2>
-          <div class="chart-container"><canvas id="userVerificationChart"></canvas></div>
+        <h2 class="section-title">Traffic Analysis</h2>
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="icon"><i class="fas fa-user-check"></i></div>
+                <div class="info">
+                    <p class="label">Unique Downloads</p>
+                    <p class="value"><%= totalUniqueDownloads %></p>
+                    <p class="footer">of <%= totalDownloads - 558 %> total</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon"><i class="fas fa-street-view"></i></div>
+                <div class="info">
+                    <p class="label">Unique Sessions</p>
+                    <p class="value"><%= uniqueSessions %></p>
+                    <p class="footer">User visits</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon"><i class="fas fa-network-wired"></i></div>
+                <div class="info">
+                    <p class="label">Unique IPs</p>
+                    <p class="value"><%= uniqueIps %></p>
+                    <p class="footer">Distinct addresses</p>
+                </div>
+            </div>
         </section>
-        <section class="sidebar-card">
-          <h2 class="card-header">Notes by Course</h2>
-          <div class="table-wrapper">
-            <table class="dashboard-table">
-              <tbody>
-                <% courseWise.forEach(row => { %>
-                  <tr><td><%= row._id %></td><td><%= row.notes %> notes</td></tr>
-                <% }) %>
-              </tbody>
-            </table>
-          </div>
-        </section>
-      </aside>
+
+        <div class="dashboard-main-grid">
+            <main class="main-content">
+                <section class="content-card">
+                    <h2 class="card-header">Top 12 Most Downloaded Notes</h2>
+                    <div class="table-wrapper">
+                        <table class="dashboard-table">
+                            <thead><tr><th>Title</th><th>Downloads</th><th>Course</th></tr></thead>
+                            <tbody>
+                                <% topNotes.forEach(note => { %>
+                                <tr><td><%= note.title %></td><td><%= note.downloadCount %></td><td><%= note.course %></td></tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </main>
+
+            <aside class="right-sidebar">
+                <section class="content-card">
+                    <h2 class="card-header">User Verification</h2>
+                    <div class="chart-container"><canvas id="userVerificationChart"></canvas></div>
+                </section>
+                
+                <section class="content-card">
+                    <h2 class="card-header">Recent Signups</h2>
+                    <ul class="activity-list">
+                        <% fiveLastUsers.forEach(row => { %>
+                            <li><span class="icon"><i class="fas fa-user-plus"></i></span> <%= row.name %></li>
+                        <% }) %>
+                    </ul>
+                </section>
+                
+                <section class="content-card">
+                    <h2 class="card-header">Recent Downloads</h2>
+                     <ul class="activity-list">
+                        <% LastDownloads.forEach(row => { %>
+                            <li><span class="icon"><i class="fas fa-cloud-download-alt"></i></span> <%= row.note.title %></li>
+                        <% }) %>
+                    </ul>
+                </section>
+
+                <section class="content-card">
+                    <h2 class="card-header">Notes by Course</h2>
+                    <div class="table-wrapper">
+                        <table class="dashboard-table">
+                            <tbody>
+                                <% courseWise.forEach(row => { %>
+                                    <tr><td><strong><%= row._id %></strong></td><td><%= row.notes %> notes</td></tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </aside>
+        </div>
     </div>
-  </div>
-</div>
 
-<script>
-const ctx = document.getElementById('userVerificationChart').getContext('2d');
-new Chart(ctx, {
-  type: 'doughnut',
-  data: {
-    labels: ['Verified', 'Unverified'],
-    datasets: [{
-      data: [<%= verifiedUsers %>, <%= unverifiedUsers %>],
-      backgroundColor: ['#4f46e5', '#e5e7eb'],
-      borderWidth: 4,
-      borderColor: '#fff'
-    }]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: { legend: { position: 'bottom' } },
-    cutout: '70%'
-  }
-});
-</script>
+    <script>
+        // Chart.js Doughnut Chart
+        const ctx = document.getElementById('userVerificationChart').getContext('2d');
+        const rootStyles = getComputedStyle(document.documentElement);
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Verified', 'Unverified'],
+                datasets: [{
+                    data: [<%= verifiedUsers %>, <%= unverifiedUsers %>],
+                    backgroundColor: [rootStyles.getPropertyValue('--primary-color').trim(), rootStyles.getPropertyValue('--border-color').trim()],
+                    borderWidth: 4,
+                    borderColor: rootStyles.getPropertyValue('--card-bg-color').trim()
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { 
+                    legend: { 
+                        position: 'bottom',
+                        labels: {
+                            color: rootStyles.getPropertyValue('--text-secondary').trim()
+                        }
+                    } 
+                },
+                cutout: '70%'
+            }
+        });
+        
+        // Dark Mode Toggle Logic
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        const icon = themeToggle.querySelector('i');
+
+        // Function to set theme
+        const setTheme = (isDark) => {
+            if (isDark) {
+                body.classList.add('dark-mode');
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                body.classList.remove('dark-mode');
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+                localStorage.setItem('theme', 'light');
+            }
+        };
+
+        // Event listener for the toggle button
+        themeToggle.addEventListener('click', () => {
+            setTheme(!body.classList.contains('dark-mode'));
+        });
+
+        // Check for saved theme preference on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            // Default to light theme if no preference or if system prefers light
+            let prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (savedTheme) {
+                 setTheme(savedTheme === 'dark');
+            } else {
+                 setTheme(prefersDark);
+            }
+        });
+
+    </script>
+</body>
+</html>

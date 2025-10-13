@@ -26,6 +26,15 @@ router.get("/", isLoggedIn, isModerator, async (req, res) => {
     const uniqueSessions = (await DownloadLog.distinct("downloaderId")).length;
     const uniqueIps = (await DownloadLog.distinct("ip")).length;
 
+    const fiveLastUsers = await User.find()
+    .sort({ createdAt: -1 })
+    .limit(5);
+
+    const LastDownloads = await DownloadLog.find()
+    .populate("note")
+    .sort({ downloadedAt: -1 })
+    .limit(30);
+
     // === User Engagement ===
     const newSignups = await User.countDocuments({ createdAt: { $gte: sevenDaysAgo } });
     const verifiedUsers = await User.countDocuments({ "verification.verified": true });
@@ -41,7 +50,7 @@ router.get("/", isLoggedIn, isModerator, async (req, res) => {
     const newNoteUploads = await Note.countDocuments({ createdAt: { $gte: sevenDaysAgo } });
     const topNotes = await Note.find({})
       .sort({ downloadCount: -1 })
-      .limit(5)
+      .limit(20)
       .select("title course downloadCount");
     const courseWise = await Note.aggregate([
         { $group: { _id: "$course", notes: { $sum: 1 } } },
@@ -68,6 +77,8 @@ router.get("/", isLoggedIn, isModerator, async (req, res) => {
       newNoteUploads,
       topNotes,
       courseWise,
+      fiveLastUsers,
+      LastDownloads,
     });
   } catch (err) {
     console.error("Admin Dashboard Error:", err);
