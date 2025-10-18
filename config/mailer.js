@@ -1,204 +1,203 @@
 // config/mailer.js
-const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
 const User = require("../models/user");
 
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.USER_EMAIL,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+// Initialize Resend with your API key from .env
+const resend = new Resend(process.env.RESEND_API_KEY);
+const fromEmail = "CampusNotes <campusnotes@bitbros.in>"; // Verified email on Resend
 
-
+/**
+ * Sends a notification to all users (except the poster) about a new note request.
+ */
 module.exports.sendNewRequestMail = async (requestData) => {
   try {
-    // exclude the request poster
+    // Exclude the request poster
     const users = await User.find(
-      { _id: { $ne: requestData._id } },  // 👈 poster exclude
+      { _id: { $ne: requestData._id } },
       "email"
     );
 
-    const emailList = users.map(u => u.email);
+    const emailList = users.map((u) => u.email);
 
-    if (!emailList.length) return console.log("⚠️ No users to mail.");
+    if (!emailList.length) {
+      console.log("⚠️ No users to mail.");
+      return;
+    }
 
-    await transporter.sendMail({
-      from: '"CamousNotes" <campusnotes@bitbros.in>',
-      bcc: emailList,
+    const { data, error } = await resend.emails.send({
+      from: fromEmail,
+      to: emailList, // Resend handles arrays for bulk sending
       subject: "📢 New Notes Request Posted!",
       html: `
         <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.5; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;">
           <h2 style="color: #2563eb; text-align: center;">New Request on CampusNotes</h2>
-          
           <p style="font-size: 16px;">
             <strong>${requestData.user.username || requestData.user.name}</strong> has requested new notes:
           </p>
-          
           <div style="background: #fff; border-left: 4px solid #2563eb; padding: 12px 16px; margin: 16px 0; border-radius: 4px; font-style: italic;">
             ${requestData.content}
           </div>
-          
           <div style="text-align: center; margin-top: 20px;">
             <a href="https://campusnotes.bitbros.in/requestnotes" 
-              style="display: inline-block; background-color: #2563eb; color: #fff; padding: 12px 20px; border-radius: 6px; text-decoration: none; font-weight: bold;">
+               style="display: inline-block; background-color: #2563eb; color: #fff; padding: 12px 20px; border-radius: 6px; text-decoration: none; font-weight: bold;">
               View Request
             </a>
           </div>
-          
           <p style="font-size: 12px; color: #888; text-align: center; margin-top: 30px;">
             You are receiving this email because you are subscribed to CampusNotes notifications.
           </p>
         </div>
-      `
+      `,
     });
 
+    if (error) {
+      throw new Error(error);
+    }
 
-    console.log("✅ Emails sent (excluding poster)");
+    console.log("✅ New request emails sent via Resend:", data.id);
   } catch (err) {
-    console.error("❌ Error sending mails:", err);
+    console.error("❌ Error sending new request mail:", err);
   }
 };
 
-
+/**
+ * Sends a password reset OTP to a specific user.
+ */
 module.exports.sendOTP = async (mail, otp) => {
   try {
-    // check user
     const user = await User.findOne({ email: mail });
-
     if (!user) {
       console.log("⚠️ No user found with this email.");
       return;
     }
 
-    await transporter.sendMail({
-      from: '"CamousNotes" <campusnotes@bitbros.in>',
-      to: user.email,  // ✅ bcc ki zarurat nahi yaha
-      subject: "📢 OTP for Password Reset!",
+    const { data, error } = await resend.emails.send({
+      from: fromEmail,
+      to: [user.email],
+      subject: "OTP for Password Reset!",
       html: `
         <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.5; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;">
           <h2 style="color: #2563eb; text-align: center;">CampusNotes Password Reset</h2>
-          
           <p style="font-size: 16px;">
             Hello <strong>${user.name || user.username || "User"}</strong>,
           </p>
-          
           <p style="font-size: 15px;">
             We received a request to reset your password. Use the OTP below to continue:
           </p>
-          
           <div style="background: #fff; border-left: 4px solid #2563eb; padding: 12px 16px; margin: 16px 0; border-radius: 4px; font-size: 20px; text-align: center; font-weight: bold; letter-spacing: 3px;">
             ${otp}
           </div>
-          
           <p style="font-size: 14px; color: #555;">
             This OTP is valid for the next 10 minutes. If you didn’t request a password reset, you can safely ignore this email.
           </p>
-          
           <p style="font-size: 12px; color: #888; text-align: center; margin-top: 30px;">
             © ${new Date().getFullYear()} CampusNotes. All rights reserved.
           </p>
         </div>
-      `
+      `,
     });
 
-    console.log("✅ OTP sent successfully to:", user.email);
+    // NEW - This will print the detailed error from Resend
+    if (error) {
+      console.error("Resend API Error:", error); // Log the full error object
+      throw new Error("Failed to send email via Resend."); // Throw a generic message
+    }
+
+    console.log("✅ OTP sent successfully via Resend to:", user.email);
   } catch (err) {
     console.error("❌ Error sending OTP:", err);
   }
 };
 
-
+/**
+ * Sends a notification about the status of a user's uploaded note.
+ */
 module.exports.sendVerificationMail = async (mail, status) => {
   try {
-    // check user
     const user = await User.findOne({ email: mail });
-
     if (!user) {
       console.log("⚠️ No user found with this email.");
       return;
     }
 
-    await transporter.sendMail({
-      from: '"CampusNotes" <campusnotes@bitbros.in>',
-      to: user.email,
+    const { data, error } = await resend.emails.send({
+      from: fromEmail,
+      to: [user.email],
       subject: `Your uploaded note is ${status}`,
       html: `
         <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.5; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;">
-          <h2 style="color: #2563eb; text-align: center;">Status of note you Uploaded!</h2>
-          
+          <h2 style="color: #2563eb; text-align: center;">Status of Note You Uploaded!</h2>
           <p style="font-size: 16px;">
             Hello <strong>${user.name || user.username || "User"}</strong>,
           </p>
-  
-          
-          <div style="background: #fff; border-left: 4px solid #2563eb; padding: 12px 16px; margin: 16px 0; border-radius: 4px; font-size: 20px; text-align: center; font-weight: bold; letter-spacing: 3px;">
+          <p>The status of your recently uploaded note is:</p>
+          <div style="background: #fff; border-left: 4px solid ${
+            status === "Approved" ? "#22c55e" : "#ef4444"
+          }; padding: 12px 16px; margin: 16px 0; border-radius: 4px; font-size: 20px; text-align: center; font-weight: bold;">
             ${status}
           </div>
-          
           <p style="font-size: 14px; color: #555;">
-            If it is rejected, it is deleted as well, and if you think this is a mistake contact campusnotes@bitbros.in
+            If it was rejected and you believe this is a mistake, please contact us at campusnotes@bitbros.in.
           </p>
-          
           <p style="font-size: 12px; color: #888; text-align: center; margin-top: 30px;">
             © ${new Date().getFullYear()} CampusNotes. All rights reserved.
           </p>
         </div>
-      `
+      `,
     });
 
-    console.log("✅ OTP sent successfully to:", user.email);
+    if (error) {
+      throw new Error(error);
+    }
+
+    console.log("✅ Note status mail sent successfully to:", user.email);
   } catch (err) {
-    console.error("❌ Error sending OTP:", err);
+    console.error("❌ Error sending verification mail:", err);
   }
 };
 
-
+/**
+ * Sends a notification about the user's account verification status.
+ */
 module.exports.sendAccountVerificationMail = async (mail, status) => {
   try {
-    // check user
     const user = await User.findOne({ email: mail });
-
     if (!user) {
       console.log("⚠️ No user found with this email.");
       return;
     }
 
-    await transporter.sendMail({
-      from: '"CamousNotes" <campusnotes@bitbros.in>',
-      to: user.email,
-      subject: `Your Account is ${status}`,
+    const { data, error } = await resend.emails.send({
+      from: fromEmail,
+      to: [user.email],
+      subject: `Your CampusNotes Account is ${status}`,
       html: `
         <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.5; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;">
-          <h2 style="color: #2563eb; text-align: center;">Your Account verification.</h2>
-          
+          <h2 style="color: #2563eb; text-align: center;">Your Account Verification</h2>
           <p style="font-size: 16px;">
-            Hello <strong>${user.name || user.username || "User"}</strong>, your account is
+            Hello <strong>${user.name || user.username || "User"}</strong>, your account has been:
           </p>
-  
-          
-          <div style="background: #fff; border-left: 4px solid #2563eb; padding: 12px 16px; margin: 16px 0; border-radius: 4px; font-size: 20px; text-align: center; font-weight: bold; letter-spacing: 3px;">
+          <div style="background: #fff; border-left: 4px solid ${
+            status === "Verified" ? "#22c55e" : "#ef4444"
+          }; padding: 12px 16px; margin: 16px 0; border-radius: 4px; font-size: 20px; text-align: center; font-weight: bold;">
             ${status}
           </div>
-          
           <p style="font-size: 14px; color: #555;">
-            If Verified, then you are allowed to upload notes.
-            <br>
-            If not verified, and you think it is a mistake then mail send correct verificaition doc again or mail at campusnotes@bitbros.in 
+            If verified, you can now upload notes. If not, and you think it is a mistake, please re-submit your verification documents or contact us at campusnotes@bitbros.in.
           </p>
-          
           <p style="font-size: 12px; color: #888; text-align: center; margin-top: 30px;">
             © ${new Date().getFullYear()} CampusNotes. All rights reserved.
           </p>
         </div>
-      `
+      `,
     });
 
-    console.log("veri mail successfully sent to", user.email);
+    if (error) {
+      throw new Error(error);
+    }
+
+    console.log("✅ Account status mail sent successfully to:", user.email);
   } catch (err) {
-    console.error("❌ Error sending mail:", err);
+    console.error("❌ Error sending account verification mail:", err);
   }
 };
-
