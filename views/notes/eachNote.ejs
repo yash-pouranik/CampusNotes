@@ -32,15 +32,28 @@
       </form>
     </div>
 
-    <div class="note-preview-new">
-      <% if (note.fileUrl.toLowerCase().endsWith('.pdf')) { %>
-        <iframe src="<%= note.fileUrl %>#toolbar=0" class="note-preview-frame-new"></iframe>
-      <% } else if (/\.(jpg|jpeg|png|gif)$/i.test(note.fileUrl)) { %>
-        <img src="<%= note.fileUrl %>" class="note-preview-frame-new">
-      <% } else { %>
-        <div class="no-preview-text">No preview available.</div>
-      <% } %>
-    </div>
+<div class="note-preview-new">
+  <% if (note.fileUrl.includes('drive.google.com')) { %>
+    
+    <%# Google Drive Link Logic %>
+    <iframe 
+      src="<%= note.fileUrl.replace('/view?usp=drivesdk', '/preview') %>" 
+      class="note-preview-frame-new">
+    </iframe>
+
+  <% } else if (note.fileUrl.toLowerCase().endsWith('.pdf')) { %>
+    
+    <%# Cloudinary Link Logic (Aapka purana code) %>
+    <iframe 
+      src="<%= note.fileUrl %>#toolbar=0" 
+      class="note-preview-frame-new">
+    </iframe>
+
+  <% } else { %>
+    <%# Image ya dusre files ke liye %>
+    <img src="<%= note.fileUrl %>" class="note-preview-frame-new">
+  <% } %>
+</div>
     
     <div class="disclaimer-box" >
         <strong>Disclaimer:</strong> Please use these notes as a reference only.
