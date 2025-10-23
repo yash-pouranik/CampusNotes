@@ -4,7 +4,7 @@ const User = require("../models/user")
 const Note = require("../models/note")
 const {isLoggedIn} = require("../middlewares")
 const multer = require("multer");
-const { storage, cloudinary  } = require("../config/cloud");
+const { storage, cloudinary, deleteFromAllAccounts  } = require("../config/cloud");
 const upload = multer({ 
   storage,
   limits: { fileSize: 5 * 1024 * 1024 } // max 5MB
@@ -119,6 +119,8 @@ router.put("/profile/:id/edit", isLoggedIn, async (req, res) => {
   }
 });
 
+// ...existing code...
+// ...existing code...
 router.put("/profile/avatar", isLoggedIn, upload.single("avatar"), async (req, res) => {
   try {
     if (!req.file) {
@@ -132,29 +134,81 @@ router.put("/profile/avatar", isLoggedIn, upload.single("avatar"), async (req, r
       return res.redirect("/profile");
     }
 
-    // ❌ delete old avatar from cloudinary (skip if it's dummy avatar)
-    if (user.avatar && !user.avatar.includes("dummy_profile")) {
+    // Helper to extract public_id from a Cloudinary URL
+    const extractPublicId = (url) => {
       try {
-        const parts = user.avatar.split("/");
-        const publicId = parts.slice(parts.indexOf("upload") + 1).join("/").split(".")[0];
-        await cloudinary.uploader.destroy(publicId, { resource_type: "image" });
+        const idx = url.indexOf('/upload/');
+        if (idx === -1) return null;
+        const afterUpload = url.slice(idx + '/upload/'.length);
+        // remove version prefix like v12345/ if present
+        const maybeWithVersion = afterUpload.split('/');
+        if (maybeWithVersion[0].startsWith('v')) maybeWithVersion.shift();
+        const pathWithExt = maybeWithVersion.join('/');
+        return pathWithExt.replace(/\.[^.]+$/, ''); // remove extension
+      } catch (e) {
+        return null;
+      }
+    };
+
+    // Delete old avatar if exists and appears to be from Cloudinary
+    if (user.avatar && user.avatar.includes('res.cloudinary.com') && !user.avatar.includes('dummy_profile')) {
+      try {
+        const oldPublicId = extractPublicId(user.avatar);
+        if (oldPublicId) {
+          await deleteFromAllAccounts(oldPublicId, { resource_type: "image" });
+        }
       } catch (err) {
-        console.warn("Cloudinary delete error:", err.message);
+        console.warn("Cloudinary delete error:", err);
       }
     }
 
-    // ✅ save new avatar path from Cloudinary
-    user.avatar = req.file.path;
+    // Upload buffer to Cloudinary (supports memoryStorage)
+    let uploadResult;
+    if (req.file.buffer) {
+      const dataUri = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+      uploadResult = await cloudinary.uploader.upload(dataUri, {
+        folder: "avatars",
+        resource_type: "image",
+        use_filename: true,
+        unique_filename: false,
+        overwrite: true
+      });
+    } else {
+      // fallback for other multer returns (path/secure_url)
+      if (req.file.path) uploadResult = { secure_url: req.file.path, public_id: req.file.filename || null };
+      else if (req.file.secure_url) uploadResult = { secure_url: req.file.secure_url, public_id: req.file.public_id || null };
+    }
+
+    if (!uploadResult || !uploadResult.secure_url) {
+      console.error("Upload returned no secure_url:", uploadResult || req.file);
+      req.flash("error", "Upload succeeded but no file URL returned");
+      return res.redirect(`/profile/${req.user._id}`);
+    }
+
+    // Save new avatar URL
+    user.avatar = uploadResult.secure_url + (uploadResult.secure_url.includes('?') ? '&' : '?') + `t=${Date.now()}`; // cache-bust
     await user.save();
 
-    req.flash("success", "Avatar updated successfully!");
-    res.redirect(`/profile/${req.user._id}`);
+    // Update session so UI reflects new avatar immediately
+    if (typeof req.logIn === "function") {
+      req.logIn(user, (err) => {
+        if (err) console.warn("Session update failed:", err);
+        req.flash("success", "Avatar updated successfully!");
+        return res.redirect(`/profile/${req.user._id}`);
+      });
+    } else {
+      req.user.avatar = user.avatar;
+      req.flash("success", "Avatar updated successfully!");
+      return res.redirect(`/profile/${req.user._id}`);
+    }
   } catch (err) {
     console.error("Avatar update error:", err);
     req.flash("error", "Something went wrong while updating avatar");
-    res.redirect("/profile");
+    res.redirect(`/profile/${req.user._id}`);
   }
 });
+// ...existing code...
+// ...existing code...
 
 
 

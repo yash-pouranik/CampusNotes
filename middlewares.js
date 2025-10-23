@@ -24,7 +24,7 @@ module.exports.notLoggedIn = (req, res, next) => {
 
 module.exports.isModerator = (req, res, next) => {
   if(req.user && req.user.roles?.isModerator) {
-    console.log("Moderator OK:", req.user);
+    console.log("Moderator OK:", req.user.username);
     return next();
   }
   res.status(404).render("errors/404", { 
