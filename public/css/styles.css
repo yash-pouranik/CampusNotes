@@ -24,21 +24,29 @@ body {
 
 
 /* ================================== */
-/* Navbar Styles */
+/* Navbar Styles (REVISED) */
 /* ================================== */
 .navbar {
-  padding: 0.8rem 1rem;
+  padding: 0.8rem 1rem; /* Padding on the navbar itself */
   color: white;
-  background: white; /* Added background for consistency */
+  background: white;
+  position: fixed; /* Fixed Navbar */
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 99;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Optional shadow */
 }
 
-.navbar .containerr {
-  margin: auto;
+.navbar .containerr { /* Note the double 'r' */
   display: flex;
   justify-content: space-between;
   align-items: center;
   position: relative;
-  max-width: 1200px; /* Match the main container width */
+  width: 100%; /* Make container take full width */
+  max-width: 1200px; /* Apply max-width */
+  margin: 0 auto; /* Center the container */
+  padding: 0; /* Remove padding from here, add to navbar */
 }
 
 .brand {
@@ -46,9 +54,11 @@ body {
   border: 1px solid #2563EB;
   border-radius: 8px;
   font-weight: 700;
-  font-size: 1.5rem; /* Adjusted for better responsiveness */
+  /* Responsive font size for brand */
+  font-size: clamp(1.2rem, 4vw, 1.5rem);
   color: #2563EB;
   text-decoration: none;
+  white-space: nowrap; /* Prevent brand text from wrapping */
 }
 
 .menu-toggle {
@@ -61,8 +71,8 @@ body {
   cursor: pointer;
   border: 1px solid #2563EB;
   border-radius: 5px;
-  margin-left: auto;
   background: none;
+  flex-shrink: 0; /* Prevent button from shrinking */
 }
 
 .menu-toggle span {
@@ -75,7 +85,7 @@ body {
 .nav-links {
   display: none;
   position: absolute;
-  top: 100%; /* Position below the navbar */
+  top: calc(100% + 10px); /* Position below navbar with gap */
   right: 0;
   background-color: #2563EB;
   flex-direction: column;
@@ -83,7 +93,7 @@ body {
   padding: 0.5rem;
   border-radius: 8px;
   list-style: none;
-  gap: 0.5rem; /* Reduced gap */
+  gap: 0.5rem;
   z-index: 10;
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
@@ -102,6 +112,11 @@ body {
 
 .nav-links a:hover {
   background-color: #3d7aff;
+}
+
+/* Adjust main content padding because navbar is fixed */
+main.container {
+  padding-top: calc(3rem + 1.6rem + 2rem); /* Navbar height + Navbar padding + extra space */
 }
 
 
