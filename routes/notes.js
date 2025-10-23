@@ -112,19 +112,29 @@ router.post("/upload", isLoggedIn, async (req, res) => {
       subjectId = subject;
     }
 
-    const note = new Note({
-      title,
-      description,
-      subject: subjectId,
-      course,
-      semester,
-      fileUrl: fileUrl, // Yahan Cloudinary se mila URL save hoga
-      uploadedBy: req.user._id,
-    });
 
-    await note.save();
+    const copied = await Note.find({title: title});
+    
 
-    res.json({ success: true, redirectUrl: "/explore" });
+
+    if(!copied) {
+      const note = new Note({
+        title,
+        description,
+        subject: subjectId,
+        course,
+        semester,
+        fileUrl: fileUrl, // Yahan Cloudinary se mila URL save hoga
+        uploadedBy: req.user._id,
+      });
+      await note.save();
+
+      res.json({ success: true, redirectUrl: "/explore" });
+    } else{
+      res.status(409).json({ success: false, error: "A note with this title already exists." });
+    }
+
+    
 
   } catch (err) {
     console.error(err);
