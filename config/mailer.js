@@ -9,6 +9,9 @@ const fromEmail = "CampusNotes <campusnotes@bitbros.in>"; // Verified email on R
 /**
  * Sends a notification to all users (except the poster) about a new note request.
  */
+// config/mailer.js
+// ... (aapka baaki code jaise Resend setup, fromEmail, etc.)
+
 module.exports.sendNewRequestMail = async (requestData) => {
   try {
     // Exclude the request poster
@@ -24,39 +27,75 @@ module.exports.sendNewRequestMail = async (requestData) => {
       return;
     }
 
-    const { data, error } = await resend.emails.send({
-      from: fromEmail,
-      to: emailList, // Resend handles arrays for bulk sending
-      subject: "📢 New Notes Request Posted!",
-      html: `
+    // --- BATCHING LOGIC SHURU ---
+    const batchSize = 50; // Resend ki limit
+
+    for (let i = 0; i < emailList.length; i += batchSize) {
+      // Har baar 50 email ka ek naya group banayega
+      const batch = emailList.slice(i, i + batchSize);
+
+      console.log(`Sending mail to batch ${Math.floor(i / batchSize) + 1}...`);
+
+      const { data, error } = await resend.emails.send({
+        from: fromEmail,
+        to: batch, // ✅ Sirf uss 50 ke group ko bhejega
+        subject: "New Notes Request Posted!",
+        html:  `
+
         <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.5; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;">
+
           <h2 style="color: #2563eb; text-align: center;">New Request on CampusNotes</h2>
+
           <p style="font-size: 16px;">
+
             <strong>${requestData.user.username || requestData.user.name}</strong> has requested new notes:
+
           </p>
+
           <div style="background: #fff; border-left: 4px solid #2563eb; padding: 12px 16px; margin: 16px 0; border-radius: 4px; font-style: italic;">
+
             ${requestData.content}
+
           </div>
+
           <div style="text-align: center; margin-top: 20px;">
-            <a href="https://campusnotes.bitbros.in/requestnotes" 
+
+            <a href="https://campusnotes.bitbros.in/requestnotes"
+
                style="display: inline-block; background-color: #2563eb; color: #fff; padding: 12px 20px; border-radius: 6px; text-decoration: none; font-weight: bold;">
+
               View Request
+
             </a>
+
           </div>
+
           <p style="font-size: 12px; color: #888; text-align: center; margin-top: 30px;">
+
             You are receiving this email because you are subscribed to CampusNotes notifications.
+
           </p>
+
         </div>
+
       `,
-    });
+      });
 
-    if (error) {
-      throw new Error(error);
+      // Har batch ka error check karega
+      if (error) {
+        console.error(`Resend API Error (Batch ${Math.floor(i / batchSize) + 1}):`, error);
+        // Agar ek batch fail ho, to agle par jaao
+        continue;
+      }
+
+      console.log(`✅ Batch ${Math.floor(i / batchSize) + 1} sent:`, data.id);
     }
+    // --- BATCHING LOGIC KHATM ---
 
-    console.log("✅ New request emails sent via Resend:", data.id);
+    console.log("✅ All new request email batches processed.");
+
   } catch (err) {
-    console.error("❌ Error sending new request mail:", err);
+    console.error("❌ Error in sendNewRequestMail function:", err.message);
   }
 };
 
