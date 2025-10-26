@@ -131,7 +131,7 @@ router.post("/upload", isLoggedIn, async (req, res) => {
 
       res.json({ success: true, redirectUrl: "/explore" });
     } else{
-      res.status(409).json({ success: false, error: "A note with this title already exists." });
+      res.status(409).json({ success: false, error: `A note with this title already exists.${copied}` });
     }
 
     
