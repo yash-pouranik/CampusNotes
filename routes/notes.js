@@ -117,7 +117,7 @@ router.post("/upload", isLoggedIn, async (req, res) => {
     
 
 
-    if(!copied) {
+    if(copied.length < 1) {
       const note = new Note({
         title,
         description,
