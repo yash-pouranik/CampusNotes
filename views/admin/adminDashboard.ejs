@@ -301,7 +301,7 @@
             <% LastDownloads.forEach(dl => { %>
               <tr>
                 <td><%= dl.note ? dl.note.title : "Unknown Note" %></td>
-                <td><%= new Date(dl.downloadedAt).toLocaleString() %></td>
+                <td><%= new Date(dl.downloadedAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }) %></td>
               </tr>
             <% }) %>
           </tbody>
