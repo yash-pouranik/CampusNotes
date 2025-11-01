@@ -198,7 +198,12 @@ router.get("/notes/:nid", async (req, res) => {
     .sort({ createdAt: -1 }) // newest first
 
 
-    res.render("notes/eachNote", { note: file, subjectNotes, semNotes, title: `${file.title} | campusnotes` });
+    res.render("notes/eachNote", { 
+      note: file,
+      subjectNotes,
+      semNotes,
+      title: `${file.title} | CampusNotes`,
+      description: `${file.description}` });
   } catch (e) {
     console.error(e);
     req.flash("error", "Server Error")
