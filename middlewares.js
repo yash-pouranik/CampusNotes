@@ -23,10 +23,11 @@ module.exports.notLoggedIn = (req, res, next) => {
 
 
 module.exports.isModerator = (req, res, next) => {
-  if(req.user && req.user.roles?.isModerator) {
+  if(req.user && (req.user.roles?.isModerator || req.user.roles?.isDev)) {
     console.log("Moderator OK:", req.user.username);
     return next();
   }
+  console.log("Moderator NOT", req.user.username);
   res.status(404).render("errors/404", { 
     title: "Page Not Found | CampusNotes",
   });
