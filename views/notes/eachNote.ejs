@@ -11,6 +11,8 @@
           <span class="uploader-name"><%= note.uploadedBy?.name || 'Unknown' %></span>
           <% if (note.uploadedBy?.roles.isModerator) { %>
             <img src="/images/blueCheckmark.svg" alt="Moderator" class="role-badge">
+          <% } else if(note.uploadedBy?.roles.isDev) { %>
+            <img src="/images/icons8-checkmark.svg" alt="Moderator" class="role-badge">
           <% } %>
         </a>
         <span class="meta-dot">·</span>
