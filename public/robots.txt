@@ -35,6 +35,10 @@ Disallow: /notes/*/upvote
 Allow: /*.css
 Allow: /*.js
 
+# Rule for the main Google Search Indexing bot
+User-agent: Googlebot
+Allow: /
+
 # =====================================
 # Sitemap location
 # =====================================
