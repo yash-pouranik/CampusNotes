@@ -36,24 +36,52 @@
 
 <div class="note-preview-new">
   <% if (note.fileUrl.includes('drive.google.com')) { %>
-    
     <%# Google Drive Link Logic %>
-    <iframe 
-      src="<%= note.fileUrl.replace('/view?usp=drivesdk', '/preview') %>" 
-      class="note-preview-frame-new">
-    </iframe>
+    <%
+      let fileId = null;
+      try {
+        // Link se File ID nikalne ka logic
+        // Example: https://drive.google.com/file/d/FILE_ID/view?usp=sharing
+        const url = new URL(note.fileUrl);
+        const pathParts = url.pathname.split('/');
+        const idIndex = pathParts.indexOf('d'); // 'd' is in the path /file/d/FILE_ID
+        if (idIndex !== -1 && pathParts.length > idIndex + 1) {
+          fileId = pathParts[idIndex + 1];
+        }
+      } catch (e) {
+        console.error('Invalid Google Drive URL', e);
+      }
+    %>
+
+    <% if (fileId) { %>
+      <%# Sabse reliable Google 'gview' embed link %>
+      <iframe 
+        src="https://docs.google.com/gview?url=https://drive.google.com/uc?export=download&id=<%= fileId %>&embedded=true" 
+        class="note-preview-frame-new" 
+        frameborder="0">
+      </iframe>
+    <% } else { %>
+      <div class="no-preview-text" style="display: flex; align-items: center; justify-content: center; height: 100%; background: #333; color: white; min-height: 400px;">
+        Error: Invalid Google Drive link format.
+      </div>
+    <% } %>
 
   <% } else if (note.fileUrl.toLowerCase().endsWith('.pdf')) { %>
-    
     <%# Cloudinary Link Logic (Aapka purana code) %>
     <iframe 
       src="<%= note.fileUrl %>#toolbar=0" 
       class="note-preview-frame-new">
     </iframe>
 
+  <% } else if (/\.(jpg|jpeg|png|gif|webp|avif)$/i.test(note.fileUrl)) { %>
+    <%# Image Logic (Updated) %>
+    <img src="<%= note.fileUrl %>" class="note-preview-frame-new" alt="Note Preview">
+    
   <% } else { %>
-    <%# Image ya dusre files ke liye %>
-    <img src="<%= note.fileUrl %>" class="note-preview-frame-new">
+    <%# Fallback %>
+    <div class="no-preview-text" style="display: flex; align-items: center; justify-content: center; height: 100%; background: #333; color: white; min-height: 400px;">
+      No preview available for this file type.
+    </div>
   <% } %>
 </div>
     
