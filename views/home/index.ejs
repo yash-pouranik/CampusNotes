@@ -1,188 +1,3 @@
-<style>
-  
-h1, h2, h3, h4 {
-  margin: 0.5em 0;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-section {
-  padding: 4rem 2rem;
-}
-
-/* HERO SECTION */
-.hero {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 2rem;
-  border-radius: 20px;
-  background-color: #f9f9f9;
-}
-
-.btns a {
-  display: inline-block;
-  padding: 0.75rem 1.5rem;
-  margin-right: 1rem;
-  border-radius: 8px;
-  font-weight: 600;
-  transition: all 0.3s ease;
-}
-
-.explore-btn {
-  background-color: #4f46e5;
-  color: #fff;
-}
-
-.explore-btn:hover {
-  background-color: #3730a3;
-}
-
-.upload-btn {
-  background-color: #facc15;
-  color: #111;
-}
-
-.upload-btn:hover {
-  background-color: #eab308;
-}
-
-/* HOW IT WORKS SECTION */
-.how-it-works {
-  text-align: center;
-}
-
-.how-it-works .steps {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 2rem;
-  margin-top: 2rem;
-}
-
-.step {
-  background-color: #fff;
-  padding: 2rem 1rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-  max-width: 250px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  text-align: center;
-}
-
-.step img {
-  max-width: 100px;
-  margin-bottom: 1rem;
-}
-
-.step:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-}
-
-/* TOP CONTRIBUTORS */
-.top-contributors {
-  text-align: center;
-}
-
-.top-contributors .contributors {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 1.5rem;
-  margin-top: 2rem;
-}
-
-.contributor {
-  background-color: #fff;
-  padding: 1.5rem 1rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-  width: 180px;
-  text-align: center;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.contributor img {
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
-  border-radius: 50%;
-  margin-bottom: 0.5rem;
-}
-
-.contributor:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-}
-
-/* BROWSE PREVIEW */
-.browse-preview {
-  text-align: center;
-}
-
-.browse-preview .departments {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 1rem;
-  margin-top: 2rem;
-}
-
-.dept {
-  background-color: #4f46e5;
-  color: #fff;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.dept:hover {
-  background-color: #3730a3;
-  transform: translateY(-3px);
-}
-
-.dept-note-highlight {
-  background-color: #fef3c7;
-  color: #92400e;
-  border-left: 4px solid #f59e0b;
-  padding: 1rem 1.5rem;
-  margin-top: 2rem;
-  border-radius: 8px;
-  max-width: 700px;
-  margin-left: auto;
-  margin-right: auto;
-  font-size: 0.95rem;
-}
-
-/* RESPONSIVE */
-@media (max-width: 1024px) {
-  .hero {
-    
-    text-align: center;
-  }
-
-  .hero-right {
-    max-width: 100%;
-  }
-
-  .how-it-works .steps, 
-  .top-contributors .contributors {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .browse-preview .departments {
-    flex-direction: column;
-  }
-}
-</style>
 
 
 
@@ -203,7 +18,6 @@ section {
   </div>
 </section>
 
-<hr>
 
 <section class="how-it-works">
   <h2>How CampusNotes - SVVV Works</h2>
@@ -215,6 +29,13 @@ section {
         <p>Search for semester-wise or subject-wise notes uploaded by real students from your campus.</p>
       </div>
     </a>
+    <a href="/most-voted">
+      <div class="step " data-aos="fade-up">
+        <img src="/images/gChart.png" alt="A bar chart with an upward arrow, symbolizing growth and credibility from uploading notes" style="width: 120px; height: 90px;">
+        <h3>Earn Credibility</h3>
+        <p>Get upvotes, build profile, and become trusted contributor on CampusNotes by climbing the <a href="/rankings" style="color: blue;">leaderboard</a>.</p>
+      </div>
+    </a>
     <a href="/upload">
       <div class="step " data-aos="fade-up">
         <img src="/images/upload.png" alt="Upload Notes">
@@ -222,17 +43,10 @@ section {
         <p>Help others by uploading your own notes — it's quick and helps the entire campus community.</p>
       </div>
     </a>
-    <a href="/most-voted">
-      <div class="step " data-aos="fade-up">
-        <img src="/images/gChart.png" alt="A bar chart with an upward arrow, symbolizing growth and credibility from uploading notes" style="width: 120px; height: 90px;">
-        <h3>Earn Credibility</h3>
-        <p>Get upvotes, build your profile, and become a trusted contributor on CampusNotes by climbing the <a href="/rankings" style="color: blue;">leaderboard</a>.</p>
-      </div>
-    </a>
+    
   </div>
 </section>
 
-<hr>
 
 
 <section class="top-contributors">
@@ -263,7 +77,6 @@ section {
 </section>
 
 
-<hr>
 
 <section class="browse-preview">
   <h2>Browse by Department</h2>

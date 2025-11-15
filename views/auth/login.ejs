@@ -1,5 +1,4 @@
-<link rel="stylesheet" href="/css/login.css">
-
+<link rel="stylesheet" href="/css/auth.css">
 
 <section class="auth-section">
 
@@ -10,37 +9,29 @@
        data-auto_select="true"
        data-itp_support="true">
   </div>
+
   <div class="g_id_signin" data-type="standard"></div>
 
   <p>or</p>
 
   <h2>Login to CampusNotes</h2>
   
-<form id="loginForm" action="/login" method="POST">
-  <input type="email" id="emailInput" name="email" placeholder="Email" required />
-  <input type="password" name="password" placeholder="Password" required />
-  <button type="submit">Login</button>
-</form>
+  <form id="loginForm" action="/login" method="POST">
+    <input type="email" id="emailInput" name="email" placeholder="Email" required />
+    <input type="password" name="password" placeholder="Password" required />
+    <button type="submit">Login</button>
+  </form>
 
-<p class="forgot-link">
-  <a href="/forgot">Forgot your password?</a>
-</p>
+  <p class="muted">
+    <a href="/forgot">Forgot your password?</a>
+  </p>
 
-<script>
-  document.getElementById("loginForm").addEventListener("submit", function(e) {
-    let emailField = document.getElementById("emailInput");
-    emailField.value = emailField.value.toLowerCase().trim(); // lowercase + trim spaces
-  });
-</script>
-
-
-  <span>Not a Member yet? Register <a href="/register-n">here</a></span>
-  
-
+  <p class="muted">
+    Not a member yet? <a href="/register-n">Register here</a>
+  </p>
 </section>
 
-
-<!-- Google Identity Script -->
+<!-- Google Script -->
 <script src="https://accounts.google.com/gsi/client" async></script>
 
 <script>
@@ -57,25 +48,20 @@
   }
 
   function handleCredentialResponse(response) {
-  console.log("Encoded JWT ID token:", response.credential);
-  const responsePayload = decodeJWT(response.credential);
-  console.log("Decoded JWT:", responsePayload);
+    const body = { credential: response.credential };
 
-      // ✅ Send to backend
     fetch("/oauth2callback", {
       method: "POST",
-      body: JSON.stringify({ credential: response.credential }),
+      body: JSON.stringify(body),
       headers: { "Content-Type": "application/json" }
     })
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        window.location.href = `/profile/${data.userId}`;
-      }
-    });
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          window.location.href = `/profile/${data.userId}`;
+        }
+      });
   }
-
-
 
   window.onload = function () {
     google.accounts.id.initialize({
@@ -87,4 +73,9 @@
       { theme: "outline", size: "large" }
     );
   };
+
+  document.getElementById("loginForm").addEventListener("submit", e => {
+    let emailField = document.getElementById("emailInput");
+    emailField.value = emailField.value.toLowerCase().trim();
+  });
 </script>

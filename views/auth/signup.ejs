@@ -1,184 +1,254 @@
-<style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Signup - CampusNotes</title>
+
+  <!-- FontAwesome (for dropdown arrow icons if needed) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+
+  /* ==========================
+     AUTH — DARK NEON THEME
+     ========================== */
 
   .auth-section {
-    max-width: 420px;
-    margin: 1px auto;
-    padding: 40px;
-    background: #fff;
-    border-radius: 12px;
+    max-width: 460px;
+    margin: 40px auto;
+    padding: 32px;
+    border-radius: 16px;
+
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
+    border: 1px solid rgba(255,255,255,0.05);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.45);
+    backdrop-filter: blur(14px) saturate(140%);
 
     text-align: center;
+    color: var(--text);
   }
 
-  .auth-section h2 {
-    font-size: 1.8rem;
-    margin-bottom: 25px;
+  h2 {
+    font-size: 1.6rem;
+    margin-bottom: 22px;
+    font-weight: 700;
+    color: var(--accent);
   }
 
-  .auth-section form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+  p {
+    color: var(--muted);
+    margin: 18px 0;
+    font-size: 0.95rem;
   }
 
-  .auth-section input,
-  .auth-section select {
+  /* ---------- INPUTS ---------- */
+  .auth-section input {
     width: 100%;
     padding: 12px 14px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.02);
+    color: var(--text);
     font-size: 1rem;
-    color: #333;
-    background-color: #fff;
-    transition: border 0.3s ease, box-shadow 0.3s ease;
+    transition: 0.2s;
+    margin-bottom: 15px;
   }
 
-  .auth-section input:focus,
-  .auth-section select:focus {
-    border-color: #2563EB;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+  .auth-section input:focus {
+    border-color: rgba(0,255,213,0.35);
+    box-shadow: 0 0 12px rgba(0,255,213,0.25);
     outline: none;
   }
 
-  /* Custom arrow for select */
-  .auth-section select {
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    background-image: url('data:image/svg+xml;utf8,<svg fill="%23333" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    background-size: 16px;
-  }
-
+  /* ---------- BUTTON ---------- */
   .auth-section button {
+    margin-top: 10px;
     padding: 12px;
-    background-color: #2563EB;
-    color: #fff;
+    background: #0d182a;
+    border: 1px solid var(--accent);
+    color: var(--accent);
     font-size: 1rem;
-    border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+    font-weight: 600;
+    transition: 0.25s;
   }
 
   .auth-section button:hover {
-    background-color: #1d4ed8;
     transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(0,255,213,0.25);
   }
 
-  .auth-section p {
-    margin: 20px 0 10px;
-    color: #555;
+  /* ----------------------------
+     CUSTOM DROPDOWN (NEON)
+     ---------------------------- */
+  .dropdown {
+    width: 100%;
+    position: relative;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 12px 14px;
+    cursor: pointer;
+    color: var(--text);
+    margin-bottom: 12px;
+    transition: 0.2s;
   }
 
+  .dropdown:hover {
+    border-color: rgba(0,255,213,0.4);
+    box-shadow: 0 0 14px rgba(0,255,213,0.15);
+  }
 
+  .dropdown-selected {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 
-</style>
+  .dropdown-selected::after {
+    content: "▾";
+    color: var(--accent);
+    font-size: 0.9rem;
+  }
+
+  .dropdown-menu {
+    position: absolute;
+    top: 105%;
+    left: 0;
+    width: 100%;
+    max-height: 230px;
+    overflow-y: auto;
+    background: rgba(9, 16, 33, 0.92);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+    backdrop-filter: blur(10px);
+    z-index: 100;
+    display: none;
+    animation: fadeIn 0.15s ease-out;
+  }
+
+  .dropdown.open .dropdown-menu {
+    display: block;
+  }
+
+  .dropdown-item {
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: 0.1s;
+    color: #dce7ff;
+  }
+
+  .dropdown-item:hover {
+    background: rgba(0,255,213,0.12);
+    color: var(--accent);
+  }
+
+  .dropdown-item.active {
+    background: rgba(138,47,255,0.18);
+    color: #d8b8ff;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  </style>
+</head>
+
+<body>
 
 <section class="auth-section">
 
-
-    <!-- Google Sign-In -->
+  <!-- Google Sign-In -->
   <div id="g_id_onload"
        data-client_id="466885260272-86cp1p5tkpsspvrdp8n79h0gbfob48qq.apps.googleusercontent.com"
        data-context="signin"
        data-auto_select="true"
        data-itp_support="true"
        data-theme="filled_blue"
-      data-text="signup_with"
-       >
-       
+       data-text="signup_with">
   </div>
-  <div class="g_id_signin" data-type="standard"
-  data-theme="filled_blue"
-      data-text="signup_with"></div>
+
+  <div class="g_id_signin"
+       data-type="standard"
+       data-theme="filled_blue"
+       data-text="signup_with"></div>
 
   <p>or</p>
-
-
-
 
   <h2>Sign Up with CampusNotes</h2>
 
   <form id="loginForm" action="/register" method="POST">
+
     <input type="text" name="username" placeholder="Username" required />
     <input type="text" name="name" placeholder="Full Name" />
     <input type="email" name="email" placeholder="Email" id="emailInput" required />
 
-    <select name="course" required>
-      <option disabled selected>Select Course</option>
-      <option value="B.Tech CSE">B.Tech CSE</option>
-      <option value="B.Tech IT">B.Tech IT</option>
-      <option value="B.Tech ECE">B.Tech ECE</option>
-      <option value="B.Tech ME">B.Tech ME</option>
-      <option value="MBA">MBA</option>
-      <option value="BBA">BBA</option>
-      <option value="MCA">MCA</option>
-      <option value="BCA">BCA</option>
-    </select>
+    <!-- COURSE -->
+    <div class="dropdown" data-name="course">
+      <div class="dropdown-selected">Select Course</div>
+      <div class="dropdown-menu">
+        <div class="dropdown-item" data-value="B.Tech CSE">B.Tech CSE</div>
+        <div class="dropdown-item" data-value="B.Tech IT">B.Tech IT</div>
+        <div class="dropdown-item" data-value="B.Tech ECE">B.Tech ECE</div>
+        <div class="dropdown-item" data-value="B.Tech ME">B.Tech ME</div>
+        <div class="dropdown-item" data-value="MBA">MBA</div>
+        <div class="dropdown-item" data-value="BBA">BBA</div>
+        <div class="dropdown-item" data-value="MCA">MCA</div>
+        <div class="dropdown-item" data-value="BCA">BCA</div>
+      </div>
+      <input type="hidden" name="course" id="course">
+    </div>
 
-    <select name="gender" required>
-      <option disabled selected>Select Gender</option>
-      <option value="He/Him">He/Him</option>
-      <option value="She/Her">She/Her</option>
-      <option value="They/Them">They/Them</option>
-      <option value="Other">Other</option>
-    </select>
+    <!-- GENDER -->
+    <div class="dropdown" data-name="gender">
+      <div class="dropdown-selected">Select Gender</div>
+      <div class="dropdown-menu">
+        <div class="dropdown-item" data-value="He/Him">He/Him</div>
+        <div class="dropdown-item" data-value="She/Her">She/Her</div>
+        <div class="dropdown-item" data-value="They/Them">They/Them</div>
+        <div class="dropdown-item" data-value="Other">Other</div>
+      </div>
+      <input type="hidden" name="gender" id="gender">
+    </div>
 
     <input type="password" name="password" placeholder="Password" required />
+
     <button type="submit">Sign Up</button>
   </form>
 
-  <script>
-  document.getElementById("loginForm").addEventListener("submit", function(e) {
-    let emailField = document.getElementById("emailInput");
-    emailField.value = emailField.value.toLowerCase().trim(); // lowercase + trim spaces
-  });
-</script>
-
-
-
-
 </section>
 
-
-<!-- Google Identity Script -->
+<!-- Google Script -->
 <script src="https://accounts.google.com/gsi/client" async></script>
 
 <script>
+  /* ---------- GOOGLE LOGIN ---------- */
   function decodeJWT(token) {
     let base64Url = token.split(".")[1];
     let base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
     let jsonPayload = decodeURIComponent(
       atob(base64)
-        .split("")
-        .map(c => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-        .join("")
+      .split("")
+      .map(c => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+      .join("")
     );
     return JSON.parse(jsonPayload);
   }
 
   function handleCredentialResponse(response) {
-  console.log("Encoded JWT ID token:", response.credential);
-  const responsePayload = decodeJWT(response.credential);
-  console.log("Decoded JWT:", responsePayload);
-
-      // ✅ Send to backend
     fetch("/oauth2callback", {
       method: "POST",
       body: JSON.stringify({ credential: response.credential }),
       headers: { "Content-Type": "application/json" }
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        window.location.href = `/explore`;
-      }
-    });
+    }).then(res => res.json())
+      .then(data => {
+        if (data.success) window.location.href = "/explore";
+      });
   }
-
-
 
   window.onload = function () {
     google.accounts.id.initialize({
@@ -192,8 +262,8 @@
   };
 </script>
 
-
 <script>
+  /* ---------- FORM VALIDATIONS ---------- */
   document.getElementById("loginForm").addEventListener("submit", function (e) {
     let emailField = document.getElementById("emailInput");
     let username = this.username.value.trim();
@@ -202,51 +272,75 @@
     let course = this.course.value;
     let gender = this.gender.value;
 
-    // ✅ Normalize email
     emailField.value = emailField.value.toLowerCase().trim();
 
-    // Username check
     if (username.length < 3) {
       alert("⚠️ Username must be at least 3 characters.");
-      e.preventDefault();
-      return;
+      e.preventDefault(); return;
     }
 
-    // Full name check
     if (name && !/^[a-zA-Z\s]+$/.test(name)) {
       alert("⚠️ Name can only contain letters and spaces.");
-      e.preventDefault();
-      return;
+      e.preventDefault(); return;
     }
 
-    // Email format check
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(emailField.value)) {
-      alert("⚠️ Please enter a valid email address.");
-      e.preventDefault();
-      return;
+      alert("⚠️ Invalid email address.");
+      e.preventDefault(); return;
     }
 
-    // Password strength check
     const passRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{6,}$/;
     if (!passRegex.test(password)) {
-      alert("⚠️ Password must be at least 6 characters, include 1 uppercase, 1 lowercase and 1 number.");
-      e.preventDefault();
-      return;
+      alert("⚠️ Password must have 1 uppercase, 1 lowercase & 1 number.");
+      e.preventDefault(); return;
     }
 
-    // Course check
-    if (!course || course === "Select Course") {
+    if (!course) {
       alert("⚠️ Please select your course.");
-      e.preventDefault();
-      return;
+      e.preventDefault(); return;
     }
 
-    // Gender check
-    if (!gender || gender === "Select Gender") {
+    if (!gender) {
       alert("⚠️ Please select your gender.");
-      e.preventDefault();
-      return;
+      e.preventDefault(); return;
     }
   });
 </script>
+
+<script>
+  /* ---------- CUSTOM DROPDOWN JS ---------- */
+  document.querySelectorAll(".dropdown").forEach(drop => {
+
+    const selected = drop.querySelector(".dropdown-selected");
+    const menu = drop.querySelector(".dropdown-menu");
+    const items = drop.querySelectorAll(".dropdown-item");
+    const hidden = drop.querySelector("input[type='hidden']");
+
+    selected.addEventListener("click", () => {
+      drop.classList.toggle("open");
+    });
+
+    items.forEach(item => {
+      item.addEventListener("click", () => {
+        selected.innerHTML = item.textContent;
+        hidden.value = item.dataset.value;
+
+        items.forEach(i => i.classList.remove("active"));
+        item.classList.add("active");
+
+        drop.classList.remove("open");
+      });
+    });
+
+  });
+
+  document.addEventListener("click", e => {
+    document.querySelectorAll(".dropdown.open").forEach(dd => {
+      if (!dd.contains(e.target)) dd.classList.remove("open");
+    });
+  });
+</script>
+
+</body>
+</html>

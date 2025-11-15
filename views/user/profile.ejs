@@ -1,347 +1,115 @@
-<style>
-  body {
-    
-    background: #192643;
-    margin: 0;
-    padding: 0;
-  }
+<link rel="stylesheet" href="/css/profile.css" />
 
-  .profile-wrapper {
-    max-width: 1200px;
-    margin: 2rem auto;
-    display: grid;
-    grid-template-columns: 280px 1fr;
-    gap: 2rem;
-    padding: 1rem;
-  }
+<div class="profile-page">
 
-  /* ===== Left Sidebar ===== */
-  .profile-sidebar {
-    height: 445px;
-    border-radius: 18px;
-    padding: 2rem 1.5rem;
-    box-shadow: 0 8px 30px rgba(1, 136, 255, 0.167);
-    text-align: center;
-  }
+  <!-- 🌟 PROFILE HEADER CARD -->
+  <section class="profile-card">
 
-  .profile-avatar {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    border: 4px solid #2563eb;
-    box-shadow: 0 0px 20px rgba(0, 255, 255, 0.167);
-    object-fit: cover;
-    background: #eee;
-  }
+    <div class="profile-left">
+      <div class="profile-avatar-wrapper">
+        <img src="<%= user.avatar %>" class="profile-avatar" />
 
-  .username {
-    margin-top: 1rem;
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: #ffffff;
-  }
-
-  .profile-email {
-    font-size: 0.9rem;
-    color: #ffffff;
-    margin-bottom: 1rem;
-  }
-
-  .edit-btn {
-    display: inline-block;
-    margin-top: 0.5rem;
-    background: #2563eb;
-    color: #fff;
-    padding: 0.5rem 1.2rem;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    text-decoration: none;
-    transition: 0.3s;
-  }
-  .edit-btn:hover {
-    background: #1e40af;
-  }
-
-  .stats {
-    margin: 2rem 0;
-    text-align: left;
-  }
-
-  .stat-card {
-    background: #f9fafb;
-    padding: 1rem;
-    border-radius: 10px;
-    margin-bottom: 0.8rem;
-    font-size: 0.95rem;
-    font-weight: 500;
-    box-shadow: inset 0 0 6px #57ff87;
-  }
-
-  .stat-card span {
-    font-weight: 700;
-    font-size: 1.2rem;
-    color: #192643;
-  }
-
-  .profile-links {
-    margin-top: 1.5rem;
-    text-align: left;
-  }
-
-  .profile-links h3 {
-    font-size: 1rem;
-    margin-bottom: 0.5rem;
-    color: #1f2937;
-  }
-
-  .profile-links p {
-    color: #fff ;
-    margin: 0.4rem 0;
-    font-size: 0.9rem;
-  }
-
-  .profile-links a {
-    color: #ffffff;
-    text-decoration: none;
-    font-weight: 500;
-  }
-  .profile-links a:hover {
-    text-decoration: underline;
-  }
-
-  /* ===== Right Content ===== */
-  .profile-content {
-    
-    border-radius: 18px;
-    padding: 2rem;
-    box-shadow: 0 8px 30px rgba(0, 98, 255, 0.357);
-  }
-
-  .notes-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.2rem;
-  }
-
-  .notes-header h2 {
-    font-size: 1.3rem;
-    color: #ffffff;
-    font-weight: 600;
-  }
-
-  .notes-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-    gap: 1.2rem;
-  }
-
-  .note-card {
-    background: #f9fafb;
-    border-radius: 14px;
-    padding: 1rem;
-    box-shadow: 0 6px 16px rgba(0,0,0,0.05);
-    transition: 0.25s;
-  }
-
-  .note-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 12px 28px rgba(0,0,0,0.1);
-  }
-
-
-
-  .note-title {
-    font-weight: 600;
-    font-size: 0.95rem;
-    margin-bottom: 0.2rem;
-    color: #1f2937;
-  }
-
-  .note-meta {
-    font-size: 0.8rem;
-    color: #6b7280;
-    margin-bottom: 0.5rem;
-  }
-
-  .note-link {
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: #2563eb;
-    text-decoration: none;
-  }
-
-  .note-link:hover {
-    text-decoration: underline;
-  }
-
-  .back-link {
-    display: block;
-    margin-top: 2rem;
-    text-align: center;
-    color: #2563eb;
-    font-weight: 600;
-    text-decoration: none;
-  }
-
-  .back-link:hover {
-    text-decoration: underline;
-  }
-
-  .edit-avatar-btn {
-  position: absolute;
-  bottom: 5px;
-  right: 5px;
-  background: #2563eb;
-  color: #fff;
-  border: none;
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 16px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-}
-.edit-avatar-btn:hover {
-  background: #1e40af;
-}
-
-
-/* Modal Overlay */ .avatar-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center; z-index: 999; } .avatar-modal-content { background: #fff; padding: 2rem; border-radius: 14px; text-align: center; max-width: 400px; width: 90%; } .avatar-modal img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin-bottom: 1rem; } .close-modal { margin-top: 1rem; display: inline-block; color: #ef4444; cursor: pointer; font-weight: 600; }
-
-
-.note-card, .profile-card, .profile-stats, .btn {
-  transition: all 0.3s ease;
-}
-
-.note-card:hover, .profile-card:hover, .profile-stats:hover {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-}
-
-
-
-  @media (max-width: 800px) {
-    .profile-wrapper {
-      grid-template-columns: 1fr;
-    }
-    .profile-sidebar {
-      margin-bottom: 1rem;
-    }
-  }
-</style>
-
-
-<div class="profile-wrapper">
-  <!-- Sidebar -->
-   
-  <aside class="profile-sidebar">
-      <div style="position: relative; display: inline-block;">
-    <img src="<%= user.avatar %>" class="profile-avatar" alt="Profile Avatar">
-
-    <% if(currUser && currUser._id.toString() === user._id.toString()) { %>
-      
-      <button class="edit-avatar-btn" onclick="openAvatarModal()">✎</button>
-    <% } %>
-  </div>
-    <div class="username"
-      style="display: flex;
-      justify-content: center;
-      align-items: center;"  
-    ><%= user.name %>
-                    <% if (user.roles.isModerator) { %>
-                  <img src="/images/blueCheckmark.svg" alt="Moderator" style="all: unset; width: 25px;">
-                <% } else if (user.roles.isDev) { %>
-                  <img src="/images/icons8-checkmark.svg" alt="Developer" style="all: unset; width: 25px;">
-                <% } else if (user.verification.verified) { %>
-                  <span style="color: green; font-size: 0.8rem;">✔</span>
-                <% } %>
-          </div>
-
-    <% if(currUser && currUser._id.toString() === user._id.toString()) { %>
-      <div class="profile-email"><%= user.email %></div>
-      <a href="/profile/<%= user._id %>/edit" class="edit-btn">Edit Profile</a>
-    <% } %>
-
-    <div class="stats">
-      <div class="stat-card">Uploaded  &nbsp;&nbsp;<span><%= user.uploaded %></span></div>
-    </div>
-
-    <div class="profile-links">
-      <h3>Social Links</h3>
-      <% if (user.socialLinks?.linkedin) { %>
-        <p>🔗 LinkedIn: <a href="<%= user.socialLinks.linkedin %>" target="_blank">View</a></p>
-      <% } else { %>
-        <p>🔗 LinkedIn: Not added</p>
-      <% } %>
-
-      <% if (user.socialLinks?.github) { %>
-        <p>💻 GitHub: <a href="<%= user.socialLinks.github %>" target="_blank">View</a></p>
-      <% } else { %>
-        <p>💻 GitHub: Not added</p>
-      <% } %>
-    </div>
-  </aside>
-
-  <!-- Content -->
-  <section class="profile-content">
-    <div class="notes-header">
-      <h2>Uploaded Notes</h2>
-    </div>
-
-    <% if (notes.length > 0) { %>
-      <div class="notes-grid">
-        <% notes.forEach(note => { %>
-          <div class="note-card">
-            
-            <div class="note-title"><%= note.title %>
-              <% if(!note.isVerified) {%>
-                <span style="color: red;">&#9033;</span>
-              <% } %>
-            </div>
-            <div class="note-meta"><%= note.subject.name %> — <%= note.course %></div>
-            <span class="note-meta"><%= note.downloadCount %> downloads</span><br>
-            <a href="/notes/<%= note._id %>" class="note-link">View Note</a>
-          </div>
-        <% }) %>
+        <% if(currUser && currUser._id.toString() === user._id.toString()) { %>
+          <button class="avatar-edit-btn" onclick="openAvatarModal()">✎</button>
+        <% } %>
       </div>
-    <% } else { %>
-      <p style="text-align: center; color: #888;">No notes uploaded yet.</p>
-    <% } %>
+    </div>
 
-    <% if(currUser && currUser._id.toString() === user._id.toString() && !user.verification.verified) {%>
-      <a href="/verify" class="back-link">← Verify Here</a>
-    <% } %>
-    <a href="/" class="back-link">← Back to Home</a>
+    <div class="profile-right">
+
+      <div class="profile-name-line">
+        <h2><%= user.name %></h2>
+
+        <% if (user.roles.isModerator) { %>
+          <img src="/images/blueCheckmark.svg" class="verify-icon">
+        <% } else if (user.roles.isDev) { %>
+          <img src="/images/icons8-checkmark.svg" class="verify-icon">
+        <% } else if (user.verification.verified) { %>
+          <span class="text-verified">✔</span>
+        <% } %>
+      </div>
+
+      <p class="profile-email"><%= user.email %></p>
+
+      <% if(currUser && currUser._id.toString() === user._id.toString()) { %>
+      <a href="/profile/<%= user._id %>/edit" class="profile-edit-btn">Edit Profile</a>
+      <% } %>
+
+      <div class="profile-stats">
+        <div class="stat-box">Uploads: <strong><%= user.uploaded %></strong></div>
+      </div>
+
+      <div class="social-links">
+        <p>🔗 LinkedIn: 
+          <% if (user.socialLinks?.linkedin) { %>
+            <a href="<%= user.socialLinks.linkedin %>" target="_blank">View</a>
+          <% } else { %> Not added <% } %>
+        </p>
+
+        <p>💻 GitHub:
+          <% if (user.socialLinks?.github) { %>
+            <a href="<%= user.socialLinks.github %>" target="_blank">View</a>
+          <% } else { %> Not added <% } %>
+        </p>
+      </div>
+
+    </div>
   </section>
+
+  <!-- ⭐ Uploaded Notes Section -->
+  <h2 class="note-section-title">Uploaded Notes</h2>
+
+  <div class="note-grid">
+    <% notes.forEach(note => { %>
+
+      <article class="card">
+
+        <div class="card-top">
+          <div>
+            <h3 class="title"><%= note.title %></h3>
+            <div class="subtitle">
+              <%= note.subject?.name %> • <%= note.course %>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <div style="display:flex; gap:8px;">
+            <div class="tag"><i class="fa-solid fa-download"></i> <strong><%= note.downloadCount %></strong></div>
+            <div class="tag"><strong><%= note.createdAt?.toDateString() %></strong></div>
+          </div>
+        </div>
+
+        <div class="card-footer">
+          <a class="view-btn" href="/notes/<%= note._id %>">View</a>
+
+         
+        </div>
+
+      </article>
+
+    <% }) %>
+  </div>
+
 </div>
 
 
-
+<!-- Avatar Modal -->
 <div id="avatarModal" class="avatar-modal" style="display:none;">
   <div class="avatar-modal-content">
     <h3>Edit Profile Picture</h3>
-    <img src="<%= user.avatar %>" alt="Current Avatar">
-    
+    <img src="<%= user.avatar %>" class="modal-avatar">
+
     <form action="/profile/avatar?_method=PUT" method="POST" enctype="multipart/form-data">
       <input type="file" name="avatar" accept="image/*" required>
-      <br><br>
-      <button type="submit" class="edit-btn">Upload</button>
+      <button class="profile-edit-btn">Upload</button>
     </form>
-    
-    <div class="close-modal" onclick="closeAvatarModal()">Cancel</div>
+
+    <div class="modal-close" onclick="closeAvatarModal()">Cancel</div>
   </div>
 </div>
 
-
 <script>
-  function openAvatarModal() {
-    document.getElementById("avatarModal").style.display = "flex";
-  }
-  function closeAvatarModal() {
-    document.getElementById("avatarModal").style.display = "none";
-  }
+function openAvatarModal(){ document.getElementById("avatarModal").style.display="flex"; }
+function closeAvatarModal(){ document.getElementById("avatarModal").style.display="none"; }
 </script>

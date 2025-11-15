@@ -2,330 +2,218 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Admin Dashboard | CampusNotes</title>
+  <title>Admin Dashboard • CampusNotes</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- Bootstrap + Font Awesome -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-  <style>
-    body {
-      font-family: "Poppins", sans-serif;
-      background: linear-gradient(135deg, #f8fbff 0%, #e6efff 100%);
-      min-height: 100vh;
-      color: #222;
-    }
+  <link rel="stylesheet" href="/css/admin.css">
 
-    .dashboard-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 1.5rem;
-    }
 
-    .dashboard-header h1 {
-      font-weight: 700;
-      font-size: 2rem;
-      color: #0d6efd;
-    }
-
-    .card {
-      border: none;
-      border-radius: 16px;
-      background: #fff;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.06);
-      transition: all 0.3s ease;
-    }
-
-    .card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
-    }
-
-    .stat-card {
-      background: linear-gradient(135deg, #eef6ff, #ffffff);
-      border-left: 5px solid #0d6efd;
-    }
-
-    .stat-icon {
-      font-size: 1.5rem;
-      color: #0d6efd;
-    }
-
-    .stat-card h5, .stat-card h6 {
-      color: #0d6efd;
-      font-weight: 600;
-    }
-
-    .stat-card h3 {
-      font-weight: 700;
-      color: #111;
-    }
-
-    h4 {
-      font-weight: 600;
-      color: #333;
-      margin-top: 2rem;
-      margin-bottom: 1rem;
-    }
-
-    table th {
-      background-color: #f8f9fb;
-      font-weight: 600;
-    }
-
-    .table-responsive {
-      border-radius: 12px;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .avatar {
-      border: 3px solid #e3e6f0;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    }
-
-    @media (max-width: 768px) {
-      .dashboard-header h1 {
-        font-size: 1.5rem;
-      }
-      .card {
-        margin-bottom: 1rem;
-      }
-    }
-  </style>
 </head>
 <body>
-  <div class="container py-4">
 
-    <!-- Header -->
-    <div class="dashboard-header">
-      <h1><i class="fa-solid fa-chart-line"></i> Admin Dashboard</h1>
-      <a href="/logout" class="btn btn-outline-danger btn-sm">
-        <i class="fa-solid fa-right-from-bracket"></i> Logout
-      </a>
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1><i class="fa-solid fa-gauge-high" style="color:var(--accent2)"></i> Admin Dashboard</h1>
+
+    <a href="/logout">
+      <button class="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+    </a>
+  </div>
+
+  <!-- MAIN STAT CARDS -->
+  <div class="grid grid-4">
+    <div class="card stat">
+      <div>
+        <p class="stat-title">Total Users</p>
+        <div class="stat-number"><%= totalUsers %></div>
+      </div>
+      <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
     </div>
 
-    <!-- Core Stats -->
-    <div class="row g-3 mb-4">
-      <div class="col-6 col-md-3">
-        <div class="card stat-card text-center p-3">
-          <i class="fa-solid fa-users stat-icon mb-2"></i>
-          <h5>Total Users</h5>
-          <h3><%= totalUsers %></h3>
-        </div>
+    <div class="card stat">
+      <div>
+        <p class="stat-title">Total Notes</p>
+        <div class="stat-number"><%= totalNotes %></div>
       </div>
-      <div class="col-6 col-md-3">
-        <div class="card stat-card text-center p-3">
-          <i class="fa-solid fa-file-lines stat-icon mb-2"></i>
-          <h5>Total Notes</h5>
-          <h3><%= totalNotes %></h3>
-        </div>
-      </div>
-      <div class="col-6 col-md-3">
-        <div class="card stat-card text-center p-3">
-          <i class="fa-solid fa-download stat-icon mb-2"></i>
-          <h5>Total Downloads</h5>
-          <h3><%= totalDownloads %></h3>
-        </div>
-      </div>
-      <div class="col-6 col-md-3">
-        <div class="card stat-card text-center p-3">
-          <i class="fa-solid fa-calendar-week stat-icon mb-2"></i>
-          <h5>Downloads (7d)</h5>
-          <h3><%= downloadsLast7Days %></h3>
-        </div>
-      </div>
+      <div class="stat-icon"><i class="fa-solid fa-file-lines"></i></div>
     </div>
 
-    <!-- Unique Traffic -->
-    <h4><i class="fa-solid fa-globe"></i> Unique Traffic</h4>
-    <div class="row g-3 mb-4">
-      <div class="col-md-4">
-        <div class="card stat-card text-center p-3">
-          <i class="fa-solid fa-chart-pie stat-icon mb-2"></i>
-          <h6>Unique Downloads</h6>
-          <h3><%= totalUniqueDownloads %></h3>
-        </div>
+    <div class="card stat">
+      <div>
+        <p class="stat-title">Total Downloads</p>
+        <div class="stat-number"><%= totalDownloads %></div>
       </div>
-      <div class="col-md-4">
-        <div class="card stat-card text-center p-3">
-          <i class="fa-solid fa-user-clock stat-icon mb-2"></i>
-          <h6>Sessions</h6>
-          <h3><%= uniqueSessions %></h3>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card stat-card text-center p-3">
-          <i class="fa-solid fa-network-wired stat-icon mb-2"></i>
-          <h6>Unique IPs</h6>
-          <h3><%= uniqueIps %></h3>
-        </div>
-      </div>
+      <div class="stat-icon"><i class="fa-solid fa-download"></i></div>
     </div>
 
-    <!-- User Engagement -->
-    <h4><i class="fa-solid fa-user-group"></i> User Engagement</h4>
-    <div class="row g-3 mb-4">
-      <div class="col-md-4">
-        <div class="card stat-card text-center p-3">
-          <i class="fa-solid fa-user-plus stat-icon mb-2"></i>
-          <h6>New Signups (7d)</h6>
-          <h3><%= newSignups %></h3>
-        </div>
+    <div class="card stat">
+      <div>
+        <p class="stat-title">Downloads (7d)</p>
+        <div class="stat-number"><%= downloadsLast7Days %></div>
       </div>
-      <div class="col-md-4">
-        <div class="card stat-card text-center p-3">
-          <i class="fa-solid fa-circle-check stat-icon mb-2"></i>
-          <h6>Verified Users</h6>
-          <h3><%= verifiedUsers %></h3>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card stat-card text-center p-3">
-          <i class="fa-solid fa-circle-xmark stat-icon mb-2"></i>
-          <h6>Unverified</h6>
-          <h3><%= unverifiedUsers %></h3>
-        </div>
-      </div>
-    </div>
-
-    <!-- Top Contributors -->
-    <h4><i class="fa-solid fa-trophy"></i> Top Contributors</h4>
-    <div class="row g-3 mb-4">
-      <% topContributors.forEach(user => { %>
-        <div class="col-md-4">
-          <div class="card text-center p-3">
-            <img src="<%= user.avatar || '/images/default-avatar.png' %>" class="rounded-circle avatar mx-auto mb-2" width="80" height="80" style="object-fit:cover;">
-            <h6 class="mb-0"><%= user.name %></h6>
-            <small class="text-muted">@<%= user.username %></small>
-            <p class="text-primary mt-2 fw-semibold">
-              <i class="fa-solid fa-file-pen"></i> Notes: <%= user.notesCount %>
-            </p>
-          </div>
-        </div>
-      <% }) %>
-    </div>
-
-    <!-- Content Moderation -->
-    <h4><i class="fa-solid fa-folder-open"></i> Content & Moderation</h4>
-    <div class="row g-3 mb-4">
-      <div class="col-md-6">
-        <div class="card stat-card text-center p-3">
-          <i class="fa-solid fa-spinner stat-icon mb-2"></i>
-          <h6>Pending Verification</h6>
-          <h3><%= notesPendingVerification %></h3>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div class="card stat-card text-center p-3">
-          <i class="fa-solid fa-cloud-upload-alt stat-icon mb-2"></i>
-          <h6>New Uploads (7d)</h6>
-          <h3><%= newNoteUploads %></h3>
-        </div>
-      </div>
-    </div>
-
-    <!-- Top Notes -->
-    <h4><i class="fa-solid fa-ranking-star"></i> Top Notes</h4>
-    <div class="card mb-4">
-      <div class="card-body table-responsive">
-        <table class="table table-hover align-middle">
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Course</th>
-              <th>Downloads</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% topNotes.forEach(note => { %>
-              <tr>
-                <td><%= note.title %></td>
-                <td><%= note.course %></td>
-                <td><i class="fa-solid fa-download text-primary"></i> <%= note.downloadCount %></td>
-              </tr>
-            <% }) %>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Course-wise Chart -->
-    <h4><i class="fa-solid fa-graduation-cap"></i> Notes by Course</h4>
-    <div class="card mb-5">
-      <div class="card-body">
-        <canvas id="courseChart"></canvas>
-      </div>
-    </div>
-
-    <!-- Recent Users -->
-    <h4><i class="fa-solid fa-user-clock"></i> Recent Users</h4>
-    <div class="card mb-4">
-      <div class="card-body table-responsive">
-        <table class="table table-hover">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Username</th>
-              <th>Joined</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% fiveLastUsers.forEach(u => { %>
-              <tr>
-                <td><%= u.name %></td>
-                <td>@<%= u.username %></td>
-                <td><%= new Date(u.createdAt).toLocaleDateString() %></td>
-              </tr>
-            <% }) %>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Recent Downloads -->
-    <h4><i class="fa-solid fa-cloud-arrow-down"></i> Recent Downloads</h4>
-    <div class="card mb-5">
-      <div class="card-body table-responsive">
-        <table class="table table-hover">
-          <thead>
-            <tr>
-              <th>Note</th>
-              <th>Downloaded At</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% LastDownloads.forEach(dl => { %>
-              <tr>
-                <td><%= dl.note ? dl.note.title : "Unknown Note" %></td>
-                <td><%= new Date(dl.downloadedAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }) %></td>
-              </tr>
-            <% }) %>
-          </tbody>
-        </table>
-      </div>
+      <div class="stat-icon"><i class="fa-solid fa-calendar-week"></i></div>
     </div>
   </div>
 
-  <script>
-    const ctx = document.getElementById('courseChart').getContext('2d');
-    const courseData = <%- JSON.stringify(courseWise) %>;
-    new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: courseData.map(c => c._id),
-        datasets: [{
-          label: 'Notes',
-          data: courseData.map(c => c.notes),
-          backgroundColor: 'rgba(13, 110, 253, 0.6)',
-          borderRadius: 8
-        }]
-      },
-      options: { scales: { y: { beginAtZero: true } } }
-    });
-  </script>
+
+
+  <!-- USER ENGAGEMENT -->
+  <h2 class="sec-title">User Engagement</h2>
+  <div class="grid grid-3">
+    <div class="card stat">
+      <div>
+        <p class="stat-title">New Signups (7d)</p>
+        <div class="stat-number"><%= newSignups %></div>
+      </div>
+      <div class="stat-icon"><i class="fa-solid fa-user-plus"></i></div>
+    </div>
+
+    <div class="card stat">
+      <div>
+        <p class="stat-title">Verified Users</p>
+        <div class="stat-number"><%= verifiedUsers %></div>
+      </div>
+      <div class="stat-icon"><i class="fa-solid fa-circle-check"></i></div>
+    </div>
+
+    <div class="card stat">
+      <div>
+        <p class="stat-title">Unverified Users</p>
+        <div class="stat-number"><%= unverifiedUsers %></div>
+      </div>
+      <div class="stat-icon"><i class="fa-solid fa-circle-xmark"></i></div>
+    </div>
+  </div>
+
+
+
+  <!-- TOP CONTRIBUTORS -->
+  <h2 class="sec-title">Top Contributors</h2>
+  <div class="grid grid-3">
+    <% topContributors.forEach(user => { %>
+      <div class="card contrib">
+        <img src="<%= user.avatar || '/images/default-avatar.png' %>" alt="">
+        <h3 style="margin:6px 0;"><%= user.name %></h3>
+        <p style="color:var(--muted);">@<%= user.username %></p>
+        <p style="margin-top:6px; color:var(--accent2); font-weight:700;">
+          <i class="fa-solid fa-file-pen"></i> <%= user.notesCount %>
+        </p>
+      </div>
+    <% }) %>
+  </div>
+
+
+
+  <!-- TOP NOTES TABLE -->
+  <h2 class="sec-title">Top Notes</h2>
+  <div class="table-wrap card">
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Course</th>
+          <th>Downloads</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% topNotes.forEach(note => { %>
+          <tr>
+            <td><%= note.title %></td>
+            <td><%= note.course %></td>
+            <td><i class="fa-solid fa-download" style="color:var(--accent)"></i> <%= note.downloadCount %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+
+
+  <!-- CHART -->
+  <h2 class="sec-title">Notes by Course</h2>
+  <div class="chart-box">
+    <canvas id="courseChart"></canvas>
+  </div>
+
+
+
+  <!-- RECENT USERS -->
+  <h2 class="sec-title">Recent Users</h2>
+  <div class="table-wrap card">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Username</th>
+          <th>Joined</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% fiveLastUsers.forEach(u => { %>
+          <tr>
+            <td><%= u.name %></td>
+            <td>@<%= u.username %></td>
+            <td><%= new Date(u.createdAt).toLocaleDateString() %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+
+
+  <!-- RECENT DOWNLOADS -->
+  <h2 class="sec-title">Recent Downloads</h2>
+  <div class="table-wrap card">
+    <table>
+      <thead>
+        <tr>
+          <th>Note</th>
+          <th>Downloaded At</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% LastDownloads.forEach(dl => { %>
+          <tr>
+            <td><%= dl.note ? dl.note.title : 'Unknown' %></td>
+            <td><%= new Date(dl.downloadedAt).toLocaleString('en-IN', { timeZone:'Asia/Kolkata' }) %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+
+<script>
+  const ctx = document.getElementById("courseChart").getContext("2d");
+  const data = <%- JSON.stringify(courseWise) %>;
+
+  new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: data.map(c => c._id),
+      datasets: [{
+        label: "Notes",
+        data: data.map(c => c.notes),
+        backgroundColor: "rgba(138,47,255,0.5)",
+        borderRadius: 8
+      }]
+    },
+    options: {
+      scales: {
+        y: { beginAtZero: true, ticks:{ color:"#cfe3ff" } },
+        x: { ticks:{ color:"#cfe3ff" } }
+      }
+    }
+  });
+</script>
+
 </body>
 </html>

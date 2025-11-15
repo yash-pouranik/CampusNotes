@@ -2,68 +2,67 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
   <link rel="icon" type="image/x-icon" href="/images/CAMPUSNOTES_LOGO.png">
 
   <title><%= typeof title !== 'undefined' ? title : 'Campus Notes - SVVV Notes' %></title>
+
+  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Urbanist&display=swap" rel="stylesheet" />
+
+  <!-- Main CSS -->
   <link rel="stylesheet" href="/css/styles.css?v=3" />
   <link rel="stylesheet" href="/css/footer_nav.css?v=2" />
-  
-  <meta name="description" content="<%= typeof description !== 'undefined' ? description : 'A SVVV (Shri Vaishnav Vidhyapeeth Vishwavidhyalaya) student-driven platform for sharing and accessing college notes, study materials, and academic resources. Join our community to upload and download free notes.' %>">
+  <link rel="stylesheet" href="/css/theme.css">
 
-  <!-- AOS CSS -->
+  <!-- SEO Meta -->
+  <meta name="description" content="<%= typeof description !== 'undefined' ? description : 'A student-driven platform for sharing notes, study materials & academic resources.' %>">
+
+  <!-- AOS -->
   <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
-  <meta name="google-site-verification" content="o5KNQ9R-ummCVpBGTiPWtBLvDPdVm-uxMuIQXmj3mlU" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-        <!-- Google tag (gtag.js) -->
-      <script async src="https://www.googletagmanager.com/gtag/js?id=G-VQX25X9M70"></script>
-      <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-        gtag('config', 'G-VQX25X9M70');
-      </script>
+  <!-- Google Tag -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VQX25X9M70"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-VQX25X9M70');
+  </script>
 
-      <!-- again google tag -->
-    <% if (typeof showAds === 'undefined' || showAds !== false) { %>
-      <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6173181732924072" crossorigin="anonymous"></script>
-    <% } %>
+  <% if (typeof showAds === 'undefined' || showAds !== false) { %>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6173181732924072" crossorigin="anonymous"></script>
+  <% } %>
 </head>
+
 <body>
+
   <%- include("partials/navbar") %>
 
+  <!-- PAGE WRAPPER FIXES BACKGROUND CUTTING ISSUE -->
+  <main class="page-wrapper">
+    
+    <% if (success_msg.length) { %>
+      <div class="flash flash-success"><%= success_msg %></div>
+    <% } %>
 
+    <% if (error_msg.length) { %>
+      <div class="flash flash-error"><%- error_msg %></div>
+    <% } %>
 
-
-  <main class="container" style="padding-top: 4rem !important;">
-  <% if (success_msg.length) { %>
-    <div class="flash flash-success"><%= success_msg %></div>
-  <% } %>
-
-  <% if (error_msg.length) { %>
-    <div class="flash flash-error"><%- error_msg %></div>
-  <% } %>
     <%- body %>
   </main>
-  
+
   <%- include("partials/footer") %>
 
+  <!-- Scripts -->
   <script src="/js/navbar.js"></script>
-  <!-- AOS JS -->
-<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
-<script>
-  AOS.init({
-    duration: 800, // animation duration
-    once: true     // animation triggers only once
-  });
-</script>
-
-<script src="https://accounts.google.com/gsi/client" async></script>
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script>AOS.init({ duration: 800, once: true });</script>
 
 </body>
-
 </html>

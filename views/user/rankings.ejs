@@ -1,202 +1,174 @@
 <style>
-  .leaderboard-section {
-  padding: 60px 20px;
+  /* ===========================
+   DARK NEON — RANKING PAGE
+   =========================== */
+
+.ranking-section {
+  padding: 70px 20px;
   text-align: center;
-  background-color: #f9fafb;
-  border-radius: 20px;
+  color: var(--text);
 }
 
-.leaderboard-title {
-  margin-top: 0;
-  font-size: 2.8rem;
+.ranking-title {
+  font-size: 2.4rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--accent);
   margin-bottom: 8px;
 }
 
-.leaderboard-subtitle {
-  color: #6b7280;
+.ranking-sub {
+  color: var(--muted);
   font-size: 1rem;
   margin-bottom: 40px;
 }
 
-.leaderboard-container {
+/* MAIN GRID */
+.ranking-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 24px;
-  max-width: 100%;
-  margin: 0 auto;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 26px;
 }
 
-.leaderboard-card {
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-  padding: 20px 24px;
+/* CARD */
+.rank-card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.05);
+  padding: 10px 10px;
+
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  transition: transform 0.2s ease;
-  border: 1px solid #e5e7eb;
+  gap: 5px;
+
+  box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+  transition: 0.2s ease;
 }
 
-.leaderboard-card:hover {
-  transform: translateY(-4px);
+.rank-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,255,213,0.15);
 }
 
-.rank-badge {
+/* LEFT RANK NUMBER */
+.rank-number {
   font-size: 1.2rem;
-  font-weight: 600;
-  color: #3b82f6;
-  margin-right: 12px;
-}
-
-.user-info {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  flex: 1;
-  text-align: left;
-}
-
-.user-avatar {
+  font-weight: 700;
+  color: var(--accent);
   width: 48px;
-  height: 48px;
+  text-align: center;
+}
+
+/* AVATAR */
+.rank-avatar {
+  width: 54px;
+  height: 54px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #3b82f6;
+  border: 2px solid var(--accent);
 }
 
-.user-details {
+/* USER INFO */
+.rank-info {
+  flex: 1;
   display: flex;
   flex-direction: column;
+  text-align: left;
+  gap: 2px;
 }
 
-.display-name {
-  font-size: 1.05rem;
-  color: #111827;
+/* NAME */
+.rank-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.username {
+/* Username */
+.rank-username {
   font-size: 0.85rem;
-  color: #6b7280;
+  color: var(--muted);
 }
 
-.course-name {
+/* Course */
+.rank-course {
   font-size: 0.75rem;
   color: #9ca3af;
 }
 
-.upload-count {
+/* Upload count */
+.rank-uploads {
   text-align: right;
 }
 
-.upload-count span {
-  font-size: 1.5rem;
+.rank-uploads span {
+  font-size: 1.7rem;
   font-weight: 700;
-  color: #10b981;
+  color: #19ffb3;
 }
 
-.upload-count small {
+.rank-uploads small {
   display: block;
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--muted);
 }
 
-@media (max-width: 500px) {
-  .leaderboard-section {
-    padding: 24px 4px;
-    border-radius: 10px;
+/* MOBILE FIX */
+@media (max-width: 520px) {
+  .rank-card {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
   }
-  .leaderboard-title {
-    font-size: 1.5rem;
+  .rank-info {
+    text-align: center;
   }
-  .upload-count span {
-    font-size: 1rem;
-    font-weight: 700;
-
-  }
-  .upload-count small {
-    display: block;
-    font-size: 0.50rem;
-    color: #6b7280;
-  }
-  .course-name {
-    font-size: 0.50rem;
-    color: #9ca3af;
-  }
-  .username {
-    font-size: 0.65rem;
-    color: #6b7280;
-  }
-  .rank-badge {
-    font-size: 0.70rem;
-    font-weight: 500;
-    margin-right: 8px;
-  }
-  .display-name {
-    font-size: 0.85rem;
-    color: #111827;
-  }
-  .leaderboard-container {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-  .leaderboard-card {
-
-    padding: 16px 10px;
-  }
-  .user-info {
-    gap: 10px;
-    margin-bottom: 10px;
-  }
-  .user-avatar {
-    width: 40px;
-    height: 40px;
-  }
-  .upload-count {
-    text-align: left;
-    margin-top: 8px;
+  .rank-uploads {
+    text-align: center;
   }
 }
-
-
 
 </style>
 
 
 
-<section class="leaderboard-section">
-  <h1 class="leaderboard-title">🏆 Top Contributors</h1>
-  <p class="leaderboard-subtitle">Based on number of notes uploaded</p>
 
-  <div class="leaderboard-container">
-    <% topUsers.forEach((user, index) => { %>
-      <div class="leaderboard-card">
-        <div class="rank-badge">#<%= index + 1 %></div>
-        <div class="user-info">
-          <img src="<%= user.avatar %>" alt="Avatar of <%= user.username %>" class="user-avatar" />
-          <div class="user-details">
-            <strong class="display-name" style="display: flex; align-items: center;"><%= user.name || user.username %>
-                <% if (user.roles.isModerator) { %>
-                  <img src="/images/blueCheckmark.svg" alt="Moderator" style="all: unset; width: 25px;">
-                <% } else if (user.roles.isDev) { %>
-                  <img src="/images/icons8-checkmark.svg" alt="Developer" style="all: unset; width: 25px;">
-                <% } else if (user.verification.verified) { %>
-                  <span style="color: green; font-size: 0.8rem;">&nbsp; ✔</span>
-                <% } %>
-            </strong>
-            <span class="username">@<%= user.username %></span> 
-            <a href="/profile/<%= user._id %>">visit</a>
-            <span class="course-name"><%= user.course || "-" %></span>
+<section class="ranking-section">
+  <h1 class="ranking-title">🏆 Top Contributors</h1>
+  <p class="ranking-sub">Based on number of notes uploaded</p>
+
+  <div class="ranking-container">
+    <% topUsers.forEach((u, i) => { %>
+      <div class="rank-card">
+
+        <div class="rank-number">#<%= i+1 %></div>
+
+        <img src="<%= u.avatar %>" class="rank-avatar" />
+
+        <div class="rank-info">
+          <div class="rank-name">
+            <%= u.name || u.username %>
+            <% if (u.roles.isModerator) { %>
+              <img src="/images/blueCheckmark.svg" width="18">
+            <% } else if (u.roles.isDev) { %>
+              <img src="/images/icons8-checkmark.svg" width="18">
+            <% } else if (u.verification?.verified) { %>
+              <span style="color:#19ffb3;">✔</span>
+            <% } %>
           </div>
+
+          <div class="rank-username">@<%= u.username %></div>
+          <div class="rank-course"><%= u.course || '-' %></div>
         </div>
-        <div class="upload-count">
-          <span><%= user.uploaded %></span>
+
+        <div class="rank-uploads">
+          <span><%= u.uploaded %></span>
           <small>Uploads</small>
         </div>
+
       </div>
     <% }) %>
   </div>
 </section>
-

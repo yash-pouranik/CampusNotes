@@ -1,379 +1,128 @@
-<style>
-  h3{
-    margin-top: 0;
-  }
-  .explore-container {
-    max-width: 1100px;
-    margin: 5px auto;
-    padding: 20px;
-  }
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="stylesheet" href="/css/explore.css">
+</head>
 
-  .explore-heading {
-    text-align: center;
-    font-size: 2.4rem;
-    color: #1a1a3d;
-    margin-bottom: 40px;
-    position: relative;
-  }
-
-  .explore-heading::after {
-    content: '';
-    display: block;
-    width: 80px;
-    height: 3px;
-    background-color: #00d80b;
-    margin: 12px auto 0;
-    border-radius: 6px;
-  }
-
-  /* Notes grid */
-  .note-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 25px;
-  }
-
-  /* Note card */
-/* Note card only */
-.note-card {
-  background: #ffffff;
-  padding: 20px;
-  border-radius: 16px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.034);
-  transition: all 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  overflow: hidden;
-}
-
-/* subtle gradient border effect */
-.note-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 16px;
-  padding: 2px;
   
-  -webkit-mask: 
-    linear-gradient(#fff 0 0) content-box, 
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-          mask-composite: exclude;
-  pointer-events: none;
-}
+  <!-- HEADER -->
+  <header class="page-head">
+    <div class="title-wrap">
+      <h1>Explore SVVV Notes</h1>
+      <div class="title-sub">Community-uploaded notes — @SVVV</div>
+    </div>
 
-.note-card:hover {
-  transform: translateY(-6px) scale(1.02);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
-}
+    <div class="controls">
+      <form id="searchForm" class="search" method="GET" action="/explore">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2"/><circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="2"/></svg>
+        <input type="search" name="q" placeholder="Search..." value="<%= query || '' %>">
+      </form>
 
-/* Title */
-.note-card h3 {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #2d2d6b;
-  margin-bottom: 8px;
-}
+      <a href="/most-voted" class="btn desktop-only">Most Voted</a>
+    </div>
+  </header>
 
-/* Info text */
-.note-card p {
-  font-size: 0.92rem;
-  color: #444;
-  margin: 5px 0;
-  line-height: 1.5;
-}
+  <!-- ⭐ NEW TOP FILTER BAR ⭐ -->
+  <form method="GET" action="/explore" class="top-filters">
 
-/* Date */
-.note-card time {
-  display: block;
-  font-size: 0.8rem;
-  color: #888;
-  margin-top: 10px;
-}
-
-/* View button inside card */
-.note-card .view-link {
-  margin-top: auto;
-  align-self: flex-start; 
-}
-.note-card .view-link:hover {
-  transform: translateY(-1.4px) scale(1.03);
-  box-shadow: 0 8px 20px rgba(67, 56, 202, 0.25);
-}
-
-
-
-  /* View link button */
- .view-link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-
-  background: linear-gradient(135deg, #2d1b69, #4338ca);
-  color: #fff;
-  font-weight: 500;
-  font-size: 0.95rem;
-
-  padding: 10px 18px;
-  border-radius: 8px;
-  text-decoration: none;
-
-  width: fit-content;
-  min-width: 10px;
-  text-align: center;
-
-  transition: all 0.3s ease;
-}
-
-.view-link:hover {
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
-}
-
-
-  /* Search + filter form */
-  .search-filter-form {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 30px;
-  }
-
-  .search-filter-form input,
-  .search-filter-form select,
-  .search-filter-form button {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 1rem;
-  }
-
-  .search-filter-form button {
-    background: #2b2b6b;
-    color: #fff;
-    cursor: pointer;
-  }
-
-  /* Most Voted link */
-  .most-voted-link {
-    display: inline-block;
-    margin-bottom: 25px;
-    background: linear-gradient(to right, #4CAF50, #81C784);
-    color: #fff;
-    padding: 10px 18px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 500;
-    transition: background 0.3s ease, transform 0.2s ease;
-  }
-
-  .most-voted-link:hover {
-    background: linear-gradient(to right, #43A047, #66BB6A);
-    transform: translateY(-2px);
-  }
-
-  /* Responsive tweaks */
-  @media (max-width: 900px) {
-    .note-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  @media (max-width: 650px) {
-    .note-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  @media (max-width: 500px) {
-    .search-filter-form {
-      flex-direction: column;
-      align-items: stretch;
-      gap: 12px;
-    }
-
-    p{
-      margin: 0 !important;
-    }
-
-    .search-filter-form input,
-    .search-filter-form select,
-    .search-filter-form button {
-      width: 100%;
-      font-size: 0.9rem;
-    }
-
-    .most-voted-link {
-      display: block;
-      text-align: center;
-      width: 60%;
-    }
-  }
-  .filter-overlay {
-  display: none;
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.5);
-  z-index: 900;
-}
-.filter-overlay.active { display: block; }
-
-
-  /* Filters */
-  @media (min-width: 769px) {
-    .desktop-filters { display: flex; }
-    .filter-toggle-btn, .filter-sidebar { display: none; }
-  }
-
-  @media (max-width: 768px) {
-    .desktop-filters { display: none; }
-
-    .filter-toggle-btn {
-      display: block;
-      margin: 10px 0 20px 0;
-      padding: 10px 15px;
-      background: #2b2b6b;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 1rem;
-    }
-
-    .filter-sidebar {
-      position: fixed;
-      top: 0;
-      left: -100%;
-      width: 75%;
-      height: 100%;
-      background: #fff;
-      z-index: 1000;
-      padding: 20px;
-      box-shadow: 2px 0 8px rgba(0,0,0,0.2);
-      transition: left 0.3s ease;
-      overflow-y: auto;
-    }
-
-    .filter-sidebar.open { left: 0; }
-  }
-</style>
-
-<div class="explore-container">
-  <h1 class="explore-heading">Explore All Notes at SVVV</h1>
-
-  <!-- Desktop Filters -->
-  <form method="GET" action="/explore" class="search-filter-form desktop-filters">
-    <input type="text" name="q" placeholder="Search by title or subject..."
-           value="<%= typeof query !== 'undefined' ? query : '' %>">
+    <input type="text" name="q" placeholder="Search..." value="<%= query || '' %>">
 
     <select name="course">
-      <option value="">All Courses</option>
+      <option value="">Course</option>
       <% ["B.Tech CSE","B.Tech IT","B.Tech ECE","B.Tech ME","MBA","BBA","MCA","BCA"].forEach(c => { %>
         <option value="<%= c %>" <%= course === c ? "selected" : "" %>><%= c %></option>
       <% }) %>
     </select>
 
     <select name="semester">
-      <option value="">All Semesters</option>
+      <option value="">Semester</option>
       <% ["I","II","III","IV","V","VI","VII","VIII","IX","X"].forEach(s => { %>
         <option value="<%= s %>" <%= semester === s ? "selected" : "" %>><%= s %></option>
       <% }) %>
     </select>
 
-    <button type="submit">Apply Filters</button>
+
+    <button type="submit" class="btn">Apply</button>
+    <button type="button" id="resetBtn" class="btn">Reset</button>
+
   </form>
 
-  <!-- Mobile Toggle -->
-  <button class="filter-toggle-btn" onclick="toggleFilters()">☰ Filters</button>
 
-  <!-- Mobile Sidebar -->
-  <div class="filter-sidebar" id="filterSidebar">
-    <button type="button" onclick="toggleFilters()" 
-        style="background:none;border:none;font-size:1.5rem;cursor:pointer;float:right;">✖</button>
-
-    <h3>Filters</h3>
-    <form method="GET" action="/explore" class="search-filter-form" style="flex-direction: column;">
-      <input type="text" name="q" placeholder="Search by title or subject..."
-             value="<%= typeof query !== 'undefined' ? query : '' %>">
-
-      <select name="course">
-        <option value="">All Courses</option>
-        <% ["B.Tech CSE","B.Tech IT","B.Tech ECE","B.Tech ME","MBA","BBA","MCA","BCA"].forEach(c => { %>
-          <option value="<%= c %>" <%= course === c ? "selected" : "" %>><%= c %></option>
-        <% }) %>
-      </select>
-
-      <select name="semester">
-        <option value="">All Semesters</option>
-        <% ["I","II","III","IV","V","VI","VII","VIII","IX","X"].forEach(s => { %>
-          <option value="<%= s %>" <%= semester === s ? "selected" : "" %>><%= s %></option>
-        <% }) %>
-      </select>
-
-      <button type="submit">Apply Filters</button>
-    </form>
-  </div>
-
-  <a href="/most-voted" class="most-voted-link">Most Voted SVVV Notes</a>
-
+  <!-- MAIN CONTENT -->
   <% if (notes.length === 0) { %>
-    <p style="text-align: center; font-size: 1.1rem; color: #666;">No SVVV notes uploaded yet.</p>
+    <div style="text-align:center; padding:40px; color:var(--muted);">
+      No SVVV notes uploaded yet.
+    </div>
   <% } else { %>
-    <div class="note-grid">
-      <% notes.forEach(note => { %>
-        <div class="note-card">
-          <h3><%= note.title %></h3>
-          <p><strong>Subject:</strong> <%= note.subject?.name || 'N/A' %></p>
-          <p><strong>Course:</strong> <%= note.course %></p>
 
-          <p style="display: flex; align-items: center;"><strong>Uploaded by:</strong> <%= note.uploadedBy?.username || "Unknown" %>
-            <% if (note.uploadedBy?.roles?.isModerator) { %>
-              <img src="/images/blueCheckmark.svg" alt="Moderator" width="15">
-            <% } else if (note.uploadedBy?.roles?.isDev) { %>
-              <img src="/images/icons8-checkmark.svg" alt="Developer" width="15">
-            <% } else if (note.uploadedBy?.verification?.verified) { %>
-              <span style="color: green; font-size: 0.8rem;">✔</span>
-            <% } %>
-          </p>
+  <div class="note-grid" id="noteGrid">
+    <% notes.forEach(note => { %>
 
-          <p><strong>Downloads:</strong> <%= note.downloadCount %></p>
-          <time><%= note.createdAt ? note.createdAt.toDateString() : 'Date not available' %></time>
-          <a href="/notes/<%= note._id %>" class="view-link">📄 View Note</a>
+      <article class="card">
+
+        <div class="card-top">
+          
+
+          <div>
+            <h3 class="title"><%= note.title %></h3>
+            <div class="subtitle"><%= note.subject?.name || 'General' %> • <%= note.course %></div>
+          </div>
         </div>
-      <% }) %>
-    </div>
-    <div id="load-more-container" style="text-align:center; margin-top:20px;">
-      <% if (currentPage < totalPages) { %>
-        <button id="loadMoreBtn" class="view-link">Load More</button>
-      <% } %>
-    </div>
 
-    <div class="disclaimer-box" style="text-align: center; margin-bottom: 25px;">
-      <strong>Important:</strong> Notes are for reference only. Your grades depend
-      on your own efforts and official course material.
+        <div class="card-body">
+          <div style="display:flex; gap:8px;">
+            <div class="tag"><i class="fa-solid fa-download"></i> &nbsp;<strong><%= note.downloadCount %></strong></div>
+            <div class="tag"><strong><%= note.createdAt?.toDateString() %></strong></div>
+          </div>
+        </div>
+
+        <div class="card-footer">
+          <a class="view-btn" href="/notes/<%= note._id %>">View</a>
+
+          <div class="badge">
+            By <span style="color:var(--accent); margin-left:6px;"><%= note.uploadedBy?.username %></span>
+
+            <% if (note.uploadedBy?.roles?.isModerator) { %>
+              <img src="/images/blueCheckmark.svg" style="width:18px;margin-left:6px;">
+            <% } else if (note.uploadedBy?.roles?.isDev) { %>
+              <img src="/images/icons8-checkmark.svg" style="width:18px;margin-left:6px;">
+            <% } else if (note.uploadedBy?.verification?.verified) { %>
+              <span style="color:#56ff9a;margin-left:6px;">✔</span>
+            <% } %>
+
+          </div>
+        </div>
+
+      </article>
+
+    <% }) %>
   </div>
 
   <% } %>
-</div>
+
+
+  <!-- LOAD MORE -->
+  <div class="load-more-wrap">
+    <% if (currentPage < totalPages) { %>
+      <button id="loadMoreBtn" class="load-more">Load more</button>
+    <% } %>
+  </div>
+
 
 <script>
-  function toggleFilters() {
-    document.getElementById('filterSidebar').classList.toggle('open');
-  }
+  // RESET FILTERS
+  document.getElementById('resetBtn')?.addEventListener('click', () => {
+    window.location.href = "/explore";
+  });
 
+  // LOAD MORE
   let currentPage = <%= currentPage %>;
-const totalPages = <%= totalPages %>;
-const loadMoreBtn = document.getElementById("loadMoreBtn");
-const grid = document.querySelector(".note-grid");
+  const totalPages = <%= totalPages %>;
+  const loadMoreBtn = document.getElementById("loadMoreBtn");
+  const noteGrid = document.getElementById("noteGrid");
 
-if (loadMoreBtn) {
-  loadMoreBtn.addEventListener("click", async () => {
+  async function appendNotes() {
     currentPage++;
-    if (currentPage > totalPages) return;
 
     const params = new URLSearchParams({
       q: "<%= query || '' %>",
@@ -386,39 +135,58 @@ if (loadMoreBtn) {
     const res = await fetch("/explore?" + params.toString(), {
       headers: { "Accept": "application/json" }
     });
+
     const data = await res.json();
 
     data.notes.forEach(note => {
-      const card = document.createElement("div");
-      card.className = "note-card";
+      const uploader = note.uploadedBy?.username || "Unknown";
 
-      // uploaded by logic
-      let uploadedBy = note.uploadedBy?.username || "Unknown";
-      if (note.uploadedBy?.roles?.isModerator) {
-        uploadedBy += ` <img src="/images/blueCheckmark.svg" alt="Moderator" width="15">`;
-      } else if (note.uploadedBy?.roles?.isDev) {
-        uploadedBy += ` <img src="/images/icons8-checkmark.svg" alt="Developer" width="15">`;
-      } else if (note.uploadedBy?.verification?.verified) {
-        uploadedBy += ` <span style="color: green; font-size: 0.8rem;">✔</span>`;
-      }
+      const badge = 
+        note.uploadedBy?.roles?.isModerator
+        ? `<img src="/images/blueCheckmark.svg" style="width:18px;margin-left:6px;">`
+        : note.uploadedBy?.roles?.isDev
+        ? `<img src="/images/icons8-checkmark.svg" style="width:18px;margin-left:6px;">`
+        : note.uploadedBy?.verification?.verified
+        ? `<span style="color:#56ff9a;margin-left:6px;">✔</span>`
+        : "";
 
-      card.innerHTML = `
-        <h3>${note.title}</h3>
-        <p><strong>Subject:</strong> ${note.subject?.name || 'N/A'}</p>
-        <p><strong>Course:</strong> ${note.course}</p>
-        <p style="display: flex; align-items: center;"><strong>Uploaded by:</strong> ${uploadedBy}</p>
-        <p style="display: flex; align-items: center;"><strong>Downloads:</strong> ${note.downloadCount}</p>
-        <time>${note.createdAt ? new Date(note.createdAt).toDateString() : 'Date not available'}</time>
-        <a href="/notes/${note._id}" class="view-link">📄 View Note</a>
+      const avatar = note.uploadedBy?.avatar
+        ? `<img src="${note.uploadedBy.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">`
+        : `<span>${uploader[0]}</span>`;
+
+      const html = `
+        <article class="card">
+          <div class="card-top">
+            <div class="avatar">${avatar}</div>
+            <div>
+              <h3 class="title">${note.title}</h3>
+              <div class="subtitle">${note.subject?.name || "General"} • ${note.course}</div>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <div style="display:flex; gap:8px;">
+              <div class="tag">Downloads: <strong>${note.downloadCount}</strong></div>
+              <div class="tag">Added: <strong>${new Date(note.createdAt).toDateString()}</strong></div>
+            </div>
+          </div>
+
+          <div class="card-footer">
+            <a class="view-btn" href="/notes/${note._id}">View</a>
+
+            <div class="badge">
+              By <span style="color:var(--accent); margin-left:6px;">${uploader}</span>
+              ${badge}
+            </div>
+          </div>
+        </article>
       `;
 
-      grid.appendChild(card);
+      noteGrid.insertAdjacentHTML("beforeend", html);
     });
 
+    if (currentPage >= totalPages) loadMoreBtn.remove();
+  }
 
-    if (currentPage >= totalPages) {
-      loadMoreBtn.style.display = "none";
-    }
-  });
-}
+  loadMoreBtn?.addEventListener("click", appendNotes);
 </script>

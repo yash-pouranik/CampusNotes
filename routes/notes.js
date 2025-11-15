@@ -316,7 +316,6 @@ router.get("/explore", async (req, res) => {
     const totalNotes = await Note.countDocuments(filter);
     const totalPages = Math.ceil(totalNotes / limit);
 
-
     if (req.xhr || req.headers.accept.indexOf('json') > -1) {
       return res.json({
         notes,
