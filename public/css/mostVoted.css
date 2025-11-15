@@ -1,0 +1,82 @@
+@import url('/css/explore.css'); /* reuse the explore styles */
+
+/* Page container */
+.mostvoted-wrapper {
+  max-width: 1200px;
+  margin: 50px auto;
+  padding: 0 20px;
+}
+
+/* Page heading */
+.mostvoted-heading {
+  text-align: center;
+  font-size: 2.2rem;
+  color: #e6eef8;
+  margin-bottom: 30px;
+  font-weight: 700;
+}
+
+/* Use explore grid */
+.note-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+/* Cards identical to explore */
+.card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.018), rgba(255,255,255,0.01));
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.03);
+  box-shadow: 0 6px 18px rgba(10,10,20,0.4);
+  transition: .22s;
+}
+.card:hover {
+  transform: translateY(-6px) scale(1.01);
+}
+
+/* Title + Subtitle */
+.card-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: #f0fbff;
+}
+.card-sub {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+/* Tag styles */
+.tag-upvote {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(138,47,255,0.12);
+  color: #cfa6ff;
+  font-size: .78rem;
+  border: 1px solid rgba(255,255,255,0.03);
+}
+.tag-download {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(0,255,213,0.07);
+  color: var(--accent);
+  font-size: .78rem;
+  border: 1px solid rgba(255,255,255,0.03);
+}
+.tag-date {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.03);
+  color: var(--muted);
+  font-size: .78rem;
+  border: 1px solid rgba(255,255,255,0.03);
+}
+
+/* Footer — View + Uploader */
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+}

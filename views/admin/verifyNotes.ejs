@@ -1,97 +1,106 @@
 <style>
-  .verify-notes-container {
-    max-width: 1300px;
-    margin: 60px auto;
-    padding: 40px;
-    border-radius: 16px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-    font-family: 'Segoe UI', sans-serif;
-  }
+  /* ========== VERIFY PAGE (Dark Neon Theme) ========== */
 
-  .note-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 24px;
-  }
+.verify-notes-container {
+  max-width: var(--maxw);
+  margin: 60px auto;
+  padding: 20px;
+}
 
-  .note-card {
-    background-color: #f7f9fc;
-    border: 1px solid #e0e6ed;
-    border-left: 6px solid #3b82f6;
-    border-radius: 12px;
-    padding: 24px;
-    transition: box-shadow 0.3s ease;
-  }
+.note-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
 
-  .note-card:hover {
-    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.2);
-  }
+/* Each card */
+.note-card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border-radius: var(--card-radius);
+  padding: 20px;
+  border: 1px solid rgba(255,255,255,0.05);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+  transition: transform .2s var(--smooth);
+}
 
-  .note-card h3 {
-    margin: 0 0 10px;
-    font-size: 20px;
-    color: #1f2937;
-  }
+.note-card:hover {
+  transform: translateY(-6px) scale(1.01);
+}
 
-  .note-card p {
-    margin: 6px 0;
-    color: #4b5563;
-    font-size: 15px;
-  }
+.note-card h3 {
+  margin: 0 0 8px;
+  font-size: 1.25rem;
+  color: #eaf7ff;
+}
 
-  .note-card form {
-    display: inline-block;
-    margin-top: 16px;
-  }
+.note-card p {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin: 6px 0;
+}
 
-  .note-card button {
-    background-color: #3b82f6;
-    color: white;
-    border: none;
-    padding: 8px 18px;
-    font-weight: 600;
-    border-radius: 8px;
-    cursor: pointer;
-    margin-right: 10px;
-    transition: background-color 0.3s ease;
-  }
+/* VIEW LINK */
+.view-btn-mini {
+  display: inline-block;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: #0d182a;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 12px;
+  transition: .2s;
+}
+.view-btn-mini:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 14px rgba(0,255,213,0.25);
+}
 
-  .note-card button.reject {
-    background-color: #ef4444;
-  }
+/* ACCEPT BUTTON */
+.accept-btn {
+  background: rgba(0,255,213,0.1);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-right: 8px;
+  transition: .2s;
+}
+.accept-btn:hover {
+  background: rgba(0,255,213,0.22);
+  box-shadow: 0 0 12px rgba(0,255,213,0.35);
+}
 
-  .note-card button:hover {
-    background-color: #2563eb;
-  }
+/* REJECT BUTTON */
+.reject-btn {
+  background: rgba(255,60,60,0.1);
+  border: 1px solid #ff4444;
+  color: #ff8888;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: .2s;
+}
+.reject-btn:hover {
+  background: rgba(255,60,60,0.2);
+  box-shadow: 0 0 12px rgba(255,60,60,0.3);
+}
 
-  .note-card button.reject:hover {
-    background-color: #dc2626;
-  }
-
-  .verify-notes-container > p {
-    text-align: center;
-    font-size: 18px;
-    color: #10b981;
-    font-weight: 600;
-  }
-
-  .back-link {
-    display: inline-block;
-    text-decoration: none ;
-    margin-top: 3rem;
-    text-align: center;
-    color: #0a66c2 !important;
-    font-weight: bold;
-    text-decoration: none;
-  }
-
-  .back-link:hover {
-    text-decoration: underline;
-  }
-
-
+/* No notes message */
+.verify-notes-container > p {
+  text-align: center;
+  font-size: 1.2rem;
+  color: var(--accent);
+  font-weight: 600;
+  padding-top: 40px;
+}
 
 </style>
+
+
 
 <div class="verify-notes-container">
   <% if (unverifiedNotes.length === 0) { %>
@@ -105,12 +114,12 @@
           <p><strong>Uploaded by:</strong> <%= note.uploadedBy?.username || 'Unknown' %></p>
 
           <!-- View Button -->
-          <a href="/notes/<%= note._id %>" class="back-link">← View</a>
+          <a href="/notes/<%= note._id %>" class="view-btn-mini">View</a>
 
           <!-- Accept Form -->
           <form method="POST" action="/admin/verify-notes">
             <input type="hidden" name="noteId" value="<%= note._id %>">
-            <input type="hidden" name="action" value="accept">
+            <input type="hidden" name="action" value="ac<button type="submit" class="accept-btn">Accept</button>
             <button type="submit">Accept</button>
           </form>
 
@@ -118,7 +127,7 @@
           <form method="POST" action="/admin/verify-notes">
             <input type="hidden" name="noteId" value="<%= note._id %>">
             <input type="hidden" name="action" value="reject">
-            <button type="submit" class="reject">Reject</button>
+            <button type="submit" class="reject-btn">Reject</button>
           </form>
         </div>
         

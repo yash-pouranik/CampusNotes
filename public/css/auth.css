@@ -1,0 +1,140 @@
+/* ===============================
+   AUTH PAGES — Dark Neon Glass UI
+   =============================== */
+
+.auth-section {
+  max-width: 440px;
+  margin: 40px auto;
+  padding: 32px;
+  border-radius: 16px;
+
+  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 10px 32px rgba(0,0,0,0.55);
+  backdrop-filter: blur(18px) saturate(140%);
+
+  text-align: center;
+  color: var(--text);
+}
+
+/* Headings */
+.auth-section h2 {
+  font-size: 1.7rem;
+  margin-bottom: 12px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.auth-section p {
+  color: var(--muted);
+  margin: 16px 0;
+}
+
+/* INPUTS */
+.auth-section input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.02);
+  color: var(--text);
+  font-size: 1rem;
+  transition: 0.2s;
+  margin-bottom: 15px;
+}
+
+.auth-section input:focus {
+  border-color: rgba(0,255,213,0.35);
+  box-shadow: 0 0 14px rgba(0,255,213,0.25);
+  outline: none;
+}
+
+/* BUTTONS */
+.auth-section button {
+  padding: 12px;
+  background: #0d182a;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-size: 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.25s;
+}
+
+.auth-section button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 18px rgba(0,255,213,0.25);
+}
+
+.auth-section a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.auth-section a:hover {
+  text-decoration: underline;
+}
+
+/* Alerts */
+.alert {
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  text-align: left;
+}
+
+.alert.success {
+  background: rgba(0,255,150,0.12);
+  border: 1px solid rgba(0,255,150,0.35);
+  color: #00ff9d;
+}
+
+.alert.error {
+  background: rgba(255,70,70,0.12);
+  border: 1px solid rgba(255,70,70,0.35);
+  color: #ff6b6b;
+}
+
+/* Readonly chip (Forgot page email badge) */
+.readonly-chip {
+  background: rgba(255,255,255,0.05);
+  border-radius: 10px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255,255,255,0.05);
+  margin-bottom: 16px;
+
+  color: var(--text);
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Muted small text */
+.muted {
+  margin-top: 12px;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+/* Row buttons (side by side) */
+.row {
+  display: flex;
+  gap: 10px;
+}
+
+.row .flex-1 {
+  flex: 1;
+}
+
+/* Secondary button */
+.btn-secondary {
+  background: rgba(255,255,255,0.05) !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+  color: var(--muted) !important;
+}
+
+.btn-secondary:hover {
+  box-shadow: none;
+  transform: translateY(-1px);
+}

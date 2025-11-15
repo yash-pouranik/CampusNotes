@@ -1,45 +1,58 @@
-<nav class="navbar" style="
-position: fixed;
-top: 0;
-right: 0;
-left: 0;
-z-index: 99;
-background: white;
-">
-  <div class="containerr">
-    <a href="/" class="brand">CampusNotes</a>
+<nav class="neon-nav">
+  <div class="nav-inner">
 
-    <button class="menu-toggle" id="menu-toggle">
+    <!-- Brand -->
+    <a href="/" class="nav-brand">CampusNotes</a>
+
+    <!-- Toggle -->
+    <button class="nav-toggle" id="navToggle">
       <span></span>
       <span></span>
       <span></span>
     </button>
 
-    <ul class="nav-links" id="nav-links">
+    <!-- Dropdown Menu -->
+    <ul class="nav-menu" id="navMenu">
       <% if (!currUser) { %>
-        <a href="/login-n" class="nav-a">Login</a>
-        <a href="/register-n" class="nav-a">Signup</a>
-        <a href="/requestnotes" class="nav-a">Request Notes</a>
-        <a href="/explore" class="nav-a">Explore</a>
-        <a href="/rankings" class="nav-a">Rankings</a>
-        <a href="/upload" class="nav-a">Upload</a>
-        <a href="/most-voted" class="nav-a">Most Voted Notes</a>
-        
+        <a href="/login-n">Login</a>
+        <a href="/register-n">Signup</a>
+        <a href="/requestnotes">Request Notes</a>
+        <a href="/explore">Explore</a>
+        <a href="/rankings">Rankings</a>
+        <a href="/upload">Upload</a>
+        <a href="/most-voted">Most Voted Notes</a>
 
       <% } else { %>
-        <a href="/rankings" class="nav-a">Rankings</a>
-        <a href="/profile/<%= currUser._id %>" class="nav-a">Profile</a>
-        <a href="/requestnotes" class="nav-a">Request Notes</a>
-        <a href="/explore" class="nav-a">Explore</a>
-        <a href="/upload" class="nav-a">Upload</a>
-        <a href="/most-voted" class="nav-a">Most Voted Notes</a>
-        <% if(currUser.roles.isModerator || currUser.roles.isDev) {%>
-          <a href="/admin/verify-notes" class="nav-a">Verify Notes</a>
-          <a href="/dashboard" class="nav-a">Admin Dashboard</a>
+        <a href="/rankings">Rankings</a>
+        <a href="/profile/<%= currUser._id %>">Profile</a>
+        <a href="/requestnotes">Request Notes</a>
+        <a href="/explore">Explore</a>
+        <a href="/upload">Upload</a>
+        <a href="/most-voted">Most Voted Notes</a>
 
+        <% if(currUser.roles.isModerator || currUser.roles.isDev) { %>
+          <a href="/admin/verify-notes">Verify Notes</a>
+          <a href="/dashboard">Admin Dashboard</a>
         <% } %>
-        <a href="/logout" class="nav-a">Logout</a>
+
+        <a href="/logout">Logout</a>
       <% } %>
     </ul>
   </div>
 </nav>
+
+
+<script>
+  const btn = document.getElementById("navToggle");
+  const menu = document.getElementById("navMenu");
+
+  btn.addEventListener("click", () => {
+    menu.classList.toggle("active");
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!btn.contains(e.target) && !menu.contains(e.target)) {
+      menu.classList.remove("active");
+    }
+  });
+</script>

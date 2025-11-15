@@ -54,7 +54,7 @@
             <% if (currUser) { %>
               <form action="/requestnotes/<%= request._id %>/comment" method="POST" class="comment-form">
                 <input type="text" name="content" placeholder="Write a comment..." maxlength="200" required>
-                <button type="submit">💬</button>
+                <button type="submit">reply</button>
               </form>
             <% } %>
 </div>

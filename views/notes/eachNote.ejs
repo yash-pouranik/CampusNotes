@@ -34,6 +34,25 @@
       </form>
     </div>
 
+    <% if (currUser && currUser._id.toString() === note.uploadedBy?._id.toString()) { %>
+  <div class="owner-actions">
+    
+    <a href="/notes/<%= note._id %>/edit" class="btn-owner edit-btn-new">
+      <i class="fa-solid fa-pen"></i> Edit
+    </a>
+
+    <form action="/notes/<%= note._id %>?_method=DELETE" method="POST" class="delete-form">
+      <button type="button"
+        class="btn-owner delete-btn-new"
+        onclick="openDeleteModal('/notes/<%= note._id %>?_method=DELETE')">
+        <i class="fa-solid fa-trash"></i> Delete
+      </button>
+    </form>
+
+  </div>
+<% } %>
+
+
 <div class="note-preview-new">
   <% if (note.fileUrl.includes('drive.google.com')) { %>
     <%# Google Drive Link Logic %>
@@ -168,6 +187,26 @@
   </div>
   </div>
 
+
+
+  <!-- DELETE CONFIRMATION MODAL -->
+<div id="deleteModal" class="neon-modal-overlay">
+  <div class="neon-modal">
+    <h2>Delete Note?</h2>
+    <p>This action cannot be undone.</p>
+
+    <div class="modal-buttons">
+      <button id="cancelDelete" class="modal-btn cancel-btn">Cancel</button>
+
+      <form id="deleteForm" method="POST">
+        <button class="modal-btn delete-btn">Delete</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+
 </section>
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
@@ -256,4 +295,28 @@
             askAiBtn.disabled = false;
         }
     });
+</script>
+
+
+<script>
+  const deleteModal = document.getElementById("deleteModal");
+const cancelDelete = document.getElementById("cancelDelete");
+const deleteForm = document.getElementById("deleteForm");
+
+function openDeleteModal(actionUrl) {
+  deleteForm.action = actionUrl;
+  deleteModal.style.display = "flex";
+}
+
+cancelDelete.addEventListener("click", () => {
+  deleteModal.style.display = "none";
+});
+
+// Close modal when clicked outside
+deleteModal.addEventListener("click", (e) => {
+  if (e.target === deleteModal) {
+    deleteModal.style.display = "none";
+  }
+});
+
 </script>

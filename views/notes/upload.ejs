@@ -1,40 +1,4 @@
-<style>
-  .error-text {
-    color: #dc2626; /* red */
-    font-size: 0.9rem;
-    margin-top: 4px;
-    display: none;
-  }
-  progress {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 60%;
-  height: 25px;
-  border-radius: 12px;
-  overflow: hidden;
-  background-color: #f3f4f6; /* light gray background */
-  box-shadow: 0 0 5px rgba(0,0,0,0.1) inset;
-}
 
-/* For Chrome/Safari */
-progress::-webkit-progress-bar {
-  background-color: #f3f4f6;
-  border-radius: 12px;
-}
-
-progress::-webkit-progress-value {
-  background: linear-gradient(90deg, #3b82f6, #2563eb); /* blue gradient */
-  border-radius: 12px;
-  transition: width 0.3s ease;
-}
-
-/* For Firefox */
-progress::-moz-progress-bar {
-  background: linear-gradient(90deg, #3b82f6, #2563eb);
-  border-radius: 12px;
-}
-
-</style>
 
 <link rel="stylesheet" href="/css/eachNoteCss.css">
 
@@ -54,13 +18,20 @@ progress::-moz-progress-bar {
 
     <div class="form-group">
       <label for="subject">Subject *</label>
-      <select name="subject" id="subject" required>
-        <option value="">-- Select Subject --</option>
-        <% subjects.forEach(sub => { %>
-          <option value="<%= sub._id %>"><%= sub.name %></option>
-        <% }) %>
-        <option value="other">➕ Add New Subject</option>
-      </select>
+      <div class="dropdown" data-name="subject">
+  <div class="dropdown-selected">-- Select Subject --</div>
+
+  <div class="dropdown-menu">
+    <% subjects.forEach(s => { %>
+      <div class="dropdown-item" data-value="<%= s._id %>"><%= s.name %></div>
+    <% }) %>
+
+    <div class="dropdown-item" data-value="other">➕ Add New Subject</div>
+  </div>
+
+  <input type="hidden" name="subject" id="subject">
+</div>
+
     </div>
 
     <!-- Hidden input for new subject -->
@@ -71,30 +42,53 @@ progress::-moz-progress-bar {
 
     <div class="form-group">
       <label for="course">Course *</label>
-      <select name="course" id="course" required>
-        <option value="">-- Select Course --</option>
-        <% courses.forEach(course => { %>
-          <option value="<%= course %>"><%= course %></option>
-        <% }) %>
-      </select>
+      <div class="dropdown" data-name="course">
+  <div class="dropdown-selected">-- Select Course --</div>
+
+  <div class="dropdown-menu">
+    <% courses.forEach(c => { %>
+      <div class="dropdown-item" data-value="<%= c %>"><%= c %></div>
+    <% }) %>
+  </div>
+
+  <!-- hidden input (actual submitted value) -->
+  <input type="hidden" name="course" id="course">
+</div>
+
     </div>
 
 
     <div class="form-group">
       <label for="semester">Semester *</label>
-      <select name="semester" id="semester" required>
-        <option value="">-- Select Semester --</option>
-        <% semester.forEach(s => { %>
-          <option value="<%= s %>"><%= s %></option>
-        <% }) %>
-      </select>
+      <div class="dropdown" data-name="semester">
+  <div class="dropdown-selected">-- Select Semester --</div>
+
+  <div class="dropdown-menu">
+    <% semester.forEach(s => { %>
+      <div class="dropdown-item" data-value="<%= s %>"><%= s %></div>
+    <% }) %>
+  </div>
+
+  <input type="hidden" name="semester" id="semester">
+</div>
+
     </div>
 
 
 
     <div class="form-group">
-      <label for="file">Upload File *</label>
-      <input type="file" name="file" id="file" accept=".pdf" required>
+      <div class="form-group">
+        <label for="file">Upload File *</label>
+
+        <div class="custom-file-input" id="fileInputBox">
+          <i class="fa-solid fa-file-pdf"></i>
+          <span id="fileLabel">Select PDF...</span>
+        </div>
+
+        <input type="file" name="file" id="file" accept="application/pdf" required>
+
+        <p class="error-text" id="fileError">❌ File must be a PDF and less than 10MB.</p>
+      </div>
       <p class="error-text" id="fileError">❌ File must be a PDF and less than 5MB.</p>
     </div>
 
@@ -107,123 +101,170 @@ progress::-moz-progress-bar {
 
 </div>
 
-<div id="progressContainer" style="
-  display:none;
-  position: fixed; 
-  top: 0; 
-  left: 0; 
-  width: 100%; 
-  height: 100%; 
-  background: rgba(255, 241, 241, 0.9); 
-  z-index: 1000;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-">
-  <progress id="progressBar" value="0" max="100" style="width: 60%; height: 25px;"></progress>
-  <span id="progressText" style="margin-top:10px; font-size:1.2rem; font-weight:600;">0%</span>
+<!-- progress container (place near bottom of upload page) -->
+<div id="progressContainer">
+  <div id="progressInner">
+    <div style="display:flex; align-items:center; gap:14px; width:100%;">
+      <div style="flex:1;">
+        <div style="font-weight:700; font-size:1.05rem;">Uploading file...</div>
+        <div style="color:var(--muted); font-size:0.9rem;">Please do not close this tab.</div>
+      </div>
+      <div style="min-width:140px; text-align:right;">
+        <div id="progressText">0%</div>
+      </div>
+    </div>
+
+    <progress id="progressBar" value="0" max="100"></progress>
+    <div style="display:flex; gap:10px; margin-top:6px;">
+      <button class="btn" id="cancelUploadBtn" type="button">Cancel</button>
+    </div>
+  </div>
 </div>
+
 
 
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 <script>
-  const fileInput = document.getElementById("file");
-  const fileError = document.getElementById("fileError");
-  const form = document.getElementById("uploadForm");
-  const progressContainer = document.getElementById("progressContainer");
-  const progressBar = document.getElementById("progressBar");
-  const progressText = document.getElementById("progressText");
+  // show/hide helpers
+function showProgress() { 
+  document.getElementById('progressContainer').style.display = 'flex'; 
+}
+function hideProgress() { 
+  document.getElementById('progressContainer').style.display = 'none'; 
+}
 
-  // Subject toggle logic (waise hi rahega)
-  document.getElementById("subject").addEventListener("change", function() {
-    document.getElementById("newSubjectGroup").style.display =
-      this.value === "other" ? "block" : "none";
-  });
+const progressBar = document.getElementById('progressBar');
+const progressText = document.getElementById('progressText');
 
-  // File validation logic
-  fileInput.addEventListener("change", function() {
-    fileError.style.display = "none";
-    const file = this.files[0];
-    if (!file) return;
+form.addEventListener('submit', async function(e){
+  e.preventDefault();
+  if (fileError.style.display === "block" || !fileInput.files[0]) {
+    alert("Please select a valid PDF file.");
+    return;
+  }
+  showProgress();
 
-    if (file.type !== "application/pdf") {
-      fileError.textContent = "❌ Only PDF files are allowed.";
-      fileError.style.display = "block";
-      this.value = "";
-      return;
-    }
+  try {
+    // Get signature from backend
+    const sigRes = await axios.get('/api/upload-signature');
+    const { signature, timestamp, cloudName, apiKey } = sigRes.data;
+    const UPLOAD_URL = `https://api.cloudinary.com/v1_1/${cloudName}/raw/upload`;
 
-    if (file.size > 10 * 1024 * 1024) {
-      fileError.textContent = "❌ File must be less than 10MB.";
-      fileError.style.display = "block";
-      this.value = "";
-      return;
-    }
-  });
+    const file = fileInput.files[0];
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("api_key", apiKey);
+    formData.append("timestamp", timestamp);
+    formData.append("signature", signature);
+    formData.append("folder", "campusNotes");
 
-  // ===== NAYA UPLOAD LOGIC =====
-  form.addEventListener("submit", async function(e) {
-    e.preventDefault();
-    if (fileError.style.display === "block" || !fileInput.files[0]) {
-        alert("Please select a valid PDF file.");
-        return;
-    }
-
-    progressContainer.style.display = "flex";
-
-    try {
-      // 1. Backend se signature + creds lao
-      const sigRes = await axios.get("/api/upload-signature");
-      const { signature, timestamp, cloudName, apiKey } = sigRes.data;
-
-      // 2. Upload URL runtime pe banao
-      const UPLOAD_URL = `https://api.cloudinary.com/v1_1/${cloudName}/raw/upload`;
-
-      const file = fileInput.files[0];
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("api_key", apiKey);
-      formData.append("timestamp", timestamp);
-      formData.append("signature", signature);
-      formData.append("folder", "campusNotes");
-
-      // 3. File Cloudinary par bhejo
-      const cloudRes = await axios.post(UPLOAD_URL, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-        onUploadProgress: (e) => {
-          const percent = Math.round((e.loaded * 100) / e.total);
-          progressBar.value = percent;
-          progressText.innerText = percent + "%";
-        }
-      });
-      console.log(cloudName);
-
-      const uploadedFileUrl = cloudRes.data.secure_url;
-
-      // 4. Server ko details bhejo
-      const noteDetails = {
-        title: form.title.value,
-        description: form.description.value,
-        subject: form.subject.value,
-        newSubject: form.newSubject.value,
-        course: form.course.value,
-        semester: form.semester.value,
-        fileUrl: uploadedFileUrl
-      };
-
-      const saveNoteResponse = await axios.post("/upload", noteDetails);
-      
-      if(saveNoteResponse.data.success) {
-        alert("✅ Upload successful! Note has been sent for verification.");
-        window.location.href = saveNoteResponse.data.redirectUrl;
+    const cloudRes = await axios.post(UPLOAD_URL, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+      onUploadProgress: (ev) => {
+        const percent = Math.round((ev.loaded * 100) / ev.total);
+        progressBar.value = percent;
+        progressText.innerText = percent + '%';
       }
+    });
 
-    } catch (err) {
-      console.error("Upload failed:", err);
-      alert("❌ Upload failed: " + (err.response?.data?.error || err.message));
-      progressContainer.style.display = "none";
+    const uploadedFileUrl = cloudRes.data.secure_url;
+    // send to server
+    const noteDetails = {
+      title: form.title.value,
+      description: form.description.value,
+      subject: form.subject.value,
+      newSubject: form.newSubject.value,
+      course: form.course.value,
+      semester: form.semester.value,
+      fileUrl: uploadedFileUrl
+    };
+
+    const saveNoteResponse = await axios.post('/upload', noteDetails);
+    if (saveNoteResponse.data.success) {
+      hideProgress();
+      alert('✅ Upload successful! Note has been sent for verification.');
+      window.location.href = saveNoteResponse.data.redirectUrl;
     }
+  } catch(err) {
+    console.error(err);
+    hideProgress();
+    alert('❌ Upload failed: ' + (err.response?.data?.error || err.message));
+  }
+});
+
+// Cancel upload (optional)
+// If you want to actually cancel the axios upload you'd need an AbortController or cancel token.
+document.getElementById('cancelUploadBtn').addEventListener('click', () => {
+  hideProgress();
+});
+
+
+
+
+</script>
+
+<script>
+document.querySelectorAll(".dropdown").forEach(drop => {
+
+  const selected = drop.querySelector(".dropdown-selected");
+  const menu = drop.querySelector(".dropdown-menu");
+  const items = drop.querySelectorAll(".dropdown-item");
+  const hidden = drop.querySelector("input[type='hidden']");
+
+  // open / close
+  selected.addEventListener("click", () => {
+    drop.classList.toggle("open");
   });
+
+  // choose item
+  items.forEach(item => {
+    item.addEventListener("click", () => {
+      const value = item.dataset.value;
+      const text = item.textContent;
+
+      selected.innerHTML = text;
+      hidden.value = value;
+
+      items.forEach(i => i.classList.remove("active"));
+      item.classList.add("active");
+
+      drop.classList.remove("open");
+
+      // Special case: Add New Subject
+      if(value === "other") {
+        document.getElementById("newSubjectGroup").style.display = "block";
+      } else if (drop.dataset.name === "subject") {
+        document.getElementById("newSubjectGroup").style.display = "none";
+      }
+    });
+  });
+
+});
+
+// click outside to close
+document.addEventListener("click", e => {
+  document.querySelectorAll(".dropdown.open").forEach(dd => {
+    if (!dd.contains(e.target)) dd.classList.remove("open");
+  });
+});
+
+
+const fileBox = document.getElementById("fileInputBox");
+const fileLabel = document.getElementById("fileLabel");
+
+fileBox.addEventListener("click", () => fileInput.click());
+
+fileInput.addEventListener("change", () => {
+  if (fileInput.files.length > 0) {
+    fileLabel.textContent = fileInput.files[0].name;
+    fileLabel.style.color = "#e6eef8"; // make text visible
+  } else {
+    fileLabel.textContent = "Select PDF...";
+    fileLabel.style.color = "var(--muted)";
+  }
+});
+
+
 </script>
