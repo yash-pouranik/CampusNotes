@@ -1,149 +1,92 @@
 /* ======================================================
-   DARK NEON THEME — EACH NOTE PAGE (REDESIGNED)
-   Matches Explore Theme (glass, neon, smooth edges)
+   DARK NEON THEME — EACH NOTE PAGE (FIXED COMPLETE)
 ====================================================== */
 
 :root {
   --bg: #071022;
   --panel: rgba(255, 255, 255, 0.03);
   --panel-hover: rgba(255, 255, 255, 0.06);
-  --glass: rgba(255, 255, 255, 0.05);
-  --muted: #96a3c7;
-  --text-main: #e8f3ff;
-
+  --border: rgba(255, 255, 255, 0.06);
   --accent: #00ffd5;
   /* Cyan */
-  --accent-glow: rgba(0, 255, 213, 0.4);
   --accent-2: #8a2fff;
   /* Purple */
-  --accent-2-glow: rgba(138, 47, 255, 0.4);
-
-  --danger: #ff4a4a;
-  --warning: #f59e0b;
-
-  --radius: 20px;
+  --text: #e8f3ff;
+  --muted: #96a3c7;
+  --radius: 16px;
   --shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
-  --smooth: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --danger: #ff4a4a;
 }
 
-/* ===========================
-      LAYOUT & GRID
-================================ */
+body {
+  background: var(--bg);
+  color: var(--text);
+}
 
 .note-page-container {
-  max-width: 1200px;
+  max-width: 1350px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 20px;
 }
 
-/* NEW LINEAR LAYOUT STYLES */
-.note-linear-layout {
-  display: flex;
-  flex-direction: column;
-  gap: 3rem;
+/* ----------------------------------
+   GRID LAYOUT SYSTEM (FIXED)
+---------------------------------- */
+.note-layout-grid {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  /* Left: Auto, Right: Fixed 360px */
+  gap: 24px;
+  align-items: start;
 }
 
-.note-header-section {
-  text-align: center;
-  margin-bottom: 1rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 2rem;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 0.8rem 2rem;
-  border-radius: 100px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-}
-
-.meta-item {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  color: var(--muted);
-  font-size: 1rem;
-}
-
-.meta-item i {
-  color: var(--accent);
-}
-
-.meta-item.uploader-info {
-  color: var(--text-main);
-  font-weight: 600;
-}
-
-.meta-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #000;
-  font-weight: bold;
-  font-size: 0.9rem;
-}
-
-.meta-divider {
-  width: 1px;
-  height: 24px;
-  background: rgba(255, 255, 255, 0.1);
-}
-
-/* PREVIEW SECTION */
-.note-preview-section {
-  width: 100%;
-  max-width: 1000px;
-  margin: 0 auto;
+/* --- LEFT COLUMN: VIEWER --- */
+.note-viewer-column {
+  min-width: 0;
+  /* Prevents overflow */
 }
 
 .preview-card {
   background: #000;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
+  height: 85vh;
+  /* Full viewport height feel */
+  min-height: 600px;
   overflow: hidden;
   box-shadow: var(--shadow);
-  position: relative;
-  min-height: 800px;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
 }
 
 .note-preview-frame {
   width: 100%;
   height: 100%;
-  flex: 1;
   border: none;
-  min-height: 800px;
 }
 
 .note-preview-img {
-  width: 100%;
+  max-width: 100%;
   height: auto;
   display: block;
 }
 
 .no-preview-box {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: var(--muted);
-  gap: 1rem;
-  padding: 4rem;
   text-align: center;
+  color: var(--muted);
+  padding: 2rem;
 }
 
 .no-preview-box i {
   font-size: 3rem;
-  opacity: 0.5;
+  margin-bottom: 1rem;
+  opacity: 0.6;
 }
 
 .btn-download-fallback {
+  display: inline-block;
   margin-top: 1rem;
   padding: 0.8rem 1.5rem;
   background: var(--panel);
@@ -159,77 +102,254 @@
   color: #000;
 }
 
-/* EXTRA CONTENT SECTION */
-.note-extra-content {
-  max-width: 1000px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
+/* --- RIGHT COLUMN: SIDEBAR --- */
+.note-sidebar-column {
+  width: 100%;
 }
 
-.extra-column {
+.sidebar-sticky-wrapper {
+  position: sticky;
+  top: 90px;
+  /* Adjust based on navbar */
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 20px;
 }
 
-/* REUSED COMPONENTS (Modified for new layout) */
-.note-details-card,
-.ai-assistant-card {
+/* INFO CARD */
+.note-info-card {
   background: var(--panel);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 1.5rem;
+  padding: 22px;
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow);
 }
 
-.action-buttons-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+.note-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 12px 0;
+  line-height: 1.3;
 }
 
-.btn-block {
-  width: 100%;
+/* Meta Row */
+.note-meta-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.uploader-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 4px 10px;
+  border-radius: 20px;
+  transition: 0.4s;
+}
+
+.uploader-badge:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border: 0.5px solid var(--accent);
+  color: var(--accent);
+}
+
+.uploader-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #000;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 1rem;
-  border-radius: 12px;
+  font-weight: bold;
+  font-size: 0.8rem;
+}
+
+.verified-icon {
+  width: 16px;
+}
+
+/* Action Buttons */
+.action-buttons-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.btn-block {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
-  font-weight: 500;
+  text-decoration: none;
+  transition: 0.2s;
+  font-size: 1rem;
+}
+
+.btn-primary-neon {
+  background: var(--accent);
+  color: #091220;
+  border: none;
+}
+
+.btn-primary-neon:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 15px rgba(0, 255, 213, 0.4);
+}
+
+.btn-secondary-neon {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text);
+  min-width: 60px;
+}
+
+.btn-secondary-neon:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Details */
+.note-details-card {
+  /* Note: reused info-card style via layout, but if standalone */
+  background: var(--panel);
+  border-radius: var(--radius);
+  padding: 22px;
+  /* padding already handled if inside note-info-card logic or separate */
+}
+
+.note-details-card h3 {
+  font-size: 1.1rem;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.details-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.details-list li {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  padding-bottom: 8px;
+}
+
+.details-list li:last-child {
+  border: none;
+}
+
+.details-list .label {
+  color: var(--muted);
+}
+
+.details-list .value {
+  color: #fff;
+  font-weight: 600;
 }
 
 .description-box {
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  margin-top: 15px;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 12px;
+  border-radius: 8px;
 }
 
 .description-box .label {
   display: block;
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.desc-text {
+  color: #dce7ff;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Owner Controls */
+.owner-controls {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.btn-icon-text {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--muted);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  transition: 0.2s;
+}
+
+.btn-icon-text:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
+
+.btn-icon-text.text-red:hover {
+  color: #ff6b6b;
+  border-color: #ff6b6b;
+}
+
+.disclaimer-text {
+  margin-top: 15px;
   font-size: 0.8rem;
   color: var(--muted);
-  margin-bottom: 0.5rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  text-align: center;
+  opacity: 0.7;
 }
 
-.description-box p {
-  margin: 0;
-  color: #dce7ff;
-  line-height: 1.6;
-  font-size: 0.95rem;
-}
-
-/* AI ASSISTANT */
+/* ----------------------------------
+   AI ASSISTANT & MODALS
+---------------------------------- */
 .ai-assistant-card {
-  background: linear-gradient(145deg, rgba(138, 47, 255, 0.05), rgba(0, 255, 213, 0.02));
+  margin-top: 20px;
+  padding: 20px;
+  background: linear-gradient(145deg, rgba(138, 47, 255, 0.08), rgba(7, 16, 34, 0.8));
   border: 1px solid rgba(138, 47, 255, 0.2);
+  border-radius: var(--radius);
 }
 
+/* ... (rest of AI styles can stay or inherit from global if defined elsewhere) ... */
+/* Adding core AI styles just in case: */
 .ai-header {
   display: flex;
   align-items: center;
@@ -246,23 +366,6 @@
   align-items: center;
   justify-content: center;
   color: var(--accent-2);
-  font-size: 1.2rem;
-  box-shadow: 0 0 15px rgba(138, 47, 255, 0.2);
-}
-
-.ai-title-group h4 {
-  margin: 0;
-  font-size: 1.1rem;
-  color: #fff;
-}
-
-.ai-badge {
-  font-size: 0.7rem;
-  background: var(--accent-2);
-  color: #fff;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-weight: 700;
 }
 
 .btn-ai-action {
@@ -273,29 +376,25 @@
   padding: 0.8rem;
   border-radius: 10px;
   cursor: pointer;
-  transition: 0.3s;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  font-weight: 600;
   margin-bottom: 1rem;
 }
 
 .btn-ai-action:hover {
   background: rgba(138, 47, 255, 0.2);
-  box-shadow: 0 0 15px rgba(138, 47, 255, 0.15);
   color: #fff;
 }
 
 .ai-response-box {
   font-size: 0.9rem;
   color: #dce7ff;
-  line-height: 1.6;
-  margin-bottom: 1.5rem;
   background: rgba(0, 0, 0, 0.2);
   padding: 1rem;
   border-radius: 10px;
+  margin-bottom: 1rem;
 }
 
 .ai-response-box:empty {
@@ -324,10 +423,6 @@
   outline: none;
 }
 
-.input-group input:focus {
-  border-color: var(--accent-2);
-}
-
 .btn-ai-send {
   background: var(--accent-2);
   border: none;
@@ -335,14 +430,12 @@
   border-radius: 10px;
   color: #fff;
   cursor: pointer;
-  transition: 0.2s;
 }
 
-.btn-ai-send:hover {
-  background: #9d50ff;
-}
-
-/* RECOMMENDED SECTION */
+/* ----------------------------------
+   RECOMMENDED SECTION ("MORE LIKE THIS")
+   (This was missing!)
+---------------------------------- */
 .recommended-section {
   margin-top: 4rem;
 }
@@ -437,7 +530,9 @@
   font-style: italic;
 }
 
-/* MODAL */
+/* ----------------------------------
+   MODAL
+---------------------------------- */
 .neon-modal-overlay {
   position: fixed;
   top: 0;
@@ -461,19 +556,6 @@
   max-width: 400px;
   text-align: center;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-  animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-@keyframes modalPop {
-  from {
-    transform: scale(0.8);
-    opacity: 0;
-  }
-
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
 }
 
 .modal-icon {
@@ -490,8 +572,8 @@
 }
 
 .neon-modal h2 {
-  margin: 0 0 0.5rem 0;
   color: #fff;
+  margin-bottom: 0.5rem;
 }
 
 .neon-modal p {
@@ -512,7 +594,6 @@
   color: #fff;
   border-radius: 10px;
   cursor: pointer;
-  transition: 0.2s;
 }
 
 .btn-modal-cancel:hover {
@@ -527,41 +608,204 @@
   color: #fff;
   border-radius: 10px;
   cursor: pointer;
-  transition: 0.2s;
-  box-shadow: 0 5px 15px rgba(255, 74, 74, 0.3);
 }
 
 .btn-modal-delete:hover {
   background: #ff2222;
-  transform: translateY(-2px);
 }
 
-.ai-loading {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--accent);
-  font-weight: 500;
-}
+/* ----------------------------------
+   RESPONSIVE
+---------------------------------- */
+@media (max-width: 900px) {
+  .note-layout-grid {
+    grid-template-columns: 1fr;
+    /* Stack vertically */
+  }
 
-/* RESPONSIVE */
-@media (max-width: 768px) {
-  .note-extra-content {
+  .preview-card {
+    height: 60vh;
+  }
+
+  .sidebar-sticky-wrapper {
+    position: static;
+  }
+
+  .note-title {
+    font-size: 1.4rem;
+  }
+
+  .rec-grid {
     grid-template-columns: 1fr;
   }
+}
 
-  .note-meta-bar {
-    flex-direction: column;
-    gap: 1rem;
-    border-radius: 20px;
-    width: 100%;
-  }
 
-  .meta-divider {
-    display: none;
-  }
+/* ======================================================
+   UPLOAD & EDIT NOTE FORM STYLES
+   (Added for upload.ejs and editNote.ejs)
+====================================================== */
 
-  .note-title-large {
-    font-size: 2rem;
-  }
+.upload-form-container {
+  max-width: 700px;
+  margin: 40px auto;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 30px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(10px);
+}
+
+.upload-form-container h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: var(--text);
+  font-size: 1.8rem;
+}
+
+/* Form Group spacing handled in theme.css but tweaked here */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+/* Input & Textarea overrides for this form */
+.upload-form-container input[type="text"],
+.upload-form-container textarea,
+.upload-form-container select {
+  width: 100%;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: #fff;
+  font-size: 1rem;
+  transition: 0.2s;
+}
+
+.upload-form-container input:focus,
+.upload-form-container textarea:focus,
+.upload-form-container select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 10px rgba(0, 255, 213, 0.1);
+  outline: none;
+}
+
+/* --- CUSTOM FILE INPUT BOX --- */
+.custom-file-input {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 30px;
+  border: 2px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  cursor: pointer;
+  transition: 0.2s;
+  text-align: center;
+}
+
+.custom-file-input:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--accent);
+}
+
+.custom-file-input i {
+  font-size: 2.5rem;
+  color: var(--muted);
+}
+
+.custom-file-input:hover i {
+  color: var(--accent);
+}
+
+.custom-file-input span {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* Hide the actual ugly file input but keep it functional */
+input[type="file"] {
+  display: none;
+}
+
+/* --- CUSTOM DROPDOWN (Used in Upload Page) --- */
+.dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.dropdown-selected {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--text);
+}
+
+.dropdown-selected::after {
+  content: '\25BC';
+  /* Down arrow */
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+.dropdown.open .dropdown-selected {
+  border-color: var(--accent);
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 110%;
+  left: 0;
+  width: 100%;
+  background: #0f172a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 100;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.dropdown.open .dropdown-menu {
+  display: block;
+}
+
+.dropdown-item {
+  padding: 10px 15px;
+  cursor: pointer;
+  color: var(--muted);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  transition: 0.2s;
+}
+
+.dropdown-item:hover,
+.dropdown-item.active {
+  background: rgba(0, 255, 213, 0.1);
+  color: var(--accent);
+}
+
+/* --- SUBMIT BUTTON --- */
+.form-submit-btn {
+  width: 100%;
+  padding: 14px;
+  font-size: 1.1rem;
+  margin-top: 10px;
+  justify-content: center;
 }
