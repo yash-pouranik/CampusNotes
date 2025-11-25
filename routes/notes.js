@@ -4,7 +4,7 @@ const router = express.Router();
 const Note = require("../models/note");
 const Subject = require("../models/subject")
 const DownloadLog = require("../models/downloadLog");
-const {isLoggedIn, isModerator} = require("../middlewares");
+const { isLoggedIn, isModerator } = require("../middlewares");
 const { sendVerificationMail } = require("../config/mailer");
 // const multer = require("multer");
 const { cloudinary, getNextAccount } = require("../config/cloud");
@@ -47,24 +47,24 @@ router.get("/upload", isLoggedIn, async (req, res) => {
   try {
     const subjects = await Subject.find().sort({ name: 1 }); // sorted A-Z
     const courses = [
-      "B.Tech CSE", 
-      "B.Tech IT", 
-      "B.Tech ECE", 
-      "B.Tech ME", 
-      "MBA", 
-      "BBA", 
-      "MCA", 
+      "B.Tech CSE",
+      "B.Tech IT",
+      "B.Tech ECE",
+      "B.Tech ME",
+      "MBA",
+      "BBA",
+      "MCA",
       "BCA"
     ];
 
     const semester = [
-      "I", 
-      "II", 
-      "III", 
-      "IV", 
-      "V", 
-      "VI", 
-      "VII", 
+      "I",
+      "II",
+      "III",
+      "IV",
+      "V",
+      "VI",
+      "VII",
       "VIII",
       "IX",
       "X"
@@ -99,7 +99,7 @@ router.post("/upload", isLoggedIn, async (req, res) => {
     if (!fileUrl) {
       return res.status(400).json({ success: false, error: "File URL is missing." });
     }
-    
+
     let subjectId;
     if (subject === "other" && newSubject) {
       let created = await Subject.findOneAndUpdate(
@@ -113,11 +113,11 @@ router.post("/upload", isLoggedIn, async (req, res) => {
     }
 
 
-    const copied = await Note.find({title: title});
-    
+    const copied = await Note.find({ title: title });
 
 
-    if(copied.length < 1) {
+
+    if (copied.length < 1) {
       const note = new Note({
         title,
         description,
@@ -130,11 +130,11 @@ router.post("/upload", isLoggedIn, async (req, res) => {
       await note.save();
 
       res.json({ success: true, redirectUrl: "/explore" });
-    } else{
+    } else {
       res.status(409).json({ success: false, error: `A note with this title already exists.${copied}` });
     }
 
-    
+
 
   } catch (err) {
     console.error(err);
@@ -181,29 +181,30 @@ router.get("/notes/:nid", async (req, res) => {
 
     console.log(file.subject.name);
     const subId = file.subject._id;
-    
+
     console.log(file.semester)
     const fileSemester = file.semester;
 
     const limit = 30
 
     const subjectNotes = await Note.find({ subject: subId })
-    .populate("subject", "name")
-    .populate("uploadedBy", "username name roles verification")
-    .sort({ createdAt: -1 }) // newest first
+      .populate("subject", "name")
+      .populate("uploadedBy", "username name roles verification")
+      .sort({ createdAt: -1 }) // newest first
 
     const semNotes = await Note.find({ semester: fileSemester })
-    .populate("subject", "name")
-    .populate("uploadedBy", "username name roles verification")
-    .sort({ createdAt: -1 }) // newest first
+      .populate("subject", "name")
+      .populate("uploadedBy", "username name roles verification")
+      .sort({ createdAt: -1 }) // newest first
 
 
-    res.render("notes/eachNote", { 
+    res.render("notes/eachNote", {
       note: file,
       subjectNotes,
       semNotes,
       title: `${file.title} | CampusNotes`,
-      description: `${file.description}` });
+      description: `${file.description}`
+    });
   } catch (e) {
     console.error(e);
     req.flash("error", "Server Error")
@@ -270,20 +271,7 @@ router.get("/explore", async (req, res) => {
 
     // 🔍 Search by query
     if (q) {
-      // Match subjects
-      const subjectMatches = await Subject.find({
-        name: new RegExp(q, "i"),
-      }).select("_id");
-
-      const subjectIds = subjectMatches.map((s) => s._id);
-
-      filter.$or = [
-        { title: new RegExp(q, "i") },
-        { description: new RegExp(q, "i") }, // ✅ also allow description search
-        { course: new RegExp(q, "i") },
-        { semester: new RegExp(q, "i") },
-        { subject: { $in: subjectIds } },
-      ];
+      filter.$text = { $search: q };
     }
 
     // 🎓 Filter by course (dropdown filter in frontend)
@@ -306,10 +294,10 @@ router.get("/explore", async (req, res) => {
     const limit = 12;
     const skip = (page - 1) * limit;
 
-    const notes = await Note.find(filter)
+    const notes = await Note.find(filter, q ? { score: { $meta: "textScore" } } : {})
       .populate("subject", "name")
       .populate("uploadedBy", "username name roles verification")
-      .sort({ createdAt: -1 }) // newest first
+      .sort(q ? { score: { $meta: "textScore" } } : { createdAt: -1 }) // sort by relevance if searching, else newest
       .skip(skip)
       .limit(limit);
 
@@ -370,13 +358,13 @@ router.get("/notes/:nid/edit", isLoggedIn, async (req, res) => {
     // ✅ Fetch subjects & courses for form dropdowns
     const subjects = await Subject.find().sort({ name: 1 });
     const courses = [
-      "B.Tech CSE", 
-      "B.Tech IT", 
-      "B.Tech ECE", 
-      "B.Tech ME", 
-      "MBA", 
-      "BBA", 
-      "MCA", 
+      "B.Tech CSE",
+      "B.Tech IT",
+      "B.Tech ECE",
+      "B.Tech ME",
+      "MBA",
+      "BBA",
+      "MCA",
       "BCA"
     ];
 
@@ -468,7 +456,7 @@ router.delete("/notes/:id", isLoggedIn, async (req, res) => {
         if (uploadIndex > -1 && urlParts.length > uploadIndex + 2) {
           const resourceType = urlParts[uploadIndex - 1]; // This will be 'image', 'raw', etc.
           const publicIdWithFolder = urlParts.slice(uploadIndex + 2).join('/').split('.')[0];
-          
+
           if (resourceType && publicIdWithFolder) {
             await cloudinary.uploader.destroy(publicIdWithFolder, { resource_type: resourceType });
           }

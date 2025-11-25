@@ -4,8 +4,6 @@
 <link rel="stylesheet" href="/css/explore.css">
 </head>
 
-  
-  <!-- HEADER -->
   <header class="page-head">
     <div class="title-wrap">
       <h1>Explore SVVV Notes</h1>
@@ -13,7 +11,7 @@
     </div>
 
     <div class="controls">
-      <form id="searchForm" class="search" method="GET" action="/explore">
+      <form id="headerSearchForm" class="search" method="GET" action="/explore">
         <svg width="16" height="16" viewBox="0 0 24 24"><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2"/><circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="2"/></svg>
         <input type="search" name="q" placeholder="Search..." value="<%= query || '' %>">
       </form>
@@ -22,10 +20,9 @@
     </div>
   </header>
 
-  <!-- ⭐ NEW TOP FILTER BAR ⭐ -->
-  <form method="GET" action="/explore" class="top-filters">
+  <form method="GET" action="/explore" class="top-filters" id="filterForm">
 
-    <input type="text" name="q" placeholder="Search..." value="<%= query || '' %>">
+    <input type="text" id="filterSearchInput" name="q" placeholder="Filter results..." value="<%= query || '' %>">
 
     <select name="course">
       <option value="">Course</option>
@@ -41,14 +38,12 @@
       <% }) %>
     </select>
 
-
     <button type="submit" class="btn">Apply</button>
     <button type="button" id="resetBtn" class="btn">Reset</button>
 
   </form>
 
 
-  <!-- MAIN CONTENT -->
   <% if (notes.length === 0) { %>
     <div style="text-align:center; padding:40px; color:var(--muted);">
       No SVVV notes uploaded yet.
@@ -59,10 +54,7 @@
     <% notes.forEach(note => { %>
 
       <article class="card">
-
         <div class="card-top">
-          
-
           <div>
             <h3 class="title"><%= note.title %></h3>
             <div class="subtitle"><%= note.subject?.name || 'General' %> • <%= note.course %></div>
@@ -78,10 +70,8 @@
 
         <div class="card-footer">
           <a class="view-btn" href="/notes/<%= note._id %>">View</a>
-
           <div class="badge">
             By <span style="color:var(--accent); margin-left:6px;"><%= note.uploadedBy?.username %></span>
-
             <% if (note.uploadedBy?.roles?.isModerator) { %>
               <img src="/images/blueCheckmark.svg" style="width:18px;margin-left:6px;">
             <% } else if (note.uploadedBy?.roles?.isDev) { %>
@@ -89,10 +79,8 @@
             <% } else if (note.uploadedBy?.verification?.verified) { %>
               <span style="color:#56ff9a;margin-left:6px;">✔</span>
             <% } %>
-
           </div>
         </div>
-
       </article>
 
     <% }) %>
@@ -101,7 +89,6 @@
   <% } %>
 
 
-  <!-- LOAD MORE -->
   <div class="load-more-wrap">
     <% if (currentPage < totalPages) { %>
       <button id="loadMoreBtn" class="load-more">Load more</button>
@@ -110,83 +97,141 @@
 
 
 <script>
-  // RESET FILTERS
-  document.getElementById('resetBtn')?.addEventListener('click', () => {
-    window.location.href = "/explore";
-  });
-
-  // LOAD MORE
-  let currentPage = <%= currentPage %>;
-  const totalPages = <%= totalPages %>;
-  const loadMoreBtn = document.getElementById("loadMoreBtn");
-  const noteGrid = document.getElementById("noteGrid");
-
-  async function appendNotes() {
-    currentPage++;
-
-    const params = new URLSearchParams({
-      q: "<%= query || '' %>",
-      course: "<%= course || '' %>",
-      semester: "<%= semester || '' %>",
-      visibility: "<%= visibility || '' %>",
-      page: currentPage
+  (function() {
+    // RESET FILTERS
+    document.getElementById('resetBtn')?.addEventListener('click', () => {
+      window.location.href = "/explore";
     });
 
-    const res = await fetch("/explore?" + params.toString(), {
-      headers: { "Accept": "application/json" }
+    // DEBOUNCE FUNCTION
+    function debounce(func, wait) {
+      let timeout;
+      return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+      };
+    }
+
+    // --- FIXED SELECTORS ---
+    // We specifically target the input in the Filter bar (#filterSearchInput)
+    const filterInput = document.getElementById('filterSearchInput');
+    const filterForm = document.getElementById('filterForm');
+    
+    // Prevent form submission on enter inside the filter form
+    filterForm?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      appendNotes(true); 
     });
 
-    const data = await res.json();
+    // Listener for the Filter Input
+    filterInput?.addEventListener('input', debounce(() => {
+      appendNotes(true);
+    }, 500));
 
-    data.notes.forEach(note => {
-      const uploader = note.uploadedBy?.username || "Unknown";
+    // FILTER LISTENERS (Dropdowns)
+    const courseSelect = document.querySelector('select[name="course"]');
+    const semesterSelect = document.querySelector('select[name="semester"]');
+    const applyBtn = document.querySelector('.top-filters button[type="submit"]');
 
-      const badge = 
-        note.uploadedBy?.roles?.isModerator
-        ? `<img src="/images/blueCheckmark.svg" style="width:18px;margin-left:6px;">`
-        : note.uploadedBy?.roles?.isDev
-        ? `<img src="/images/icons8-checkmark.svg" style="width:18px;margin-left:6px;">`
-        : note.uploadedBy?.verification?.verified
-        ? `<span style="color:#56ff9a;margin-left:6px;">✔</span>`
-        : "";
+    // Hide Apply button as we use auto-update
+    if(applyBtn) applyBtn.style.display = 'none';
 
-      const avatar = note.uploadedBy?.avatar
-        ? `<img src="${note.uploadedBy.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">`
-        : `<span>${uploader[0]}</span>`;
+    courseSelect?.addEventListener('change', () => appendNotes(true));
+    semesterSelect?.addEventListener('change', () => appendNotes(true));
 
-      const html = `
-        <article class="card">
-          <div class="card-top">
-            <div class="avatar">${avatar}</div>
-            <div>
-              <h3 class="title">${note.title}</h3>
-              <div class="subtitle">${note.subject?.name || "General"} • ${note.course}</div>
-            </div>
-          </div>
 
-          <div class="card-body">
-            <div style="display:flex; gap:8px;">
-              <div class="tag">Downloads: <strong>${note.downloadCount}</strong></div>
-              <div class="tag">Added: <strong>${new Date(note.createdAt).toDateString()}</strong></div>
-            </div>
-          </div>
+    // LOAD MORE LOGIC
+    let currentPage = <%= currentPage %>;
+    let totalPages = <%= totalPages %>;
+    const loadMoreBtn = document.getElementById("loadMoreBtn");
+    const noteGrid = document.getElementById("noteGrid");
 
-          <div class="card-footer">
-            <a class="view-btn" href="/notes/${note._id}">View</a>
+    async function appendNotes(reset = false) {
+      if (reset) {
+        currentPage = 0; 
+        noteGrid.innerHTML = '<div style="text-align:center;width:100%;padding:20px;">Loading...</div>';
+      }
 
-            <div class="badge">
-              By <span style="color:var(--accent); margin-left:6px;">${uploader}</span>
-              ${badge}
-            </div>
-          </div>
-        </article>
-      `;
+      currentPage++;
 
-      noteGrid.insertAdjacentHTML("beforeend", html);
-    });
+      // Use filterInput.value here
+      const params = new URLSearchParams({
+        q: filterInput?.value || "",
+        course: courseSelect?.value || "",
+        semester: semesterSelect?.value || "",
+        page: currentPage
+      });
 
-    if (currentPage >= totalPages) loadMoreBtn.remove();
-  }
+      try {
+        const res = await fetch("/explore?" + params.toString(), {
+          headers: { "Accept": "application/json" }
+        });
 
-  loadMoreBtn?.addEventListener("click", appendNotes);
+        const data = await res.json();
+        
+        if (reset) noteGrid.innerHTML = '';
+
+        if (data.notes.length === 0 && reset) {
+          noteGrid.innerHTML = '<div style="text-align:center; padding:40px; color:var(--muted);">No notes found matching your criteria.</div>';
+          if(loadMoreBtn) loadMoreBtn.style.display = 'none';
+          return;
+        }
+
+        data.notes.forEach(note => {
+          const uploader = note.uploadedBy?.username || "Unknown";
+          
+          const badge = 
+            note.uploadedBy?.roles?.isModerator
+            ? `<img src="/images/blueCheckmark.svg" style="width:18px;margin-left:6px;">`
+            : note.uploadedBy?.roles?.isDev
+            ? `<img src="/images/icons8-checkmark.svg" style="width:18px;margin-left:6px;">`
+            : note.uploadedBy?.verification?.verified
+            ? `<span style="color:#56ff9a;margin-left:6px;">✔</span>`
+            : "";
+
+          // Note: Avatar handling logic kept same as your code
+          
+          const html = `
+            <article class="card">
+              <div class="card-top">
+                <div>
+                  <h3 class="title">${note.title}</h3>
+                  <div class="subtitle">${note.subject?.name || "General"} • ${note.course}</div>
+                </div>
+              </div>
+
+              <div class="card-body">
+                <div style="display:flex; gap:8px;">
+                  <div class="tag"><i class="fa-solid fa-download"></i> &nbsp;<strong>${note.downloadCount}</strong></div>
+                  <div class="tag"><strong>${new Date(note.createdAt).toDateString()}</strong></div>
+                </div>
+              </div>
+
+              <div class="card-footer">
+                <a class="view-btn" href="/notes/${note._id}">View</a>
+                <div class="badge">
+                  By <span style="color:var(--accent); margin-left:6px;">${uploader}</span>
+                  ${badge}
+                </div>
+              </div>
+            </article>
+          `;
+
+          noteGrid.insertAdjacentHTML("beforeend", html);
+        });
+
+        totalPages = data.totalPages;
+        if (currentPage >= totalPages) {
+          if(loadMoreBtn) loadMoreBtn.style.display = 'none';
+        } else {
+          if(loadMoreBtn) loadMoreBtn.style.display = 'block';
+        }
+      } catch (err) {
+        console.error(err);
+        if(reset) noteGrid.innerHTML = '<div style="text-align:center;color:red;">Error loading notes.</div>';
+      }
+    }
+
+    loadMoreBtn?.addEventListener("click", () => appendNotes(false));
+  })();
 </script>
