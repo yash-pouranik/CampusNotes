@@ -145,18 +145,16 @@ router.post("/upload", isLoggedIn, async (req, res) => {
 
 
 // most voted notes
-router.get("/most-voted", async (req, res) => {
+// most downloaded notes
+router.get("/most-downloaded", async (req, res) => {
   try {
-    const notes = await Note.find()
+    const notes = await Note.find({ downloadCount: { $gt: 0 } })
+      .sort({ downloadCount: -1 })
       .populate("subject uploadedBy")
-      .lean();
+      .lean()
+      .limit(80);
 
-    // Filter out notes with 0 upvotes
-    const votedNotes = notes
-      .filter(note => note.upvotes && note.upvotes.length > 0)
-      .sort((a, b) => b.upvotes.length - a.upvotes.length);
-
-    res.render("notes/mostVoted", { notes: votedNotes, title: "Most Voted Notes | CampusNotes" });
+    res.render("notes/mostDownloaded", { notes, title: "Most Downloaded Notes | CampusNotes" });
   } catch (err) {
     console.error(err);
     req.flash("error", "Something went wrong")

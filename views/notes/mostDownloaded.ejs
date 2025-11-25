@@ -2,11 +2,11 @@
 
 <div class="mostvoted-wrapper">
 
-  <h1 class="mostvoted-heading">Most Voted Notes</h1>
+  <h1 class="mostvoted-heading">Most Downloaded Notes</h1>
 
   <% if (notes.length === 0) { %>
     <p style="text-align: center; color: var(--muted); font-size: 1.1rem;">
-      No notes have been upvoted yet.
+      No notes have been downloaded yet.
     </p>
   <% } else { %>
 
@@ -24,10 +24,6 @@
 
         <div class="card-body">
           <div style="display:flex; gap:8px; flex-wrap:wrap;">
-
-            <div class="tag-upvote">
-              <i class="fa-solid fa-thumbs-up"></i> <strong><%= note.upvotes.length %></strong>
-            </div>
 
             <div class="tag-download">
               ⬇ <strong><%= note.downloadCount %></strong>
