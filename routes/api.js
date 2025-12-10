@@ -5,7 +5,7 @@ const Note = require("../models/note");
 const User = require("../models/user");
 const Subject = require("../models/subject");
 const { isLoggedIn, isModerator } = require("../middlewares");
-const triviaQuestions = require("../config/trivia"); 
+const triviaQuestions = require("../config/trivia");
 const axios = require('axios');
 const pdf = require('pdf-parse');
 
@@ -13,7 +13,7 @@ const pdf = require('pdf-parse');
 // Add the Gemini AI setup
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
+const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
 
 // This is our new AI route
@@ -50,7 +50,11 @@ router.post("/notes/:id/ask", isLoggedIn, async (req, res) => {
 
     } catch (error) {
         console.error("AI Route Error:", error);
-        res.status(500).json({ error: "Something went wrong while asking the AI." });
+        console.log("Gemini API Key exists:", !!process.env.GEMINI_API_KEY);
+        res.status(500).json({
+            error: "Something went wrong while asking the AI.",
+            details: error.message
+        });
     }
 });
 
@@ -120,49 +124,49 @@ router.get("/notes/:sec", async (req, res) => {
 
 
 router.get("/trivia-question", isLoggedIn, (req, res) => {
-  // Check if user is already verified
-  if (req.user.verification.verified) {
-    return res.status(400).json({ error: "You are already verified." });
-  }
+    // Check if user is already verified
+    if (req.user.verification.verified) {
+        return res.status(400).json({ error: "You are already verified." });
+    }
 
-  // Get a random question
-  const randomQuestion = triviaQuestions[Math.floor(Math.random() * triviaQuestions.length)];
+    // Get a random question
+    const randomQuestion = triviaQuestions[Math.floor(Math.random() * triviaQuestions.length)];
 
-  // Store the question ID in the user's session to prevent cheating
-  req.session.triviaQuestionId = randomQuestion.id;
+    // Store the question ID in the user's session to prevent cheating
+    req.session.triviaQuestionId = randomQuestion.id;
 
-  // Send only the question to the frontend, not the answer
-  res.json({ question: randomQuestion.question });
+    // Send only the question to the frontend, not the answer
+    res.json({ question: randomQuestion.question });
 });
 
 // 2. NAYA ROUTE: Answer Verify Karne Ke Liye
 router.post("/verify-trivia", isLoggedIn, async (req, res) => {
-  const { answer } = req.body;
-  const questionId = req.session.triviaQuestionId;
+    const { answer } = req.body;
+    const questionId = req.session.triviaQuestionId;
 
-  if (!questionId) {
-    return res.status(400).json({ error: "No question was provided. Please refresh." });
-  }
+    if (!questionId) {
+        return res.status(400).json({ error: "No question was provided. Please refresh." });
+    }
 
-  // Find the question from our config file
-  const question = triviaQuestions.find(q => q.id === questionId);
-  
-  // Clean up and compare the answers
-  const isCorrect = answer && question && (answer.trim().toLowerCase() === question.answer);
+    // Find the question from our config file
+    const question = triviaQuestions.find(q => q.id === questionId);
 
-  if (isCorrect) {
-    // If answer is correct, update the user's profile
-    await User.findByIdAndUpdate(req.user._id, {
-      "verification.verified": true,
-      "verification.verifiedAt": new Date()
-    });
-    // Clear the question ID from the session
-    delete req.session.triviaQuestionId;
-    return res.json({ success: true, message: "Verification successful!" });
-  } else {
-    // If incorrect, send an error message
-    return res.status(400).json({ error: "Incorrect answer. Please try again. OR if you are facing any issue mail to: campusnotes@bitbros.in" });
-  }
+    // Clean up and compare the answers
+    const isCorrect = answer && question && (answer.trim().toLowerCase() === question.answer);
+
+    if (isCorrect) {
+        // If answer is correct, update the user's profile
+        await User.findByIdAndUpdate(req.user._id, {
+            "verification.verified": true,
+            "verification.verifiedAt": new Date()
+        });
+        // Clear the question ID from the session
+        delete req.session.triviaQuestionId;
+        return res.json({ success: true, message: "Verification successful!" });
+    } else {
+        // If incorrect, send an error message
+        return res.status(400).json({ error: "Incorrect answer. Please try again. OR if you are facing any issue mail to: campusnotes@bitbros.in" });
+    }
 });
 
 // Purana signature wala route waise hi rahega
