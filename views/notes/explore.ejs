@@ -20,6 +20,14 @@
     </div>
   </header>
 
+  <a href="https://gyanam.gitaforlife.net/" target="_blank" class="ad-banner">
+    <div class="ad-content">
+      <span class="ad-badge">Competition</span>
+      <span class="ad-text">🏆 <strong>Gyanam:</strong> Join the Gita For Life competition! Win exciting prizes.</span>
+    </div>
+    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+  </a>
+
   <form method="GET" action="/explore" class="top-filters" id="filterForm">
 
     <input type="text" id="filterSearchInput" name="q" placeholder="Filter results..." value="<%= query || '' %>">
@@ -235,3 +243,56 @@
     loadMoreBtn?.addEventListener("click", () => appendNotes(false));
   })();
 </script>
+
+<style>
+    /* Inline style for the banner to match your Neon theme */
+    .ad-banner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(90deg, rgba(138, 47, 255, 0.15), rgba(0, 255, 213, 0.05));
+      border: 1px solid rgba(138, 47, 255, 0.3);
+      padding: 12px 20px;
+      border-radius: 12px;
+      margin-bottom: 22px;
+      text-decoration: none;
+      color: #e8f3ff;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      backdrop-filter: blur(5px);
+    }
+
+    .ad-banner:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 15px rgba(138, 47, 255, 0.25);
+      border-color: var(--accent-2);
+    }
+
+    .ad-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .ad-badge {
+      background: var(--accent-2); /* Purple from your theme */
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .ad-text {
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 600px) {
+
+      .ad-content {
+        flex-direction: column;
+        gap: 6px;
+      }
+    }
+  </style>

@@ -62,6 +62,36 @@
 
 
 
+  <!-- UNIQUE TRAFFIC -->
+  <h2 class="sec-title">Unique Traffic</h2>
+  <div class="grid grid-3">
+    <div class="card stat">
+      <div>
+        <p class="stat-title">Unique Downloads</p>
+        <div class="stat-number"><%= totalUniqueDownloads %></div>
+      </div>
+      <div class="stat-icon"><i class="fa-solid fa-fingerprint"></i></div>
+    </div>
+
+    <div class="card stat">
+      <div>
+        <p class="stat-title">Unique Sessions</p>
+        <div class="stat-number"><%= uniqueSessions %></div>
+      </div>
+      <div class="stat-icon"><i class="fa-solid fa-stopwatch"></i></div>
+    </div>
+
+    <div class="card stat">
+      <div>
+        <p class="stat-title">Unique IPs</p>
+        <div class="stat-number"><%= uniqueIps %></div>
+      </div>
+      <div class="stat-icon"><i class="fa-solid fa-network-wired"></i></div>
+    </div>
+  </div>
+
+
+
   <!-- USER ENGAGEMENT -->
   <h2 class="sec-title">User Engagement</h2>
   <div class="grid grid-3">
@@ -89,6 +119,29 @@
       <div class="stat-icon"><i class="fa-solid fa-circle-xmark"></i></div>
     </div>
   </div>
+
+
+
+  <!-- CONTENT & MODERATION -->
+  <h2 class="sec-title">Content & Moderation</h2>
+  <div class="grid grid-2">
+    <div class="card stat">
+      <div>
+        <p class="stat-title">Pending Verification</p>
+        <div class="stat-number"><%= notesPendingVerification %></div>
+      </div>
+      <div class="stat-icon"><i class="fa-solid fa-hourglass-half"></i></div>
+    </div>
+
+    <div class="card stat">
+      <div>
+        <p class="stat-title">New Note Uploads (7d)</p>
+        <div class="stat-number"><%= newNoteUploads %></div>
+      </div>
+      <div class="stat-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+    </div>
+  </div>
+
 
 
 
