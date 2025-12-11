@@ -80,7 +80,7 @@
                 <% if (msg.role === 'user') { %>
                   <i class="fa-regular fa-user"></i>
                 <% } else { %>
-                  <i class="fa-solid fa-robot"></i>
+                  <i class="fa-solid fa-dice"></i>
                 <% } %>
               </div>
               <div class="msg-content markdown-body"><%= msg.content %></div>
@@ -257,7 +257,7 @@
           loadDiv.className = 'full-message ai';
           loadDiv.id = 'loading-msg';
           loadDiv.innerHTML = `
-            <div class="msg-avatar"><i class="fa-solid fa-robot"></i></div>
+            <div class="msg-avatar"><i class="fa-solid fa-dice"></i></div>
             <div class="msg-content"><i class="fa-solid fa-circle-notch fa-spin"></i></div>
           `;
           chatMessagesBox.appendChild(loadDiv);
@@ -270,7 +270,7 @@
               const aiDiv = document.createElement('div');
               aiDiv.className = 'full-message ai';
               aiDiv.innerHTML = `
-                <div class="msg-avatar"><i class="fa-solid fa-robot"></i></div>
+                <div class="msg-avatar"><i class="fa-solid fa-dice"></i></i></div>
                 <div class="msg-content">${typeof converter !== 'undefined' ? converter.makeHtml(res.data.reply) : res.data.reply}</div>
               `;
               chatMessagesBox.appendChild(aiDiv);
