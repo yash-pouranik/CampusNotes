@@ -14,7 +14,7 @@ require('./config/passport'); // path to the passport file
 app.use(methodOverride('_method'));
 
 //requiring middleware
-const {isModerator} = require("./middlewares")
+const { isModerator } = require("./middlewares")
 
 
 
@@ -47,7 +47,7 @@ app.use(session({
   secret: process.env.SECRET,
   resave: false,
   saveUninitialized: true,
-  
+
   store: MongoStore.create({
     mongoUrl: process.env.MONGODB_URI, // Yeh aapke .env file se connection string le lega
     collectionName: 'sessions', // MongoDB mein collection ka naam
@@ -89,6 +89,7 @@ const reqNotes = require("./routes/reqNotes");
 const companyRoutes = require("./routes/company")
 const apiR = require("./routes/api")
 const dash = require("./routes/adminRoutes");
+const chatRoutes = require("./routes/chat");
 
 
 // Corrected code for server.js
@@ -100,6 +101,7 @@ app.use('/', userRoutes);
 app.use("/", reqNotes)
 app.use("/", verifyRRoute)
 app.use("/", companyRoutes)
+app.use("/", chatRoutes); // Register Chat Routes
 
 
 

@@ -8,12 +8,20 @@ const { isLoggedIn, isModerator } = require("../middlewares");
 const triviaQuestions = require("../config/trivia");
 const axios = require('axios');
 const pdf = require('pdf-parse');
+const aiService = require("../services/ai");
 
 
-// Add the Gemini AI setup
-const { GoogleGenerativeAI } = require("@google/generative-ai");
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+// Route to get list of all notes for the AI Chat dropdown
+router.get("/notes/list", isLoggedIn, async (req, res) => {
+    try {
+        // Fetch all notes, selecting only _id and title to keep it light
+        const notes = await Note.find({}, "_id title").sort({ createdAt: -1 });
+        res.json(notes);
+    } catch (error) {
+        console.error("Error fetching note list:", error);
+        res.status(500).json({ error: "Could not fetch notes." });
+    }
+});
 
 
 // This is our new AI route
@@ -27,30 +35,33 @@ router.post("/notes/:id/ask", isLoggedIn, async (req, res) => {
         // Get the user's question from the request, default to "summarize"
         const userQuestion = req.body.question || "Summarize this document in 5 bullet points.";
 
-        // 1. Download the PDF file from Cloudinary
-        const response = await axios.get(note.fileUrl, {
-            responseType: 'arraybuffer'
-        });
-        const pdfBuffer = response.data;
+        let contextText = "";
 
-        // 2. Extract text from the PDF buffer
-        const data = await pdf(pdfBuffer);
-        const documentText = data.text;
+        // 1. Download the PDF file from Cloudinary (Primitive Text Extraction)
+        // Note: For 'Vision' model support, the AIService would need to handle base64.
+        // For Groq (Llama), we *must* extract text. 
+        if (note.fileUrl) {
+            try {
+                const response = await axios.get(note.fileUrl, { responseType: 'arraybuffer' });
+                const pdfBuffer = response.data;
+                const data = await pdf(pdfBuffer);
+                contextText = data.text.trim().substring(0, 12000); // 12k char context limit
+            } catch (err) {
+                console.log("PDF Parse Error:", err.message);
+            }
+        }
 
-        // 3. Create the prompt for the Gemini API
-        const prompt = `Based on the following document, please answer the user's question. Document Content: "${documentText}". Question: "${userQuestion}"`;
+        // 2. Generate Answer via Service
+        // We package the question as a single user message
+        const messages = [{ role: 'user', content: userQuestion }];
 
-        // 4. Call the Gemini API and get the response
-        const result = await model.generateContent(prompt);
-        const aiResponse = await result.response;
-        const text = aiResponse.text();
+        const aiResponseText = await aiService.generateResponse(messages, contextText);
 
-        // 5. Send the AI's answer back to the frontend
-        res.json({ answer: text });
+        // 3. Send the AI's answer back to the frontend
+        res.json({ answer: aiResponseText });
 
     } catch (error) {
         console.error("AI Route Error:", error);
-        console.log("Gemini API Key exists:", !!process.env.GEMINI_API_KEY);
         res.status(500).json({
             error: "Something went wrong while asking the AI.",
             details: error.message
