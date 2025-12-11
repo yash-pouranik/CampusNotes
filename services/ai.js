@@ -31,7 +31,7 @@ class AIService {
 
     async _callGroq(messages, context) {
         // Construct System Prompt
-        let systemPrompt = "You are an intelligent study assistant named 'Campus AI'. Keep answers concise, helpful, and educational.";
+        let systemPrompt = "You are 'Campus AI', a smart study assistant. IMPORTANT: Keep answers very concise, specific, and to the point. Avoid fluff. Use bullet points where possible to save tokens.";
         if (context) {
             systemPrompt += `\n\nCONTEXT FROM USER NOTE:\n${context}\n\nUse this context to answer the user's question.`;
         }

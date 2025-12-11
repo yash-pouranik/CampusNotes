@@ -83,9 +83,7 @@
                   <i class="fa-solid fa-robot"></i>
                 <% } %>
               </div>
-              <div class="msg-content markdown-body">
-                <%= msg.content %> 
-              </div>
+              <div class="msg-content markdown-body"><%= msg.content %></div>
             </div>
           <% } %>
         <% }) %>
@@ -102,19 +100,11 @@
       </div>
 
     <% } else { %>
-      <!-- Empty State -->
+      <br><br> <br>
       <div class="empty-state-container">
-        <!-- Mobile Sidebar Toggle -->
-        <button class="mobile-back-btn" onclick="showMobileSidebar()" style="position:absolute; top:20px; left:20px;">
-            <i class="fa-solid fa-bars"></i> Chats
-        </button>
-
-        <i class="fa-solid fa-robot empty-state-icon"></i>
         <h3 style="font-size: 24px; color: var(--text); margin-bottom: 10px; text-align: center;">Select a chat or start a new one</h3>
         <p style="text-align: center;">You can manage up to <%= maxChats %> concurrent chats.</p>
-        <button onclick="openNewChatModal()" class="btn-new-chat" style="width: auto; margin-top: 20px; padding: 12px 30px;">
-           <i class="fa-solid fa-plus"></i> Start New Chat
-        </button>
+       
       </div>
     <% } %>
 
@@ -146,7 +136,12 @@
 <script>
   document.addEventListener('DOMContentLoaded', () => {
       // Use global converter from layout.ejs
-      const converter = new showdown.Converter(); // Initialize converter
+      const converter = new showdown.Converter({ 
+          tables: true, 
+          tasklists: true, 
+          strikethrough: true, 
+          simplifiedAutoLink: true 
+      }); // Initialize converter with Tables support
       
       const currentChatId = "<%= currentChat ? currentChat._id : '' %>";
       let chatMessagesBox = document.getElementById('full-chat-messages');
@@ -161,7 +156,12 @@
           if (!el.dataset.rendered) {
               // Check if converter exists
               if (typeof converter !== 'undefined') {
-                 el.innerHTML = converter.makeHtml(el.innerText);
+                 // Use textContent to preserve whitespace/newlines correctly from the EJS output
+                 // Trim slightly to avoid excessive padding if EJS introduced newlines
+                 const rawText = el.textContent; 
+                 if(rawText.trim()) {
+                    el.innerHTML = converter.makeHtml(rawText);
+                 }
               }
               el.dataset.rendered = true;
           }
@@ -356,6 +356,14 @@
       display: flex;
       gap: 20px;
   }
+      .mobile-back-btn { 
+        display: flex;
+        background-color: transparent;
+        border: none;
+        color: var(--text);
+        font-size: 20px;
+        cursor: pointer;
+       }
 
   /* ... (existing styles) ... */
 
@@ -368,7 +376,7 @@
           height: calc(100dvh - 70px);
       }
 
-      .mobile-back-btn { display: block; }
+
       
       .full-chat-messages {
           padding: 10px; /* Less padding on mobile */
