@@ -1,46 +1,27 @@
-# ===============================================================
-# robots.txt for CampusNotes
-# ===============================================================
-
-# Rule sabhi search engine bots (Google, Bing, etc.) ke liye hai
 User-agent: *
 
-# ==========================================
-# Pages not to crawl(Disallow)
-# ==========================================
-
-# Admin and Dashboard
+# --- Sirf Admin & API ko Block karein ---
 Disallow: /admin/
 Disallow: /dashboard/
-
-# User-specific authentication pages
-Disallow: /profile/
-Disallow: /login-n
-Disallow: /register-n
-Disallow: /logout
-Disallow: /forgot/
-Disallow: /verify
-
 Disallow: /api/
+
+# Note: Maine Login/Register se Disallow hata diya hai, ab wo index honge.
+
+# --- Actions ko Block karein (Taaki duplicate content na ho) ---
 Disallow: /notes/*/edit
 Disallow: /notes/*/download
 Disallow: /notes/*/upvote
+Disallow: /requestnotes/*/delete
+Disallow: /requestnotes/*/comment
 
-# ====================================
-# Pages to be crawled (Allow)
-# ====================================
-
-# Publicly accessible pages ko allow karna zaroori nahi hota,
-# lekin specific file types ko allow karna acchi practice hai.
+# --- Resources Allow karein ---
 Allow: /*.css
 Allow: /*.js
-
-# Rule for the main Google Search Indexing bot
-User-agent: Googlebot
-Allow: /
+Allow: /*.png
+Allow: /*.jpg
+Allow: /*.webp
 
 # =====================================
 # Sitemap location
 # =====================================
-
 Sitemap: https://campusnotes.bitbros.in/sitemap.xml

@@ -127,6 +127,74 @@ app.get("/", async (req, res) => {
 });
 
 
+app.get("/sitemap.xml", async (req, res) => {
+  try {
+    const baseUrl = "https://campusnotes.bitbros.in";
+
+    // 1. Static Pages
+    const staticUrls = [
+      "/",
+      "/explore",
+      "/most-downloaded",
+      "/requestnotes",
+      "/rankings",
+      "/login-n",
+      "/register-n",
+      "/bitbros/aboutus",
+      "/faq"
+    ];
+
+    // 2. Fetch Dynamic Data (Latest 500 to keep it fast)
+    const notes = await Note.find({ isVerified: true }).select("_id updatedAt").limit(500).sort({ updatedAt: -1 });
+    const users = await User.find({}).select("_id").limit(200);
+
+    // 3. Generate XML
+    let xml = `<?xml version="1.0" encoding="UTF-8"?>
+    <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
+
+    // Add Static Pages
+    staticUrls.forEach(url => {
+      xml += `
+        <url>
+          <loc>${baseUrl}${url}</loc>
+          <changefreq>weekly</changefreq>
+          <priority>0.8</priority>
+        </url>`;
+    });
+
+    // Add Notes
+    notes.forEach(note => {
+      xml += `
+        <url>
+          <loc>${baseUrl}/notes/${note._id}</loc>
+          <lastmod>${new Date(note.updatedAt).toISOString()}</lastmod>
+          <changefreq>monthly</changefreq>
+          <priority>0.9</priority>
+        </url>`;
+    });
+
+    // Add Profiles
+    users.forEach(user => {
+      xml += `
+        <url>
+          <loc>${baseUrl}/profile/${user._id}</loc>
+          <changefreq>monthly</changefreq>
+          <priority>0.6</priority>
+        </url>`;
+    });
+
+    xml += `</urlset>`;
+
+    res.header("Content-Type", "application/xml");
+    res.send(xml);
+
+  } catch (err) {
+    console.error("Sitemap Error:", err);
+    res.status(500).end();
+  }
+});
+
+
 
 
 
