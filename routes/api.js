@@ -180,10 +180,7 @@ router.post("/verify-trivia", isLoggedIn, async (req, res) => {
     }
 });
 
-// Purana signature wala route waise hi rahega
-router.get("/upload-signature", isLoggedIn, (req, res) => {
-    // ... (existing signature code)
-});
+// ok
 
 
 module.exports = router;

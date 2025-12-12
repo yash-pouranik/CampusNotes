@@ -2,18 +2,36 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <link rel="stylesheet" href="/css/explore.css">
+<style>
+  /* New SEO Description Style */
+  .seo-desc {
+    color: var(--muted);
+    font-size: 1rem;
+    max-width: 700px;
+    margin: 8px 0 25px 0;
+    line-height: 1.5;
+  }
+  @media (max-width: 768px) {
+    .seo-desc { font-size: 0.9rem; margin-bottom: 20px; }
+  }
+</style>
 </head>
 
   <header class="page-head">
     <div class="title-wrap">
       <h1>Explore SVVV Notes</h1>
-      <div class="title-sub">Community-uploaded notes — @SVVV</div>
+      
+      <p class="seo-desc">
+        Welcome to the central library of <strong>CampusNotes</strong>. Browse verified handwritten notes, study materials, and assignments for 
+        <strong>B.Tech (CSE, IT)</strong> students at SVVV. 
+        Use the filters below to find content specific to your Course and Semester instantly.
+      </p>
     </div>
 
     <div class="controls">
       <form id="headerSearchForm" class="search" method="GET" action="/explore">
         <svg width="16" height="16" viewBox="0 0 24 24"><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2"/><circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="2"/></svg>
-        <input type="search" name="q" placeholder="Search..." value="<%= query || '' %>">
+        <input type="search" name="q" placeholder="Search topics..." value="<%= query || '' %>">
       </form>
 
       <a href="/most-downloaded" class="btn desktop-only">Most Downloaded</a>
@@ -24,7 +42,6 @@
      target="_blank" 
      class="ad-banner"
      onclick="gtag('event', 'ad_click', { 'event_category': 'promotion', 'event_label': 'Gyanam_Competition' })">
-    
     <div class="ad-content">
       <span class="ad-badge">Competition</span>
       <span class="ad-text">🏆 <strong>Gyanam:</strong> Join the Gita For Life competition! Win exciting prizes.</span>
@@ -33,18 +50,17 @@
   </a>
 
   <form method="GET" action="/explore" class="top-filters" id="filterForm">
-
     <input type="text" id="filterSearchInput" name="q" placeholder="Filter results..." value="<%= query || '' %>">
 
     <select name="course">
-      <option value="">Course</option>
-      <% ["B.Tech CSE","B.Tech IT","B.Tech ECE","B.Tech ME","MBA","BBA","MCA","BCA"].forEach(c => { %>
+      <option value="">All Courses</option>
+      <% ["B.Tech CSE","B.Tech IT","MBA","BBA","MCA","BCA"].forEach(c => { %>
         <option value="<%= c %>" <%= course === c ? "selected" : "" %>><%= c %></option>
       <% }) %>
     </select>
 
     <select name="semester">
-      <option value="">Semester</option>
+      <option value="">All Semesters</option>
       <% ["I","II","III","IV","V","VI","VII","VIII","IX","X"].forEach(s => { %>
         <option value="<%= s %>" <%= semester === s ? "selected" : "" %>><%= s %></option>
       <% }) %>
@@ -52,19 +68,18 @@
 
     <button type="submit" class="btn">Apply</button>
     <button type="button" id="resetBtn" class="btn">Reset</button>
-
   </form>
 
-
   <% if (notes.length === 0) { %>
-    <div style="text-align:center; padding:40px; color:var(--muted);">
-      No SVVV notes uploaded yet.
+    <div style="text-align:center; padding:60px 20px; color:var(--muted);">
+      <i class="fa-regular fa-folder-open" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.5;"></i>
+      <p>No notes found matching your criteria.</p>
+      <a href="/explore" style="color:var(--accent); text-decoration:underline;">Clear Filters</a>
     </div>
   <% } else { %>
 
   <div class="note-grid" id="noteGrid">
     <% notes.forEach(note => { %>
-
       <article class="card">
         <div class="card-top">
           <div>
@@ -85,28 +100,25 @@
           <div class="badge">
             By <span style="color:var(--accent); margin-left:6px;"><%= note.uploadedBy?.username %></span>
             <% if (note.uploadedBy?.roles?.isModerator) { %>
-              <img src="/images/blueCheckmark.svg" style="width:18px;margin-left:6px;">
+              <img src="/images/blueCheckmark.svg" style="width:18px;margin-left:6px;" alt="Mod">
             <% } else if (note.uploadedBy?.roles?.isDev) { %>
-              <img src="/images/icons8-checkmark.svg" style="width:18px;margin-left:6px;">
+              <img src="/images/icons8-checkmark.svg" style="width:18px;margin-left:6px;" alt="Dev">
             <% } else if (note.uploadedBy?.verification?.verified) { %>
               <span style="color:#56ff9a;margin-left:6px;">✔</span>
             <% } %>
           </div>
         </div>
       </article>
-
     <% }) %>
   </div>
 
   <% } %>
 
-
   <div class="load-more-wrap">
     <% if (currentPage < totalPages) { %>
-      <button id="loadMoreBtn" class="load-more">Load more</button>
+      <button id="loadMoreBtn" class="load-more">Load more notes</button>
     <% } %>
   </div>
-
 
 <script>
   (function() {
@@ -124,33 +136,29 @@
       };
     }
 
-    // --- FIXED SELECTORS ---
-    // We specifically target the input in the Filter bar (#filterSearchInput)
     const filterInput = document.getElementById('filterSearchInput');
     const filterForm = document.getElementById('filterForm');
     
-    // Prevent form submission on enter inside the filter form
+    // Prevent default submit
     filterForm?.addEventListener('submit', (e) => {
       e.preventDefault();
       appendNotes(true); 
     });
 
-    // Listener for the Filter Input
+    // Auto-search on typing
     filterInput?.addEventListener('input', debounce(() => {
       appendNotes(true);
     }, 500));
 
-    // FILTER LISTENERS (Dropdowns)
+    // FILTER LISTENERS
     const courseSelect = document.querySelector('select[name="course"]');
     const semesterSelect = document.querySelector('select[name="semester"]');
     const applyBtn = document.querySelector('.top-filters button[type="submit"]');
-
-    // Hide Apply button as we use auto-update
-    if(applyBtn) applyBtn.style.display = 'none';
+    
+    if(applyBtn) applyBtn.style.display = 'none'; // Hide apply button if JS is active
 
     courseSelect?.addEventListener('change', () => appendNotes(true));
     semesterSelect?.addEventListener('change', () => appendNotes(true));
-
 
     // LOAD MORE LOGIC
     let currentPage = <%= currentPage %>;
@@ -160,13 +168,12 @@
 
     async function appendNotes(reset = false) {
       if (reset) {
-        currentPage = 0; 
-        noteGrid.innerHTML = '<div style="text-align:center;width:100%;padding:20px;">Loading...</div>';
+        currentPage = 0;
+        noteGrid.innerHTML = '<div style="text-align:center;width:100%;padding:40px;color:var(--muted);">Loading...</div>';
       }
 
       currentPage++;
 
-      // Use filterInput.value here
       const params = new URLSearchParams({
         q: filterInput?.value || "",
         course: courseSelect?.value || "",
@@ -178,13 +185,16 @@
         const res = await fetch("/explore?" + params.toString(), {
           headers: { "Accept": "application/json" }
         });
-
         const data = await res.json();
         
         if (reset) noteGrid.innerHTML = '';
 
         if (data.notes.length === 0 && reset) {
-          noteGrid.innerHTML = '<div style="text-align:center; padding:40px; color:var(--muted);">No notes found matching your criteria.</div>';
+          noteGrid.innerHTML = `
+            <div style="text-align:center; padding:60px 20px; color:var(--muted);">
+              <i class="fa-regular fa-face-frown" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.5;"></i>
+              <p>No notes found matching your criteria.</p>
+            </div>`;
           if(loadMoreBtn) loadMoreBtn.style.display = 'none';
           return;
         }
@@ -192,17 +202,11 @@
         data.notes.forEach(note => {
           const uploader = note.uploadedBy?.username || "Unknown";
           
-          const badge = 
-            note.uploadedBy?.roles?.isModerator
-            ? `<img src="/images/blueCheckmark.svg" style="width:18px;margin-left:6px;">`
-            : note.uploadedBy?.roles?.isDev
-            ? `<img src="/images/icons8-checkmark.svg" style="width:18px;margin-left:6px;">`
-            : note.uploadedBy?.verification?.verified
-            ? `<span style="color:#56ff9a;margin-left:6px;">✔</span>`
-            : "";
+          let badge = "";
+          if (note.uploadedBy?.roles?.isModerator) badge = `<img src="/images/blueCheckmark.svg" style="width:18px;margin-left:6px;">`;
+          else if (note.uploadedBy?.roles?.isDev) badge = `<img src="/images/icons8-checkmark.svg" style="width:18px;margin-left:6px;">`;
+          else if (note.uploadedBy?.verification?.verified) badge = `<span style="color:#56ff9a;margin-left:6px;">✔</span>`;
 
-          // Note: Avatar handling logic kept same as your code
-          
           const html = `
             <article class="card">
               <div class="card-top">
@@ -211,14 +215,12 @@
                   <div class="subtitle">${note.subject?.name || "General"} • ${note.course}</div>
                 </div>
               </div>
-
               <div class="card-body">
                 <div style="display:flex; gap:8px;">
                   <div class="tag"><i class="fa-solid fa-download"></i> &nbsp;<strong>${note.downloadCount}</strong></div>
                   <div class="tag"><strong>${new Date(note.createdAt).toDateString()}</strong></div>
                 </div>
               </div>
-
               <div class="card-footer">
                 <a class="view-btn" href="/notes/${note._id}">View</a>
                 <div class="badge">
@@ -228,19 +230,19 @@
               </div>
             </article>
           `;
-
           noteGrid.insertAdjacentHTML("beforeend", html);
         });
 
         totalPages = data.totalPages;
-        if (currentPage >= totalPages) {
-          if(loadMoreBtn) loadMoreBtn.style.display = 'none';
-        } else {
-          if(loadMoreBtn) loadMoreBtn.style.display = 'block';
+        
+        if(loadMoreBtn) {
+            if (currentPage >= totalPages) loadMoreBtn.style.display = 'none';
+            else loadMoreBtn.style.display = 'block';
         }
+
       } catch (err) {
         console.error(err);
-        if(reset) noteGrid.innerHTML = '<div style="text-align:center;color:red;">Error loading notes.</div>';
+        if(reset) noteGrid.innerHTML = '<div style="text-align:center;color:#ff6b6b;">Error loading notes. Please refresh.</div>';
       }
     }
 
@@ -249,7 +251,7 @@
 </script>
 
 <style>
-    /* Inline style for the banner to match your Neon theme */
+    /* CSS for Ad Banner (Same as before) */
     .ad-banner {
       display: flex;
       justify-content: space-between;
@@ -264,21 +266,18 @@
       transition: transform 0.2s ease, box-shadow 0.2s ease;
       backdrop-filter: blur(5px);
     }
-
     .ad-banner:hover {
       transform: translateY(-2px);
       box-shadow: 0 0 15px rgba(138, 47, 255, 0.25);
       border-color: var(--accent-2);
     }
-
     .ad-content {
       display: flex;
       align-items: center;
       gap: 12px;
     }
-
     .ad-badge {
-      background: var(--accent-2); /* Purple from your theme */
+      background: var(--accent-2);
       color: white;
       font-size: 0.75rem;
       font-weight: 700;
@@ -287,16 +286,8 @@
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
-
-    .ad-text {
-      font-size: 0.95rem;
-    }
-
+    .ad-text { font-size: 0.95rem; }
     @media (max-width: 600px) {
-
-      .ad-content {
-        flex-direction: column;
-        gap: 6px;
-      }
+      .ad-content { flex-direction: column; gap: 6px; align-items: flex-start; }
     }
-  </style>
+</style>

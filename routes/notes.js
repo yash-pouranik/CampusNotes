@@ -289,7 +289,7 @@ router.get("/explore", async (req, res) => {
 
     // 📄 Pagination (for better performance)
     const page = parseInt(req.query.page) || 1;
-    const limit = 12;
+    const limit = 20;
     const skip = (page - 1) * limit;
 
     const notes = await Note.find(filter, q ? { score: { $meta: "textScore" } } : {})
