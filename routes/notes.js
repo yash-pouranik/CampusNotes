@@ -267,27 +267,27 @@ router.get("/explore", async (req, res) => {
 
     let filter = { isVerified: true };
 
-    // 🔍 Search by query
+    // Search by query
     if (q) {
       filter.$text = { $search: q };
     }
 
-    // 🎓 Filter by course (dropdown filter in frontend)
+    // Filter by course (dropdown filter in frontend)
     if (course && course !== "all") {
       filter.course = course;
     }
 
-    // 📚 Filter by semester
+    // Filter by semester
     if (semester && semester !== "all") {
       filter.semester = semester;
     }
 
-    // 🌍 Filter by visibility
+    // Filter by visibility
     if (visibility && visibility !== "all") {
       filter.visibility = visibility;
     }
 
-    // 📄 Pagination (for better performance)
+    // Pagination (for better performance)
     const page = parseInt(req.query.page) || 1;
     const limit = 20;
     const skip = (page - 1) * limit;
@@ -392,7 +392,7 @@ router.put('/notes/:id', isLoggedIn, async (req, res) => {
       return res.redirect("/explore");
     }
 
-    // ✅ Authorization: Only owner or moderator/dev can edit
+    // Authorization: Only owner or moderator/dev can edit
     const isOwner = note.uploadedBy._id.toString() === req.user._id.toString();
     const isModerator = req.user.roles?.isModerator;
     const isDev = req.user.roles?.isDev;
@@ -402,13 +402,13 @@ router.put('/notes/:id', isLoggedIn, async (req, res) => {
       return res.redirect(`/notes/${req.params.id}`);
     }
 
-    // ✅ Validate subject ID
+    // Validate subject ID
     if (!mongoose.Types.ObjectId.isValid(req.body.subject)) {
       req.flash("error", "Invalid subject selected");
       return res.redirect(`/notes/${req.params.id}/edit`);
     }
 
-    // ✅ Update fields
+    // Update fields
     await Note.findByIdAndUpdate(req.params.id, {
       title: req.body.title,
       description: req.body.description,
@@ -437,7 +437,7 @@ router.delete("/notes/:id", isLoggedIn, async (req, res) => {
       return res.redirect("/explore");
     }
 
-    // ✅ permission check
+    // permission check
     if (
       note.uploadedBy.toString() !== req.user._id.toString() &&
       !req.user.roles?.isModerator
@@ -446,7 +446,7 @@ router.delete("/notes/:id", isLoggedIn, async (req, res) => {
       return res.redirect(`/notes/${note._id}`);
     }
 
-    // ✅ Corrected Cloudinary delete logic
+    // Corrected Cloudinary delete logic
     if (note.fileUrl) {
       try {
         const urlParts = note.fileUrl.split('/');
@@ -465,13 +465,13 @@ router.delete("/notes/:id", isLoggedIn, async (req, res) => {
       }
     }
 
-    // ✅ user.notes array se bhi remove karo
+    // user.notes array se bhi remove karo
     await mongoose.model("User").updateOne(
       { _id: note.uploadedBy },
       { $pull: { notes: note._id } }
     );
 
-    // ✅ finally note delete
+    // finally note delete
     await note.deleteOne();
 
     req.flash("success", "Note deleted successfully!");

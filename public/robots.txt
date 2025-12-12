@@ -1,20 +1,29 @@
 User-agent: *
 
-# --- Sirf Admin & API ko Block karein ---
+# --- Block Admin Apis ---
 Disallow: /admin/
 Disallow: /dashboard/
 Disallow: /api/
 
-# Note: Maine Login/Register se Disallow hata diya hai, ab wo index honge.
-
-# --- Actions ko Block karein (Taaki duplicate content na ho) ---
+# --- Block Actions ---
 Disallow: /notes/*/edit
 Disallow: /notes/*/download
 Disallow: /notes/*/upvote
 Disallow: /requestnotes/*/delete
 Disallow: /requestnotes/*/comment
 
-# --- Resources Allow karein ---
+# --- Block Login/Register ---
+Disallow: /login
+Disallow: /register
+
+# --- Block Actions ---
+Disallow: /notes/*/edit
+Disallow: /notes/*/download
+Disallow: /notes/*/upvote
+Disallow: /requestnotes/*/delete
+Disallow: /requestnotes/*/comment
+
+# --- Resources Allow ---
 Allow: /*.css
 Allow: /*.js
 Allow: /*.png
