@@ -70,6 +70,7 @@ app.use((req, res, next) => {
   res.locals.currUser = req.user;
   res.locals.success_msg = req.flash("success");
   res.locals.error_msg = req.flash("error");
+  res.locals.currentUrl = `https://campusnotes.bitbros.in${req.path}`;
   next();
 });
 
