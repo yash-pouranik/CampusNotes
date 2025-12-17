@@ -21,7 +21,7 @@
 
     <div class="hero-stats">
       <div class="stat-item">
-        <span class="stat-num">100+</span>
+        <span class="stat-num">150+</span>
         <span class="stat-label">Notes</span>
       </div>
       <div class="stat-item">
@@ -37,7 +37,15 @@
 
   <div class="hero-visual" data-aos="fade-left" data-aos-delay="200">
     <div class="visual-card">
-      <img src="/images/notes-hero.webp" alt="CampusNotes Hero" class="hero-img" />
+      <img 
+        src="/images/notes-hero.webp" 
+        alt="CampusNotes Hero" 
+        class="hero-img"
+        width="600" 
+        height="400" 
+        fetchpriority="high"
+        decoding="async" 
+      />
       <div class="floating-badge badge-1">
         <i class="fa-solid fa-check-circle"></i> Verified
       </div>
@@ -117,7 +125,13 @@
         <div class="contributor-card" data-aos="zoom-in" data-aos-delay="<%= index * 100 %>">
           <div class="rank-badge">#<%= index + 1 %></div>
           <div class="contributor-avatar">
-            <img src="<%= contributor.avatar || '/images/dummy_profile.avif' %>" alt="<%= contributor.name %>">
+            <% 
+              let avatarUrl = contributor.avatar || '/images/dummy_profile.avif';
+              if(avatarUrl.includes('cloudinary')) {
+                avatarUrl = avatarUrl.replace('/upload/', '/upload/w_100,h_100,c_fill,q_auto,f_auto/');
+              }
+            %>
+            <img src="<%= avatarUrl %>" alt="<%= contributor.name %>" loading="lazy">
           </div>
           <div class="contributor-info">
             <h4>
@@ -143,7 +157,7 @@
   </div>
 </section>
 
-<!-- TESTIMONIALS SECTION -->
+<!-- TESTIMONIALS SECTION
 <section class="testimonials-section">
   <div class="section-header" data-aos="fade-up">
     <h2 class="section-title">Student Stories</h2>
@@ -184,7 +198,7 @@
       </div>
     </div>
   </div>
-</section>
+</section> -->
 
 <!-- FAQ SECTION -->
 <section class="faq-section">

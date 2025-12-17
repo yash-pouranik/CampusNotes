@@ -49,7 +49,7 @@ router.get("/rankings", async (req, res) => {
     const topUsers = await User.aggregate([
       { $addFields: { uploaded: { $size: "$notes" } } },
       { $sort: { uploaded: -1 } },
-      { $limit: 80 }
+      { $limit: 100 }
     ]);
 
 
