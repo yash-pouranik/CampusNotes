@@ -29,6 +29,11 @@ app.use(cookieParser()); // Use cookie-parser middleware
 app.use(expressLayouts);
 
 app.use(express.static(path.join(__dirname, "public")));
+// caching for 1 day in user browser
+app.use(express.static(path.join(__dirname, "public"), {
+  maxAge: '1d', 
+  etag: false
+}));
 
 //db
 const connectDB = require('./config/db');
@@ -106,23 +111,61 @@ app.use("/", chatRoutes); // Register Chat Routes
 
 
 
+// Add these variables at the top of your server.js (Global Scope)
+let cachedContributors = null;
+let lastCacheTime = 0;
+const CACHE_TTL = 1000 * 60 * 60 * 24; // Cache for 12 Hour
+
 app.get("/", async (req, res) => {
   try {
+    const now = Date.now();
+
+    // 1. Check if we have valid cached data
+    if (cachedContributors && (now - lastCacheTime < CACHE_TTL)) {
+       return res.render("home/index", {
+         title: "CampusNotes | Your Campus, Your Notes - SVVV",
+         topContributors: cachedContributors
+       });
+    }
+
+    // 2. If no cache, run the Optimized Aggregation
     const topContributors = await User.aggregate([
+      // Optimization: Only consider users who have notes (Filter first!)
+      { $match: { "notes.0": { $exists: true } } }, 
+
+      // Calculate Upload Count
       { $addFields: { uploaded: { $size: "$notes" } } },
+      
       { $sort: { uploaded: -1 } },
-      { $limit: 3 }
+      { $limit: 3 },
+
+      // Optimization: Fetch ONLY what index.ejs needs
+      { $project: {
+          name: 1,
+          username: 1,
+          avatar: 1,
+          roles: 1,
+          course: 1,
+          verification: 1, // Needed for the 'verified' check
+          uploaded: 1
+      }}
     ]);
+
+    // 3. Update the Cache
+    cachedContributors = topContributors;
+    lastCacheTime = now;
 
     res.render("home/index", {
       title: "CampusNotes | Your Campus, Your Notes - SVVV",
       topContributors
     });
+
   } catch (err) {
-    console.error(err);
+    console.error("Home Route Error:", err);
+    // Serve stale cache if DB fails, or empty array
     res.render("home/index", {
       title: "CampusNotes",
-      topContributors: []
+      topContributors: cachedContributors || []
     });
   }
 });

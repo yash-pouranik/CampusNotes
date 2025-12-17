@@ -145,22 +145,35 @@
   <h1 class="ranking-title">🏆 Top Contributors</h1>
   <p class="ranking-sub">Based on number of notes uploaded</p>
 
-  <div class="ranking-container">
+<div class="ranking-container">
     <% topUsers.forEach((u, i) => { %>
+      
+      <% 
+        let avatarUrl = u.avatar || '/images/dummy_profile.avif';
+
+        // 1. Cloudinary Logic (Same as before)
+        if (avatarUrl.includes('cloudinary.com')) {
+          if (!avatarUrl.includes('w_100')) {
+             avatarUrl = avatarUrl.replace(/(\/upload\/)/, '$1w_100,h_100,c_fill,q_auto,f_auto/');
+          }
+        } 
+      %>
+      
       <div class="rank-card">
 
         <div class="rank-number">#<%= i+1 %></div>
 
-        <img src="<%= u.avatar %>" class="rank-avatar" />
+        <img src="<%= avatarUrl %>" class="rank-avatar" loading="lazy" alt="<%= u.username %>" />
 
         <div class="rank-info">
           <div class="rank-name">
             <%= u.name || u.username %>
-            <% if (u.roles.isModerator) { %>
+            
+            <% if (u.roles && u.roles.isModerator) { %>
               <img src="/images/blueCheckmark.svg" width="18">
-            <% } else if (u.roles.isDev) { %>
+            <% } else if (u.roles && u.roles.isDev) { %>
               <img src="/images/icons8-checkmark.svg" width="18">
-            <% } else if (u.verification?.verified) { %>
+            <% } else if (u.verification && u.verification.verified) { %>
               <span style="color:#19ffb3;">✔</span>
             <% } %>
           </div>

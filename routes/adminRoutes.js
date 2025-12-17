@@ -9,15 +9,20 @@ const { isLoggedIn, isModerator } = require("../middlewares");
 
 // Admin Dashboard Data
 router.get("/", isLoggedIn, isModerator, async (req, res) => {
+  
   try {
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
-    // === Core Stats ===
-    const totalUsers = await User.countDocuments();
-    const totalNotes = await Note.countDocuments();
-    const totalDownloadsAgg = await Note.aggregate([
-      { $group: { _id: null, total: { $sum: "$downloadCount" } } },
+
+    const [totalUsers, totalNotes, totalDownloadsAgg, fiveLastUsers, topNotes] = await Promise.all([
+      User.countDocuments(),
+      Note.countDocuments(),
+      Note.aggregate([{ $group: { _id: null, total: { $sum: "$downloadCount" } } }]),
+      User.find().sort({ createdAt: -1 }).limit(5).lean(), // Added .lean()
+      Note.find({}).sort({ downloadCount: -1 }).limit(12).select("title course downloadCount").lean()
     ]);
+
+
     const totalDownloads = totalDownloadsAgg[0]?.total || 0;
     const downloadsLast7Days = await DownloadLog.countDocuments({ downloadedAt: { $gte: sevenDaysAgo } });
 
@@ -26,9 +31,7 @@ router.get("/", isLoggedIn, isModerator, async (req, res) => {
     const uniqueSessions = (await DownloadLog.distinct("downloaderId")).length;
     const uniqueIps = (await DownloadLog.distinct("ip")).length;
 
-    const fiveLastUsers = await User.find()
-    .sort({ createdAt: -1 })
-    .limit(5);
+
 
     const LastDownloads = await DownloadLog.find()
     .populate("note")
@@ -48,10 +51,7 @@ router.get("/", isLoggedIn, isModerator, async (req, res) => {
     // === Content & Moderation ===
     const notesPendingVerification = await Note.countDocuments({ isVerified: false });
     const newNoteUploads = await Note.countDocuments({ createdAt: { $gte: sevenDaysAgo } });
-    const topNotes = await Note.find({})
-      .sort({ downloadCount: -1 })
-      .limit(12)
-      .select("title course downloadCount");
+
     const courseWise = await Note.aggregate([
         { $group: { _id: "$course", notes: { $sum: 1 } } },
         { $sort: { notes: -1 } },

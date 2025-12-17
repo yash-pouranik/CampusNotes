@@ -81,4 +81,7 @@ noteSchema.index({
   semester: "text"
 });
 
+noteSchema.index({ isVerified: 1, course: 1, semester: 1 });
+noteSchema.index({ uploadedBy: 1 });
+
 module.exports = mongoose.model("Note", noteSchema);
