@@ -5,8 +5,7 @@ class AIService {
     constructor() {
         this.groqApiKey = process.env.GROQ_API_KEY;
         this.geminiApiKey = process.env.GEMINI_API_KEY;
-        // Default Model
-        this.groqModel = "groq/compound"; // Super fast, good for chat
+        this.groqModel = "groq/compound"; 
     }
 
 

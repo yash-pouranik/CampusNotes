@@ -5,31 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <link rel="icon" type="image/x-icon" href="/images/CAMPUSNOTES_LOGO.png">
-
   <link rel="canonical" href="<%= typeof currentUrl !== 'undefined' ? currentUrl : 'https://campusnotes.bitbros.in' %>" />
 
   <title><%= typeof title !== 'undefined' ? title : 'Campus Notes - SVVV Notes' %></title>
 
-  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Urbanist&display=swap" rel="stylesheet" />
 
-  <!-- Main CSS -->
-  <link rel="stylesheet" href="/css/styles.css?v=5" />
-  <link rel="stylesheet" href="/css/footer_nav.css?v=3" />
-  <link rel="stylesheet" href="/css/theme.css?v=1">
-  <link rel="stylesheet" href="/css/ai-chat.css?v=1">
+  <link rel="stylesheet" href="/css/styles.css" />
+  <link rel="stylesheet" href="/css/footer_nav.css" />
+  <link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/ai-chat.css">
 
-  <!-- SEO Meta -->
   <meta name="description" content="<%= typeof description !== 'undefined' ? description : 'A student-driven platform for sharing notes, study materials & academic resources.' %>">
 
-  <!-- AOS -->
   <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
 
-  <!-- FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-  <!-- Google Tag -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VQX25X9M70"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VQX25X9M70" defer></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
@@ -37,12 +32,8 @@
     gtag('config', 'G-VQX25X9M70');
   </script>
 
-  <!-- Axios (Global) - Moved to Head for dependencies -->
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
-
   <% if (typeof showAds === 'undefined' || showAds !== false) { %>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6173181732924072" crossorigin="anonymous"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6173181732924072" crossorigin="anonymous" defer></script>
   <% } %>
 </head>
 
@@ -50,9 +41,7 @@
 
   <%- include("partials/navbar") %>
 
-  <!-- PAGE WRAPPER FIXES BACKGROUND CUTTING ISSUE -->
   <main class="page-wrapper">
-    
     <% if (success_msg.length) { %>
       <div class="flash flash-success"><%= success_msg %></div>
     <% } %>
@@ -66,15 +55,7 @@
 
   <%- include("partials/footer") %>
 
-  <!-- Scripts -->
-  <script src="/js/navbar.js"></script>
-  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
-  <script>AOS.init({ duration: 800, once: true });</script>
-
-  <script>AOS.init({ duration: 800, once: true });</script>
-
-  <!-- AI Chat Widget HTML -->
-  <div id="ai-chat-widget" style="display: none;"> <!-- Hidden by default, shown via JS if user is logged in -->
+  <div id="ai-chat-widget" style="display: none;">
     <div class="ai-chat-toggle" onclick="toggleChat()">
       <i class="fa-solid fa-dice"></i>
     </div>
@@ -97,14 +78,12 @@
       </div>
 
       <div class="ai-chat-input-area">
-        <!-- Selected Note Indicator -->
         <div class="selected-note-pill" id="selected-note-pill">
           <i class="fa-regular fa-file-lines"></i>
           <span id="selected-note-title">Note Title</span>
           <i class="fa-solid fa-xmark remove-note-btn" onclick="clearNoteSelection()"></i>
         </div>
 
-        <!-- Dropdown -->
         <div class="notes-dropdown" id="notes-dropdown">
           <div class="dropdown-search">
              <input type="text" id="note-search" placeholder="Search notes..." onkeyup="filterNotes()">
@@ -127,9 +106,24 @@
     </div>
   </div>
 
-  <!-- AI Chat Logic -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js" defer></script>
+  <script src="/js/navbar.js" defer></script>
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js" defer></script>
+  
   <script>
-    const chatWidget = document.getElementById('ai-chat-widget');
+    // Initialize AOS only after script loads
+    window.addEventListener('load', () => {
+      if(typeof AOS !== 'undefined') {
+        AOS.init({ duration: 800, once: true });
+      }
+    });
+
+    // AI Chat Widget Script
+    <% if (typeof currUser !== 'undefined' && currUser) { %>
+        document.getElementById('ai-chat-widget').style.display = 'block';
+    <% } %>
+
     const chatContainer = document.getElementById('chat-container');
     const notesDropdown = document.getElementById('notes-dropdown');
     const notesListContainer = document.getElementById('notes-list-container');
@@ -142,22 +136,13 @@
     let currentNoteId = null;
     let notesLoaded = false;
     let allNotes = [];
-    const converter = new showdown.Converter();
-
-    // Check if user is logged in (simple check via existing EJS variable or DOM)
-    // We can check if 'currUser' exists in the page. 
-    // Since this is a layout file, we can use EJS to conditionally render the widget.
-    // But for now, let's assume we show it, and if API fails (401), we handle it.
-    // Actually, let's use EJS to only show if user is logged in.
     
-    <% if (typeof currUser !== 'undefined' && currUser) { %>
-        document.getElementById('ai-chat-widget').style.display = 'block';
-    <% } %>
+    // Note: showdown is deferred, converter should be initialized when needed
+    let converter;
 
     function toggleChat() {
         chatContainer.classList.toggle('active');
         if (chatContainer.classList.contains('active')) {
-            // Focus input
             setTimeout(() => chatInput.focus(), 300);
         }
     }
@@ -168,9 +153,7 @@
             notesDropdown.style.display = 'none';
         } else {
             notesDropdown.style.display = 'block';
-            if (!notesLoaded) {
-                await fetchNotes();
-            }
+            if (!notesLoaded) await fetchNotes();
             document.getElementById('note-search').focus();
         }
     }
@@ -192,7 +175,6 @@
             notesListContainer.innerHTML = '<div class="note-item">No notes found.</div>';
             return;
         }
-        
         notesListContainer.innerHTML = notes.map(note => `
             <div class="note-item" onclick="selectNote('${note._id}', '${escapeHtml(note.title)}')">
                 <i class="fa-regular fa-file-lines" style="margin-right: 8px; color: #6366f1;"></i>
@@ -212,8 +194,6 @@
         selectedNoteTitle.textContent = title;
         selectedNotePill.style.display = 'flex';
         notesDropdown.style.display = 'none';
-        
-        // Add system message
         addMessage('system', `Context set to: <strong>${title}</strong>`);
     }
 
@@ -228,72 +208,35 @@
     }
 
     function maximizeChat() {
-        // Collect current messages
         const msgs = [];
         const msgElements = chatMessages.querySelectorAll('.message');
         msgElements.forEach(el => {
-            if (el.classList.contains('system')) return; // Skip system messages
-            
+            if (el.classList.contains('system')) return;
             const role = el.classList.contains('user') ? 'user' : 'ai';
-            // We need to get TEXT content. 
-            // Since we render HTML in widget, getting innerText is safer slightly but might lose formatting.
-            // For persistence, let's grab innerHTML or innerText. Data model expects 'content'.
-            // Simple approach: innerText for now to keep it clean.
             const content = el.innerText.trim();
-            if(content && content !== 'Thinking...') {
-                 msgs.push({ role, content });
-            }
+            if(content && content !== 'Thinking...') msgs.push({ role, content });
         });
 
-        // Prepare payload
-        const payload = { 
-            noteId: currentNoteId || null, 
-            messages: msgs 
-        };
+        const payload = { noteId: currentNoteId || null, messages: msgs };
 
-        // Create chat with history
         axios.post('/api/chat/new', payload)
             .then(res => {
-                if(res.data.success) {
-                    window.location.href = `/chat?id=${res.data.chatId}`;
-                }
+                if(res.data.success) window.location.href = `/chat?id=${res.data.chatId}`;
             })
             .catch(err => {
-                if (err.response && err.response.status === 403) {
-                    alert(err.response.data.error); 
-                    window.location.href = '/chat';
-                } else {
-                    console.error(err);
-                    window.location.href = '/chat';
-                }
+                console.error(err);
+                window.location.href = '/chat';
             });
     }
 
-
     async function sendMessage() {
         const text = chatInput.value.trim();
-        if (!text) return;
+        if (!text || !currentNoteId) return;
 
-        if (!currentNoteId) {
-            alert("To start a chat, please select a note first.");
-            return;
-        }
-
-        // --- CHANGE: If user sends a message in widget, we AUTO-MAXIMIZE if they want persistence?
-        // User asked: "chat will start from widget then there is a icon to maximize"
-        // IMPLIED: Widget is temporary/quick. Maximize is for full session.
-        // Let's keep the widget as "Quick Ask" (stateless API) as implemented before, 
-        // BUT add the maximize button to "Move" to a full session.
-        // So I will NOT change sendMessage logic here to save to DB, 
-        // because that would double the complexity (syncing widget state to DB).
-        // The user explicitly said: "when maximizing... redirect to new ejs... store all chats".
-        
-        // Add user message
         addMessage('user', text);
         chatInput.value = '';
         sendBtn.disabled = true;
 
-        // Add loading
         const loadingId = addMessage('ai', '<i class="fa-solid fa-circle-notch fa-spin"></i> Thinking...');
 
         try {
@@ -301,13 +244,12 @@
                 question: text
             });
             
-            // Replace loading with answer
+            if(!converter) converter = new showdown.Converter();
             const answerHtml = converter.makeHtml(response.data.answer);
             updateMessage(loadingId, answerHtml);
             
         } catch (error) {
-            console.error(error);
-            updateMessage(loadingId, 'Sorry, something went wrong. Please try again.');
+            updateMessage(loadingId, 'Sorry, something went wrong.');
         } finally {
             sendBtn.disabled = false;
         }
@@ -332,22 +274,14 @@
     }
 
     function escapeHtml(text) {
-        return text
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
+        return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
     
-    // Close dropdown if clicked outside
     document.addEventListener('click', (e) => {
         if (!e.target.closest('.notes-dropdown') && !e.target.closest('.plus-btn')) {
             notesDropdown.style.display = 'none';
         }
     });
-
   </script>
-
 </body>
 </html>
