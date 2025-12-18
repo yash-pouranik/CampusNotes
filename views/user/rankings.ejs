@@ -146,9 +146,9 @@
   <p class="ranking-sub">Based on number of notes uploaded</p>
 
 <div class="ranking-container">
-    <% topUsers.forEach((u, i) => { %>
-      
-      <% 
+    <% topUsers.forEach((u, i) => { %>      
+      <a href="/profile/<%= u._id %>">
+        <% 
         let avatarUrl = u.avatar || '/images/dummy_profile.avif';
 
         // 1. Cloudinary Logic (Same as before)
@@ -188,6 +188,7 @@
         </div>
 
       </div>
+      </a>
     <% }) %>
-  </div>
+</div>
 </section>
