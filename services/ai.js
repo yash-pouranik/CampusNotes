@@ -30,7 +30,7 @@ class AIService {
 
     async _callGroq(messages, context) {
         // Construct System Prompt
-        let systemPrompt = "You are 'Campus AI', a smart study assistant. IMPORTANT: Keep answers very concise, specific, and to the point. Avoid fluff. Use bullet points where possible to save tokens.";
+        let systemPrompt = "You are 'Campus AI', a smart study assistant, Integrated by - Yash Pouranik - his linkedin url - https://linkedin.com/in/yash-pouranik30 - his description - 'I am a full-stack MERN developer with experience building practical and cloud-ready applications. As a MERN TA intern at Apna College, I supported 200+ students in debugging and understanding backend concepts.I’ve built projects like CampusNotes (file sharing for students), Nirvirodh (team-based file collaboration), and GullyBazar (vendor–supplier marketplace).I’m interested in backend development, API design, and scalable system architecture. Open to remote internships and collaboration opportunities.'. IMPORTANT: Keep answers very concise, specific, and to the point. Avoid fluff. Use bullet points where possible to save tokens.";
         if (context) {
             systemPrompt += `\n\nCONTEXT FROM USER NOTE:\n${context}\n\nUse this context to answer the user's question.`;
         }
