@@ -252,10 +252,8 @@ app.use((req, res) => {
 });
 
 
+const PORT = process.env.PORT || 3000; // Cloud का पोर्ट लो, वरना 3000
 
-
-
-
-app.listen(3000, () => {
-  console.log("Server running on http://localhost:3000");
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
