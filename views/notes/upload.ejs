@@ -87,9 +87,8 @@
 
         <input type="file" name="file" id="file" accept="application/pdf" required>
 
-        <p class="error-text" id="fileError">❌ File must be a PDF and less than 10MB.</p>
+        <p class="error-text" id="fileError">X - File must be a PDF and less than 10MB.</p>
       </div>
-      <p class="error-text" id="fileError">❌ File must be a PDF and less than 5MB.</p>
     </div>
 
     <button type="submit" class="form-submit-btn">Upload Note</button>
@@ -263,12 +262,30 @@ const fileLabel = document.getElementById("fileLabel");
 fileBox.addEventListener("click", () => fileInput.click());
 
 fileInput.addEventListener("change", () => {
-  if (fileInput.files.length > 0) {
-    fileLabel.textContent = fileInput.files[0].name;
-    fileLabel.style.color = "#e6eef8"; // make text visible
+  const file = fileInput.files[0];
+
+  if (file) {
+    // 10MB Validation (10 * 1024 * 1024 bytes)
+    const maxSize = 10 * 1024 * 1024; 
+
+    if (file.size > maxSize) {
+      // अगर फाइल बड़ी है तो Error दिखाएं और फाइल हटा दें
+      fileError.style.display = "block";
+      fileError.innerText = "❌ File is too large! Max limit is 10MB.";
+      
+      fileInput.value = ""; // Input reset करें
+      fileLabel.textContent = "Select PDF...";
+      fileLabel.style.color = "var(--muted)";
+    } else {
+      // अगर फाइल सही है
+      fileError.style.display = "none";
+      fileLabel.textContent = file.name;
+      fileLabel.style.color = "#e6eef8";
+    }
   } else {
     fileLabel.textContent = "Select PDF...";
     fileLabel.style.color = "var(--muted)";
+    fileError.style.display = "none";
   }
 });
 
