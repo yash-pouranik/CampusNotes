@@ -1,16 +1,19 @@
-/* NAVBAR */
+/* =========================================
+   LIGHTWEIGHT NAVBAR UI
+   ========================================= */
+
 .neon-nav {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   padding: 12px 24px;
-  background: rgba(5, 5, 5, 0.85);
-  /* Deep Black Glass */
-  backdrop-filter: blur(12px);
+  background: rgba(10, 10, 10, 0.95);
+  backdrop-filter: blur(8px);
   z-index: 999;
-  border-bottom: 1px solid #27272A;
-  /* Zinc-800 */
+  border-bottom: 1px solid #27272a;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  transition: background 0.2s ease;
 }
 
 .nav-inner {
@@ -30,10 +33,13 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
+  transition: opacity 0.2s ease;
 }
 
-
+.nav-brand:hover {
+  opacity: 0.8;
+}
 
 /* TOGGLE BUTTON */
 .nav-toggle {
@@ -44,8 +50,15 @@
   flex-direction: column;
   justify-content: space-around;
   background: transparent;
-  border: none;
+  border: 1px solid #3f3f46;
+  border-radius: 4px;
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nav-toggle:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: #52525b;
 }
 
 .nav-toggle span {
@@ -62,46 +75,59 @@
   flex-direction: column;
   position: absolute;
   top: 100%;
-  right: 20px;
+  right: 24px;
   width: 220px;
-  background: #0A0A0A;
-  border: 1px solid #27272A;
+  background: #0a0a0a;
+  border: 1px solid #27272a;
   border-radius: 8px;
   padding: 8px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  margin-top: 8px;
 }
 
 .nav-menu.active {
   display: flex;
-  animation: fadeIn 0.2s ease;
+  animation: fadeIn 0.15s ease-out;
 }
 
 .nav-menu a {
   padding: 10px 16px;
   color: #a1a1aa;
-  /* Gray-400 */
   text-decoration: none;
   font-size: 0.9rem;
   font-weight: 500;
   border-radius: 6px;
   transition: all 0.2s;
+  display: block;
 }
 
 .nav-menu a:hover {
-  background: #27272A;
+  background: #27272a;
   color: #fff;
 }
 
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(-4px);
+    transform: translateY(-5px);
   }
 
   to {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* ADMIN STYLES */
+.nav-menu a[href*="admin"] {
+  border-left: 2px solid #8b5cf6;
+  padding-left: 14px;
+}
+
+.nav-menu a[href="/logout"] {
+  border-top: 1px solid #27272a;
+  margin-top: 4px;
+  padding-top: 12px;
 }
 
 /* ============================ */

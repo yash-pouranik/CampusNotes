@@ -1,422 +1,548 @@
 <%- contentFor('body') %>
 
-<%- contentFor('body') %>
+<head>
+    <!-- Dependencies -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#FF5722", 
+              "primary-hover": "#F4511E",
+              "background-dark": "#050505", // Deep Black
+              "surface-dark": "#0A0A0A",    // Soft Black
+              "surface-dark-lighter": "#171717", // Lighter Black
+              "border-dark": "#27272A",     // Border Gray
+            },
+            fontFamily: {
+              "display": ["Inter", "system-ui", "sans-serif"]
+            }
+          },
+        },
+      }
+    </script>
+    <style>
+        /* Force Full Screen Layout */
+        body { 
+            overflow: hidden !important; 
+            padding: 0 !important;
+            margin: 0 !important;
+            height: 100vh;
+            background-color: #050505 !important;
+            color: #ececf1;
+            padding-top: 70px !important; /* Navbar Safe Area */
+        }
+        .page-wrapper {
+             max-width: 100vw !important;
+             padding: 0 !important;
+             margin: 0 !important;
+             height: calc(100vh - 70px);
+        }
+        footer { display: none !important; }
 
-<div class="chat-layout-wrapper">
+        /* Custom Scrollbar */
+        .custom-scroll { scrollbar-width: thin; scrollbar-color: #27272A transparent; }
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background-color: #27272A; border-radius: 20px; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background-color: #FF5722; }
 
-  <!-- Sidebar: Chat History -->
-  <aside class="chat-sidebar">
-    
-    <div class="sidebar-header">
-      <h3>My Chats</h3>
-      <p><%= userChatsCount %> / <%= maxChats %> used</p>
-    </div>
+        /* Markdown Style Overrides for Dark Theme */
+        .markdown-body { font-size: 0.95rem; line-height: 1.6; color: #d1d5db; }
+        .markdown-body strong { color: white; }
+        .markdown-body h1, .markdown-body h2, .markdown-body h3 { color: white; font-weight: 600; margin-top: 1rem; margin-bottom: 0.5rem; }
+        .markdown-body p { margin-bottom: 0.75rem; }
+        .markdown-body ul, .markdown-body ol { padding-left: 1.5rem; margin-bottom: 0.75rem; list-style: disc; }
+        .markdown-body a { color: #FF5722; text-decoration: underline; }
+        .markdown-body code { background: rgba(255,87,34,0.1); color: #FF8A65; padding: 2px 4px; border-radius: 4px; font-family: monospace; font-size: 0.9em; }
+        .markdown-body pre { background: #000000; padding: 15px; border-radius: 8px; overflow-x: auto; margin-bottom: 1rem; border: 1px solid #27272A; }
+        .markdown-body pre code { background: transparent; color: #e5e7eb; padding: 0; border: none; }
+        
+        /* Typing Cursor Animation */
+        .typing-cursor {
+            display: inline-block;
+            width: 8px;
+            height: 1em;
+            background-color: #FF5722;
+            margin-left: 2px;
+            animation: blink 1s infinite;
+            vertical-align: text-bottom;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        
+        /* Mobile View Toggle */
+        @media (max-width: 768px) {
+            .mobile-hidden { display: none !important; }
+            .mobile-flex { display: flex !important; }
+        }
+    </style>
+</head>
 
-    <!-- New Chat Button -->
-    <div style="padding: 15px;">
-      <button onclick="openNewChatModal()" class="btn-new-chat" <%= userChatsCount >= maxChats ? 'disabled' : '' %>>
-        <i class="fa-solid fa-plus"></i> New Chat
-      </button>
-      <% if (userChatsCount >= maxChats) { %>
-        <p style="font-size: 11px; color: #ff7171; margin-top: 5px; text-align: center;">Limit reached.</p>
-      <% } %>
-    </div>
+<div class="flex h-full w-full overflow-hidden text-gray-100 font-display relative bg-background-dark">
 
-    <!-- List -->
-    <div class="chat-list">
-      <% if (chatHistory.length === 0) { %>
-        <div style="text-align: center; padding: 20px; color: var(--muted); font-size: 14px;">No chats yet</div>
-      <% } else { %>
-        <% chatHistory.forEach(chat => { %>
-          <div class="chat-list-item <%= currentChat && currentChat._id.toString() === chat._id.toString() ? 'active' : '' %>" 
-               onclick="window.location.href='/chat?id=<%= chat._id %>'">
-            
-            <div class="chat-item-title">
-              <%= chat.noteTitle || chat.title || 'General Chat' %>
-            </div>
-            <div class="chat-item-date">
-              <%= new Date(chat.lastActivity).toLocaleDateString() %>
-            </div>
-
-            <button class="delete-chat-btn" onclick="event.stopPropagation(); deleteChat('<%= chat._id %>')">
-              <i class="fa-solid fa-trash"></i>
+    <!-- SIDEBAR: Chat History -->
+    <aside id="chat-sidebar" class="w-full md:w-[280px] flex-shrink-0 flex flex-col bg-surface-dark border-r border-border-dark transition-all duration-300 z-20 h-full <%= currentChat ? 'mobile-hidden' : '' %>">
+        
+        <!-- New Chat Button -->
+        <div class="p-4">
+            <button onclick="openNewChatModal()" <%= userChatsCount >= maxChats ? 'disabled' : '' %> 
+                class="w-full bg-primary/10 hover:bg-primary/20 border border-primary/20 text-primary font-medium text-sm py-3 px-3 rounded-xl transition-all flex items-center gap-3 justify-center group">
+                <span class="material-icons text-sm group-hover:rotate-90 transition-transform">add</span>
+                New Chat
             </button>
-          </div>
-        <% }) %>
-      <% } %>
-    </div>
-  </aside>
-
-  <!-- Main: Chat Interface -->
-  <main class="chat-main">
-    
-    <% if (currentChat) { %>
-      <!-- Header -->
-      <div class="chat-main-header">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <!-- Mobile Back Button -->
-          <button class="mobile-back-btn" onclick="showMobileSidebar()">
-              <i class="fa-solid fa-arrow-left"></i>
-          </button>
-          
-          <div>
-            <h2><%= currentChat.noteTitle %></h2>
-            <!-- Context Badge (Clickable to change/new) -->
-            <div class="chat-context-badge" onclick="openNewChatModal()" title="Change Context">
-               <i class="fa-regular fa-file-lines" style="color: var(--accent);"></i>
-               <span><%= currentChat.noteTitle %></span>
-               <i class="fa-solid fa-pen" style="font-size: 10px; margin-left: 5px;"></i>
-            </div>
-          </div>
         </div>
-      </div>
 
-      <!-- Messages -->
-      <div id="full-chat-messages" class="full-chat-messages">
-        <% currentChat.messages.forEach(msg => { %>
-          <% if (msg.role !== 'system') { %>
-            <div class="full-message <%= msg.role %>">
-              <div class="msg-avatar">
-                <% if (msg.role === 'user') { %>
-                  <i class="fa-regular fa-user"></i>
-                <% } else { %>
-                  <i class="fa-solid fa-dice"></i>
-                <% } %>
-              </div>
-              <div class="msg-content markdown-body"><%= msg.content %></div>
-            </div>
-          <% } %>
-        <% }) %>
-      </div>
+        <!-- Limit Warning -->
+        <% if (userChatsCount >= maxChats) { %>
+            <div class="px-4 pb-2 text-xs text-red-400 text-center">Chat limit reached (<%= maxChats %>)</div>
+        <% } %>
 
-      <!-- Input -->
-      <div class="chat-input-wrapper">
-        <div style="display: flex; gap: 10px; max-width: 900px; margin: 0 auto;">
-          <input type="text" id="full-chat-input" placeholder="Type your message..." autocomplete="off">
-          <button onclick="sendFullConnectMessage()" id="full-send-btn" class="send-btn">
-            <i class="fa-solid fa-paper-plane"></i>
-          </button>
+        <!-- List -->
+        <div class="flex-1 overflow-y-auto custom-scroll px-3 space-y-1 pb-4">
+            <% if (chatHistory.length === 0) { %>
+                <div class="text-center py-10 text-gray-500 text-sm">No chats yet</div>
+            <% } else { %>
+                <div class="text-xs font-bold text-gray-500 px-2 py-2 uppercase tracking-wide">Recents</div>
+                <% chatHistory.forEach(chat => { %>
+                    <div onclick="window.location.href='/chat?id=<%= chat._id %>'" 
+                         class="group relative flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all border border-transparent <%= currentChat && currentChat._id.toString() === chat._id.toString() ? 'bg-surface-dark-lighter border-border-dark shadow-sm' : 'hover:bg-surface-dark-lighter' %>">
+                        
+                        <span class="material-icons text-gray-500 group-hover:text-primary transition-colors text-sm">chat_bubble_outline</span>
+                        
+                        <div class="flex-1 min-w-0 overflow-hidden">
+                            <h3 class="text-sm text-gray-300 group-hover:text-white truncate transition-colors"><%= chat.noteTitle || chat.title || 'General Chat' %></h3>
+                        </div>
+                        
+                        <!-- Delete specific chat -->
+                        <button onclick="event.stopPropagation(); deleteChat('<%= chat._id %>')" 
+                            class="text-gray-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                             <span class="material-icons text-sm">delete</span>
+                        </button>
+                    </div>
+                <% }) %>
+            <% } %>
         </div>
-      </div>
+    </aside>
 
-    <% } else { %>
-      <br><br> <br>
-      <div class="empty-state-container">
-        <h3 style="font-size: 24px; color: var(--text); margin-bottom: 10px; text-align: center;">Select a chat or start a new one</h3>
-        <p style="text-align: center;">You can manage up to <%= maxChats %> concurrent chats.</p>
-       
-      </div>
-    <% } %>
 
-  </main>
+    <!-- MAIN: Chat Area -->
+    <main id="chat-main" class="flex-1 flex flex-col relative h-full bg-background-dark <%= currentChat ? '' : 'mobile-hidden' %>">
+        
+        <% if (currentChat) { %>
+            <!-- Header (Mobile Only) -->
+            <header class="flex items-center justify-between px-4 py-3 border-b border-border-dark bg-surface-dark/95 backdrop-blur md:hidden z-10">
+                <button onclick="toggleMobileSidebar()" class="text-gray-300">
+                    <span class="material-icons">arrow_back</span>
+                </button>
+                <div class="font-bold truncate text-sm text-white"><%= currentChat.noteTitle %></div>
+                <button onclick="openNewChatModal()" class="text-primary">
+                    <span class="material-icons">add</span>
+                </button>
+            </header>
+
+            <!-- Messages Container -->
+            <div id="chat-messages" class="flex-1 overflow-y-auto custom-scroll w-full scroll-smooth pb-32">
+                 <% currentChat.messages.forEach(msg => { %>
+                    <% if (msg.role !== 'system') { %>
+                        <!-- Message Row -->
+                        <div class="w-full border-b border-white/5 <%= msg.role === 'user' ? 'bg-transparent' : 'bg-surface-dark' %>">
+                            <div class="max-w-3xl mx-auto flex gap-4 p-5 md:p-8 text-base m-auto">
+                                
+                                <!-- Avatar -->
+                                <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 shadow-lg <%= msg.role === 'user' ? 'bg-gradient-to-br from-primary to-orange-600' : 'bg-surface-dark-lighter border border-border-dark' %>">
+                                    <% if (msg.role === 'user') { %>
+                                        <span class="material-icons text-white text-sm">person</span>
+                                    <% } else { %>
+                                         <span class="material-icons text-primary text-sm">auto_awesome</span>
+                                    <% } %>
+                                </div>
+                                
+                                <!-- Content -->
+                                <div class="relative flex-1 overflow-hidden">
+                                     <div class="markdown-body"><%= msg.content %></div>
+                                </div>
+                            </div>
+                        </div>
+                    <% } %>
+                <% }) %>
+            </div>
+
+            <!-- Input Area (Fixed Bottom) -->
+            <div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-background-dark via-background-dark to-transparent pt-10 pb-6 px-4">
+                <div class="max-w-3xl mx-auto relative group">
+                    <div class="relative flex items-end w-full p-2 bg-surface-dark-lighter border border-border-dark rounded-2xl shadow-2xl focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20 transition-all">
+                        <textarea id="chat-input" rows="1"
+                            class="w-full max-h-[200px] bg-transparent border-0 text-white focus:ring-0 resize-none py-3 pr-12 pl-4 custom-scroll outline-none placeholder-gray-500"
+                            placeholder="Ask anything about your notes..."></textarea>
+                        
+                        <button onclick="sendMessage()" id="send-btn" 
+                            class="absolute right-3 bottom-2.5 p-2 rounded-xl bg-primary hover:bg-primary-hover text-white shadow-lg shadow-primary/20 transition-all disabled:opacity-50 disabled:grayscale cursor-pointer">
+                            <span class="material-icons text-sm flex items-center">send</span>
+                        </button>
+                    </div>
+                     <p class="text-[10px] text-center text-gray-600 mt-3 font-mono">CampusNotes AI can make mistakes. Verify important info.</p>
+                </div>
+            </div>
+
+        <% } else { %>
+            <!-- Empty State -->
+            <div class="flex-1 flex flex-col items-center justify-center text-center p-8 h-full bg-background-dark">
+                <div class="w-20 h-20 bg-surface-dark border border-border-dark rounded-2xl flex items-center justify-center mb-8 shadow-2xl shadow-primary/5 relative">
+                    <div class="absolute inset-0 bg-primary/20 blur-xl rounded-full"></div>
+                    <span class="material-icons text-5xl text-primary relative z-10">auto_awesome</span>
+                </div>
+                <h2 class="text-3xl font-extrabold text-white mb-3">CampusNotes AI</h2>
+                <p class="text-gray-400 mb-10 max-w-sm text-sm leading-relaxed">Unlock insights from your study materials. Select a note to start chatting.</p>
+                
+                <button onclick="openNewChatModal()" class="px-6 py-3 bg-white text-black font-bold rounded-full hover:bg-gray-200 transition-all flex items-center gap-2 shadow-xl hover:shadow-2xl transform hover:-translate-y-0.5">
+                    <span class="material-icons text-black text-sm">add</span>
+                    Start New Chat
+                </button>
+            </div>
+        <% } %>
+    </main>
+
 </div>
 
-<!-- Modal for Note Selection -->
-<div id="noteSelectModal" style="display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; justify-content:center; align-items:center; backdrop-filter: blur(5px);">
-  <div class="modal-content" style="padding:25px; border-radius:20px; width:450px; max-height:80vh; display:flex; flex-direction:column; box-shadow:0 20px 60px rgba(0,0,0,0.6);">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-        <h3 style="margin:0; color:var(--text);">Select Specific Note</h3>
-        <button onclick="closeNewChatModal()" style="background:none; border:none; color:var(--muted); font-size:20px; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+<!-- Modal: New Chat -->
+<div id="new-chat-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/90 backdrop-blur-sm p-4 animate-fade-in">
+    <div class="w-full max-w-lg bg-surface-dark border border-border-dark rounded-2xl shadow-2xl flex flex-col max-h-[80vh]">
+        
+        <!-- Header -->
+        <div class="flex items-center justify-between p-5 border-b border-border-dark">
+            <h3 class="text-lg font-bold text-white">Select a Note</h3>
+            <button onclick="closeNewChatModal()" class="text-gray-500 hover:text-white transition-colors">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+        
+        <!-- Search -->
+        <div class="p-4 border-b border-border-dark/50">
+             <div class="relative">
+                <span class="material-icons absolute left-3 top-3 text-gray-500 text-sm">search</span>
+                <input type="text" id="modal-search" onkeyup="filterModalNotes()" 
+                    class="w-full bg-background-dark border border-border-dark rounded-xl py-2.5 pl-10 pr-4 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-primary transition-colors"
+                    placeholder="Search your notes...">
+            </div>
+        </div>
+        
+        <!-- List -->
+        <div id="modal-note-list" class="flex-1 overflow-y-auto custom-scroll p-2 space-y-1">
+            <!-- Populated by JS -->
+        </div>
+
+        <div class="p-4 border-t border-border-dark bg-surface-dark-lighter/50 rounded-b-2xl">
+             <button onclick="createChatWithNote(null)" class="w-full py-3 bg-white/5 hover:bg-white/10 text-primary font-medium rounded-xl text-sm transition-colors flex items-center justify-center gap-2">
+                Skip & Start General Chat
+                <span class="material-icons text-xs">arrow_forward</span>
+            </button>
+        </div>
     </div>
-    
-    <div class="dropdown-search" style="background: transparent; padding: 0 0 15px 0;">
-         <input type="text" id="modal-search" placeholder="Search notes..." onkeyup="filterModalNotes()">
-    </div>
-    
-    <div id="modal-note-list" style="flex:1; overflow-y:auto; border:1px solid rgba(255,255,255,0.05); border-radius:12px; display:flex; flex-direction:column;">
-        <!-- Notes populated by JS -->
-    </div>
-    
-    <div style="margin-top:20px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.05); text-align:center;">
-        <button onclick="createChatWithNote(null)" style="background:none; border:none; color:var(--accent); cursor:pointer; font-size:14px; font-weight: 600;">Skip & Start General Chat <i class="fa-solid fa-arrow-right"></i></button>
-    </div>
-  </div>
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-      // Use global converter from layout.ejs
-      const converter = new showdown.Converter({ 
-          tables: true, 
-          tasklists: true, 
-          strikethrough: true, 
-          simplifiedAutoLink: true 
-      }); // Initialize converter with Tables support
-      
-      const currentChatId = "<%= currentChat ? currentChat._id : '' %>";
-      let chatMessagesBox = document.getElementById('full-chat-messages');
-      const chatInput = document.getElementById('full-chat-input');
-      const sendBtn = document.getElementById('full-send-btn');
+    document.addEventListener('DOMContentLoaded', () => {
+        const converter = new showdown.Converter({ tables: true, tasklists: true, strikethrough: true, simplifiedAutoLink: true });
+        const currentChatId = "<%= currentChat ? currentChat._id : '' %>";
+        const messageBox = document.getElementById('chat-messages');
+        const input = document.getElementById('chat-input');
+        const sendBtn = document.getElementById('send-btn');
+        const sidebar = document.getElementById('chat-sidebar');
+        const main = document.getElementById('chat-main');
+        
+        // Auto-resize textarea
+        if(input) {
+            input.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+            input.addEventListener('keydown', (e) => {
+                if(e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+        }
 
-      // Scroll to bottom
-      if (chatMessagesBox) chatMessagesBox.scrollTop = chatMessagesBox.scrollHeight;
+        // Scroll to bottom Logic
+        function scrollToBottom() {
+            if (messageBox) {
+                 messageBox.scrollTop = messageBox.scrollHeight;
+            }
+        }
+        scrollToBottom();
 
-      // Render Initial Markdown
-      document.querySelectorAll('.msg-content').forEach(el => {
-          if (!el.dataset.rendered) {
-              // Check if converter exists
-              if (typeof converter !== 'undefined') {
-                 // Use textContent to preserve whitespace/newlines correctly from the EJS output
-                 // Trim slightly to avoid excessive padding if EJS introduced newlines
-                 const rawText = el.textContent; 
-                 if(rawText.trim()) {
+        // Render Markdown
+        document.querySelectorAll('.markdown-body').forEach(el => {
+            if (!el.dataset.rendered) {
+                const rawText = el.textContent; 
+                if(rawText.trim()) {
                     el.innerHTML = converter.makeHtml(rawText);
-                 }
-              }
-              el.dataset.rendered = true;
-          }
-      });
+                }
+                el.dataset.rendered = true;
+            }
+        });
 
-      // --- New Chat Logic ---
-      window.openNewChatModal = function() { // Expose to global for button onclick
-          const noteModal = document.getElementById('noteSelectModal');
-          const modalNoteList = document.getElementById('modal-note-list');
-          let noteSelectionNotes = [];
-          
-          noteModal.style.display = 'flex';
-          modalNoteList.innerHTML = '<p style="text-align:center; color:#94a3b8;">Loading notes...</p>';
-          
-          axios.get('/api/notes/list')
-              .then(res => {
-                  noteSelectionNotes = res.data;
-                  renderModalNotes(noteSelectionNotes, modalNoteList);
-                  
-                  // Setup Search
-                  window.filterModalNotes = function() {
-                      const query = document.getElementById('modal-search').value.toLowerCase();
-                      const filtered = noteSelectionNotes.filter(n => n.title.toLowerCase().includes(query));
-                      renderModalNotes(filtered, modalNoteList);
-                  }
-              })
-              .catch(err => {
-                  modalNoteList.innerHTML = '<p style="color:red; text-align:center;">Failed to load notes.</p>';
-              });
-      };
+        window.toggleMobileSidebar = function() {
+            sidebar.classList.remove('mobile-hidden');
+            main.classList.add('mobile-hidden');
+        };
 
-      window.closeNewChatModal = function() {
-          document.getElementById('noteSelectModal').style.display = 'none';
-      };
+        // --- New Chat Modal ---
+        window.openNewChatModal = function() {
+            const modal = document.getElementById('new-chat-modal');
+            const list = document.getElementById('modal-note-list');
+            let allNotes = [];
+            
+            modal.classList.remove('hidden');
+            list.innerHTML = '<div class="text-center py-8 text-gray-500 text-sm"><span class="material-icons animate-spin mr-2 text-primary">sync</span>Loading...</div>';
+            
+            axios.get('/api/notes/list')
+                .then(res => {
+                    allNotes = res.data;
+                    renderNotes(allNotes, list);
+                    window.filterModalNotes = function() {
+                        const q = document.getElementById('modal-search').value.toLowerCase();
+                        const filtered = allNotes.filter(n => n.title.toLowerCase().includes(q));
+                        renderNotes(filtered, list);
+                    }
+                })
+                .catch(() => {
+                    list.innerHTML = '<div class="text-center py-8 text-red-500 text-sm">Failed to load notes.</div>';
+                });
+        };
 
-      window.createChatWithNote = function(noteId) {
-          const payload = noteId ? { noteId } : {};
-          axios.post('/api/chat/new', payload)
-              .then(res => {
-                  if (res.data.success) {
-                      window.location.href = `/chat?id=${res.data.chatId}`;
-                  }
-              })
-              .catch(err => {
-                  alert(err.response?.data?.error || "Error creating chat");
-              });
-      };
-      
-      window.deleteChat = async function(id) {
-          if(!confirm("Delete this chat?")) return;
-          try {
-              await axios.delete(`/api/chat/${id}`);
-              window.location.reload();
-          } catch (e) {
-              alert("Failed to delete");
-          }
-      };
+        window.closeNewChatModal = function() {
+            document.getElementById('new-chat-modal').classList.add('hidden');
+        };
 
-      function renderModalNotes(notes, container) {
-          if(notes.length === 0) {
-              container.innerHTML = '<p style="text-align:center; color:#94a3b8;">No notes found.</p>';
-              return;
-          }
-          container.innerHTML = notes.map(n => `
-              <div class="modal-note-item" onclick="createChatWithNote('${n._id}')">
-                  <i class="fa-regular fa-file-lines"></i> ${n.title}
-              </div>
-          `).join('');
-      }
+        document.getElementById('new-chat-modal').addEventListener('click', (e) => {
+             if(e.target.id === 'new-chat-modal') window.closeNewChatModal();
+        });
 
-      // --- Message Logic ---
-      window.sendFullConnectMessage = async function() {
-          const text = chatInput.value.trim();
-          if(!text) return;
-          
-          // Re-fetch in case of weird state
-          chatMessagesBox = document.getElementById('full-chat-messages');
+        function renderNotes(notes, container) {
+            if(notes.length === 0) {
+                container.innerHTML = '<div class="text-center py-8 text-gray-500 text-sm">No notes found.</div>';
+                return;
+            }
+            container.innerHTML = notes.map(n => `
+                <div onclick="createChatWithNote('${n._id}')" 
+                    class="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-white/5 transition-colors group">
+                    <div class="w-8 h-8 rounded-lg bg-surface-dark-lighter border border-border-dark flex items-center justify-center text-gray-500 group-hover:text-primary group-hover:border-primary/30 transition-all">
+                        <span class="material-icons text-sm">description</span>
+                    </div>
+                    <span class="text-sm text-gray-300 font-medium truncate group-hover:text-white transition-colors">${n.title}</span>
+                </div>
+            `).join('');
+        }
 
-          // UI Update
-          const msgDiv = document.createElement('div');
-          msgDiv.className = 'full-message user';
-          msgDiv.innerHTML = `
-            <div class="msg-avatar"><i class="fa-regular fa-user"></i></div>
-            <div class="msg-content">${text}</div>
-          `;
-          chatMessagesBox.appendChild(msgDiv);
-          chatMessagesBox.scrollTop = chatMessagesBox.scrollHeight;
-          chatInput.value = ''; 
-          sendBtn.disabled = true;
+        window.createChatWithNote = function(noteId) {
+            const payload = noteId ? { noteId } : {};
+            axios.post('/api/chat/new', payload)
+                .then(res => {
+                    if (res.data.success) {
+                        window.location.href = `/chat?id=${res.data.chatId}`;
+                    }
+                })
+                .catch(err => alert("Error creating chat"));
+        };
 
-          // Loading UI
-          const loadDiv = document.createElement('div');
-          loadDiv.className = 'full-message ai';
-          loadDiv.id = 'loading-msg';
-          loadDiv.innerHTML = `
-            <div class="msg-avatar"><i class="fa-solid fa-dice"></i></div>
-            <div class="msg-content"><i class="fa-solid fa-circle-notch fa-spin"></i></div>
-          `;
-          chatMessagesBox.appendChild(loadDiv);
+        window.deleteChat = async function(id) {
+            if(!confirm("Delete chat?")) return;
+            try {
+                await axios.delete(`/api/chat/${id}`);
+                window.location.href = '/chat';
+            } catch (e) {
+                alert("Failed to delete chat");
+            }
+        };
 
-          try {
-              const res = await axios.post(`/api/chat/${currentChatId}/message`, { message: text });
-              
-              loadDiv.remove();
-              
-              const aiDiv = document.createElement('div');
-              aiDiv.className = 'full-message ai';
-              aiDiv.innerHTML = `
-                <div class="msg-avatar"><i class="fa-solid fa-dice"></i></i></div>
-                <div class="msg-content">${typeof converter !== 'undefined' ? converter.makeHtml(res.data.reply) : res.data.reply}</div>
-              `;
-              chatMessagesBox.appendChild(aiDiv);
-              chatMessagesBox.scrollTop = chatMessagesBox.scrollHeight;
+        // --- Messaging ---
+        window.sendMessage = async function() {
+            const text = input.value.trim();
+            if(!text) return;
 
-          } catch (error) {
-              console.error(error);
-              loadDiv.innerHTML = `<div class="msg-content text-red">Failed to send message.</div>`;
-          } finally {
-              sendBtn.disabled = false;
-          }
-      };
-      
-      // Enter key
-      if(chatInput) {
-          chatInput.addEventListener('keypress', (e) => {
-              if (e.key === 'Enter') sendFullConnectMessage();
-          });
-      }
+            appendMessage(text, 'user');
+            input.value = '';
+            input.style.height = 'auto'; 
+            sendBtn.disabled = true;
 
+            // Create streaming AI message
+            const aiMessageId = 'ai-msg-' + Date.now();
+            appendStreamingMessage(aiMessageId);
 
-      // Modal Outside Click
-      const noteModal = document.getElementById('noteSelectModal');
-      if (noteModal) {
-          noteModal.addEventListener('click', (e) => {
-              if (e.target.id === 'noteSelectModal') closeNewChatModal();
-          });
-      }
+            try {
+                // Use fetch for streaming instead of EventSource (better for POST)
+                const response = await fetch(`/api/chat/${currentChatId}/message/stream`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: text })
+                });
 
-      // --- Mobile Responsiveness Logic ---
-      window.showMobileSidebar = function() {
-          const wrapper = document.querySelector('.chat-layout-wrapper');
-          wrapper.classList.toggle('show-sidebar');
-      };
-      
-      // Auto-hide sidebar on selection (mobile)
-      if (window.innerWidth < 768) {
-         document.querySelectorAll('.chat-list-item').forEach(item => {
-             item.addEventListener('click', () => {
-                 document.querySelector('.chat-layout-wrapper').classList.remove('show-sidebar');
-             });
-         });
-      }
-  });
+                if (!response.ok) {
+                    throw new Error('Streaming failed');
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    
+                    if (done) break;
+
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    
+                    // Keep the last incomplete line in buffer
+                    buffer = lines.pop() || '';
+
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const data = line.slice(6);
+                            
+                            if (data === '[DONE]') {
+                                finalizeStreamingMessage(aiMessageId);
+                                continue;
+                            }
+
+                            try {
+                                const parsed = JSON.parse(data);
+                                if (parsed.chunk) {
+                                    appendChunkToMessage(aiMessageId, parsed.chunk);
+                                } else if (parsed.error) {
+                                    showStreamError(aiMessageId, parsed.error);
+                                }
+                            } catch (e) {
+                                // Skip invalid JSON
+                            }
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error('Streaming error:', e);
+                showStreamError(aiMessageId, 'Failed to send message.');
+            } finally {
+                sendBtn.disabled = false;
+                input.focus();
+            }
+        };
+
+        function appendMessage(text, role) {
+            const isUser = role === 'user';
+            
+            const html = `
+                <div class="w-full border-b border-white/5 ${isUser ? 'bg-transparent' : 'bg-surface-dark'} animate-fade-in-up">
+                    <div class="max-w-3xl mx-auto flex gap-4 p-5 md:p-8 text-base m-auto">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 shadow-lg ${isUser ? 'bg-gradient-to-br from-primary to-orange-600' : 'bg-surface-dark-lighter border border-border-dark'}">
+                             <span class="material-icons ${isUser ? 'text-white' : 'text-primary'} text-sm">${isUser ? 'person' : 'auto_awesome'}</span>
+                        </div>
+                        <div class="relative flex-1 overflow-hidden">
+                                <div class="markdown-body">${role !== 'error' ? converter.makeHtml(text) : text}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            messageBox.insertAdjacentHTML('beforeend', html);
+            scrollToBottom();
+        }
+
+        // NEW: Create streaming message placeholder with typing cursor
+        function appendStreamingMessage(id) {
+            const html = `
+                <div id="${id}" class="w-full border-b border-white/5 bg-surface-dark">
+                    <div class="max-w-3xl mx-auto flex gap-4 p-5 md:p-8 text-base m-auto">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 shadow-lg bg-surface-dark-lighter border border-border-dark">
+                             <span class="material-icons text-primary text-sm">auto_awesome</span>
+                        </div>
+                        <div class="relative flex-1 overflow-hidden">
+                            <div class="markdown-body" data-content=""><span class="typing-cursor"></span></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            messageBox.insertAdjacentHTML('beforeend', html);
+            scrollToBottom();
+        }
+
+        // NEW: Append chunk to streaming message
+        let renderTimeout = null;
+        function appendChunkToMessage(id, chunk) {
+            const messageEl = document.getElementById(id);
+            if (!messageEl) return;
+
+            const contentDiv = messageEl.querySelector('.markdown-body');
+            const currentContent = contentDiv.dataset.content || '';
+            const newContent = currentContent + chunk;
+            contentDiv.dataset.content = newContent;
+
+            // Debounced markdown rendering (every 50ms max)
+            clearTimeout(renderTimeout);
+            renderTimeout = setTimeout(() => {
+                const cursor = contentDiv.querySelector('.typing-cursor');
+                contentDiv.innerHTML = converter.makeHtml(newContent);
+                if (cursor) {
+                    contentDiv.appendChild(cursor);
+                }
+                scrollToBottom();
+            }, 50);
+        }
+
+        // NEW: Finalize streaming message (remove cursor)
+        function finalizeStreamingMessage(id) {
+            const messageEl = document.getElementById(id);
+            if (!messageEl) return;
+
+            const contentDiv = messageEl.querySelector('.markdown-body');
+            const finalContent = contentDiv.dataset.content || '';
+            
+            // Final render without cursor
+            contentDiv.innerHTML = converter.makeHtml(finalContent);
+            scrollToBottom();
+        }
+
+        // NEW: Show error in streaming message
+        function showStreamError(id, errorMsg) {
+            const messageEl = document.getElementById(id);
+            if (!messageEl) return;
+
+            const contentDiv = messageEl.querySelector('.markdown-body');
+            contentDiv.innerHTML = `<span class="text-red-400">${errorMsg}</span>`;
+        }
+
+        function appendLoading(id) {
+             const html = `
+                <div id="${id}" class="w-full border-b border-white/5 bg-surface-dark animate-pulse">
+                    <div class="max-w-3xl mx-auto flex gap-4 p-5 md:p-8 text-base m-auto">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-surface-dark-lighter border border-border-dark">
+                             <span class="material-icons text-primary text-sm animate-spin">sync</span>
+                        </div>
+                         <div class="relative flex-1 overflow-hidden text-gray-500">
+                                Thinking...
+                        </div>
+                    </div>
+                </div>
+            `;
+            messageBox.insertAdjacentHTML('beforeend', html);
+            scrollToBottom();
+        }
+
+        function removeLoading(id) {
+            const el = document.getElementById(id);
+            if(el) el.remove();
+        }
+    });
 </script>
-
-<style>
-  /* 
-     FORCE OVERRIDES for Chat Page Layout 
-     We need to undo the global padding to make this full-screen.
-  */
-  
-  /* Reset global body/main padding */
-  body { 
-      padding-top: 0 !important;
-      padding-bottom: 0 !important;
-      overflow: hidden !important; 
-      height: 100vh;
-      height: 100dvh; /* Mobile viewport fix */
-  }
-  
-  .page-wrapper {
-      padding: 0 !important;
-      margin: 0 !important;
-      max-width: 100vw !important;
-  }
-
-  footer { 
-      display: none !important; 
-  }
-
-  /* Chat Layout Container */
-  .chat-layout-wrapper { 
-      /* Navbar is usually ~80px-100px. We use flex to fill remainder */
-      margin-top: 80px; 
-      height: calc(100vh - 80px); 
-      height: calc(100dvh - 80px);
-      width: 100%;
-      padding: 0 20px 20px 20px; /* Side/Bottom padding */
-      position: relative;
-      box-sizing: border-box;
-      
-      display: flex;
-      gap: 20px;
-  }
-      .mobile-back-btn { 
-        display: flex;
-        background-color: transparent;
-        border: none;
-        color: var(--text);
-        font-size: 20px;
-        cursor: pointer;
-       }
-
-  /* ... (existing styles) ... */
-
-  /* Mobile Changes */
-  @media (max-width: 768px) {
-      .chat-layout-wrapper {
-          padding: 0; /* Full width on mobile */
-          margin-top: 70px; /* Slightly smaller nav usually */
-          height: calc(100vh - 70px);
-          height: calc(100dvh - 70px);
-      }
-
-
-      
-      .full-chat-messages {
-          padding: 10px; /* Less padding on mobile */
-      }
-      
-      .chat-input-wrapper {
-          padding: 15px;
-          padding-bottom: max(15px, env(safe-area-inset-bottom)); /* iPhone Safe Area */
-      }
-
-      .chat-sidebar {
-          position: absolute;
-          z-index: 50;
-          width: 100%;
-          height: 100%;
-          border-radius: 0;
-          left: 0;
-          top: 0;
-          background: #030811; /* Ensure solid background */
-          display: none; 
-      }
-      
-      .chat-main {
-         width: 100%;
-         height: 100%;
-         border-radius: 0;
-         display: flex;
-      }
-      
-      /* Toggle Classes logic */
-      .chat-layout-wrapper.show-sidebar .chat-sidebar { display: flex; }
-      .chat-layout-wrapper.show-sidebar .chat-main { display: none; }
-      
-      /* Logic for default view */
-      <% if (currentChat) { %>
-         .chat-sidebar { display: none; }
-         .chat-main { display: flex; }
-      <% } else { %>
-         .chat-sidebar { display: flex; } /* Show list by default if no chat selected */
-         .chat-main { display: none; }
-      <% } %>
-  }
-</style>

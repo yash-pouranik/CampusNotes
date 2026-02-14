@@ -1,102 +1,148 @@
-<style>
-  .legal-container {
-    max-width: 800px;
-    margin: 40px auto;
-    padding: 25px 35px;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.07);
-    font-family: 'Segoe UI', sans-serif;
-    line-height: 1.6;
-    color: #333;
-  }
-  .legal-container h1 {
-    font-size: 2rem;
-    color: #1e3a8a;
-    margin-bottom: 10px;
-    text-align: center;
-  }
-  .legal-container h2 {
-    font-size: 1.4rem;
-    color: #2563eb;
-    margin-top: 30px;
-    border-bottom: 2px solid #e0e7ff;
-    padding-bottom: 5px;
-  }
-  .legal-container p, .legal-container li {
-    font-size: 0.95rem;
-    color: #4b5563;
-  }
-  .legal-container strong {
-    color: #1f2937;
-  }
-  .legal-container .last-updated {
-    text-align: center;
-    font-size: 0.9rem;
-    color: #6b7280;
-    margin-bottom: 25px;
-  }
-</style>
-
-<div class="legal-container">
-    <h1>Terms of Service for CampusNotes</h1>
-    <p class="last-updated">Last Updated: September 21, 2025</p>
-
-    <h2>1. Acceptance of Terms</h2>
-    <p>By accessing and using CampusNotes (the "Service"), you accept and agree to be bound by these Terms of Service ("Terms"). If you do not agree to abide by these Terms, please do not use the Service.</p>
-
-    <h2>2. Description of Service</h2>
-    <p>CampusNotes provides a platform for students of Shri Vaishnav Vidyapeeth Vishwavidyalaya (SVVV) to share, download, and request academic notes and study materials ("Content").</p>
-
-    <h2>3. User Conduct and Responsibilities</h2>
-    <p>As a user of the Service, you agree to the following conditions. Breaching these terms may result in the suspension or termination of your account.</p>
-    <ul>
-        <li><strong>Eligibility:</strong> You must be a student or affiliate of SVVV to use all features, especially uploading content.</li>
-        <li><strong>Accurate Information:</strong> You must provide accurate and current information during registration and keep your account details updated.</li>
-        <li><strong>Account Security:</strong> You are responsible for maintaining the confidentiality of your password and for all activities that occur under your account.</li>
-        <li><strong>Prohibited Content:</strong> You agree not to upload, post, or share any Content that is:
-            <ul>
-                <li>Unlawful, harmful, abusive, harassing, defamatory, or obscene.</li>
-                <li>Infringing on any copyright, trademark, patent, or other intellectual property rights of any party.</li>
-                <li>Considered spam, junk mail, or any form of unauthorized solicitation.</li>
-                <li>Containing viruses or any other computer code, files, or programs designed to interrupt, destroy, or limit the functionality of any computer software or hardware.</li>
-            </ul>
-        </li>
-        <li><strong>Prohibited Actions:</strong> You agree not to use the Service to:
-            <ul>
-                <li>Impersonate any person or entity.</li>
-                <li>Interfere with or disrupt the service or servers.</li>
-                <li>Attempt to gain unauthorized access to any portion of the Service.</li>
-            </ul>
-        </li>
-    </ul>
-
-    <h2>4. Intellectual Property Rights</h2>
-    <ul>
-        <li><strong>Your Content:</strong> You retain all ownership rights to the Content you upload.</li>
-        <li><strong>License to Us:</strong> By uploading Content, you grant CampusNotes a worldwide, non-exclusive, royalty-free license to host, display, reproduce, and distribute your Content solely for the purpose of operating, promoting, and improving the Service.</li>
-    </ul>
-
-    <h2>5. Disclaimer of Warranties</h2>
-    <p>The Service is provided "as is". We disclaim all warranties of any kind, express or implied. We do not warrant that the Service will be error-free, secure, or uninterrupted. You use the Service at your own discretion and risk.</p>
-
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
     
-    <h2>6. Academic Responsibility</h2>
-    <p>
-        All Content available on the Service is user-submitted and is intended
-        for reference and supplementary study purposes only. <strong>CampusNotes does
-        not guarantee the accuracy, completeness, or quality of the Content.</strong>
-        You agree that you will not rely solely on the Content for your academic
-        performance. Your grades and results are your own responsibility.
-    </p>
-
-
-    <h2>7. Termination</h2>
-    <p>We may terminate or suspend your access to the Service immediately, without prior notice or liability, for any reason whatsoever, including, without limitation, if you breach the Terms outlined in Section 3.</p>
-
-    <h2>8. Changes to Terms</h2>
-    <p>We reserve the right to modify these Terms at any time. We will provide notice by updating the "Last Updated" date. Your continued use of the Service after any changes constitutes your acceptance of the new Terms.</p>
-
-    <h2>9. Contact Us</h2>
-    <p>If you have any questions about these Terms, please contact us at: <strong>campusnotes@bitbros.in</strong></p>
-</div>
+    <!-- Google Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+    
+    <!-- Tailwind CSS & Config -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#FF5722",
+              "primary-hover": "#F4511E",
+              "background-dark": "#050505",
+              "surface-dark": "#0A0A0A",
+              "surface-dark-lighter": "#171717",
+              "border-dark": "#27272A",
+            },
+            fontFamily: {
+              "display": ["Inter", "system-ui", "sans-serif"]
+            }
+          },
+        },
+      }
+    </script>
+    <style>
+      body {
+        background-color: #050505 !important;
+        color: #d1d5db; /* gray-300 */
+        font-family: 'Inter', sans-serif;
+      }
+      h1, h2, h3 { color: #ffffff; }
+      strong { color: #f3f4f6; /* gray-100 */ }
+      a { color: #FF5722; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      ul { padding-left: 1.5rem; list-style-type: disc; margin-bottom: 1rem; }
+      li { margin-bottom: 0.5rem; }
+    </style>
+  </head>
+  
+  <div class="min-h-screen bg-background-dark font-display antialiased py-20 px-4 sm:px-6 lg:px-8">
+    
+    <div class="max-w-4xl mx-auto bg-surface-dark border border-border-dark rounded-2xl p-8 md:p-12 shadow-2xl">
+        
+        <div class="text-center mb-10 border-b border-border-dark pb-8">
+            <h1 class="text-3xl md:text-4xl font-bold mb-4">Terms of Service</h1>
+            <p class="text-gray-500 font-mono text-sm">Last Updated: September 21, 2025</p>
+        </div>
+  
+        <div class="space-y-8 text-lg leading-relaxed">
+            
+            <section>
+                <h2 class="text-2xl font-bold mb-4 text-white flex items-center gap-2">
+                    <span class="material-icons-outlined text-primary">gavel</span> 1. Acceptance of Terms
+                </h2>
+                <p class="text-gray-400">By accessing and using CampusNotes (the "Service"), you accept and agree to be bound by these Terms of Service ("Terms"). If you do not agree to abide by these Terms, please do not use the Service.</p>
+            </section>
+  
+            <section>
+                <h2 class="text-2xl font-bold mb-4 text-white flex items-center gap-2">
+                    <span class="material-icons-outlined text-blue-500">description</span> 2. Description of Service
+                </h2>
+                <p class="text-gray-400">CampusNotes provides a platform for students of Shri Vaishnav Vidyapeeth Vishwavidyalaya (SVVV) to share, download, and request academic notes and study materials ("Content").</p>
+            </section>
+  
+            <section>
+                <h2 class="text-2xl font-bold mb-4 text-white flex items-center gap-2">
+                    <span class="material-icons-outlined text-red-500">rule</span> 3. User Conduct and Responsibilities
+                </h2>
+                <p class="mb-4 text-gray-400">As a user of the Service, you agree to the following conditions. Breaching these terms may result in the suspension or termination of your account.</p>
+                <ul class="list-disc pl-6 space-y-2 text-gray-400">
+                    <li><strong>Eligibility:</strong> You must be a student or affiliate of SVVV to use all features, especially uploading content.</li>
+                    <li><strong>Accurate Information:</strong> You must provide accurate and current information during registration and keep your account details updated.</li>
+                    <li><strong>Account Security:</strong> You are responsible for maintaining the confidentiality of your password and for all activities that occur under your account.</li>
+                    <li><strong>Prohibited Content:</strong> You agree not to upload, post, or share any Content that is:
+                        <ul class="list-circle pl-6 mt-2 space-y-1">
+                            <li>Unlawful, harmful, abusive, harassing, defamatory, or obscene.</li>
+                            <li>Infringing on any copyright, trademark, patent, or other intellectual property rights of any party.</li>
+                            <li>Considered spam, junk mail, or any form of unauthorized solicitation.</li>
+                            <li>Containing viruses or any other computer code, files, or programs designed to interrupt, destroy, or limit the functionality of any computer software or hardware.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Prohibited Actions:</strong> You agree not to use the Service to:
+                        <ul class="list-circle pl-6 mt-2 space-y-1">
+                            <li>Impersonate any person or entity.</li>
+                            <li>Interfere with or disrupt the service or servers.</li>
+                            <li>Attempt to gain unauthorized access to any portion of the Service.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+  
+            <section>
+                <h2 class="text-2xl font-bold mb-4 text-white flex items-center gap-2">
+                    <span class="material-icons-outlined text-green-500">copyright</span> 4. Intellectual Property Rights
+                </h2>
+                <ul class="list-disc pl-6 space-y-2 text-gray-400">
+                    <li><strong>Your Content:</strong> You retain all ownership rights to the Content you upload.</li>
+                    <li><strong>License to Us:</strong> By uploading Content, you grant CampusNotes a worldwide, non-exclusive, royalty-free license to host, display, reproduce, and distribute your Content solely for the purpose of operating, promoting, and improving the Service.</li>
+                </ul>
+            </section>
+  
+            <section>
+                <h2 class="text-2xl font-bold mb-4 text-white flex items-center gap-2">
+                    <span class="material-icons-outlined text-yellow-500">warning</span> 5. Disclaimer of Warranties
+                </h2>
+                <p class="text-gray-400">The Service is provided "as is". We disclaim all warranties of any kind, express or implied. We do not warrant that the Service will be error-free, secure, or uninterrupted. You use the Service at your own discretion and risk.</p>
+            </section>
+            
+            <section>
+                <h2 class="text-2xl font-bold mb-4 text-white flex items-center gap-2">
+                    <span class="material-icons-outlined text-purple-500">school</span> 6. Academic Responsibility
+                </h2>
+                <p class="text-gray-400">
+                    All Content available on the Service is user-submitted and is intended for reference and supplementary study purposes only. <strong>CampusNotes does not guarantee the accuracy, completeness, or quality of the Content.</strong> You agree that you will not rely solely on the Content for your academic performance. Your grades and results are your own responsibility.
+                </p>
+            </section>
+  
+            <section>
+                <h2 class="text-2xl font-bold mb-4 text-white flex items-center gap-2">
+                    <span class="material-icons-outlined text-red-600">block</span> 7. Termination
+                </h2>
+                <p class="text-gray-400">We may terminate or suspend your access to the Service immediately, without prior notice or liability, for any reason whatsoever, including, without limitation, if you breach the Terms outlined in Section 3.</p>
+            </section>
+  
+            <section>
+                <h2 class="text-2xl font-bold mb-4 text-white flex items-center gap-2">
+                    <span class="material-icons-outlined text-teal-500">update</span> 8. Changes to Terms
+                </h2>
+                <p class="text-gray-400">We reserve the right to modify these Terms at any time. We will provide notice by updating the "Last Updated" date. Your continued use of the Service after any changes constitutes your acceptance of the new Terms.</p>
+            </section>
+  
+            <section class="border-t border-border-dark pt-8 mt-8">
+                <h2 class="text-2xl font-bold mb-4 text-white flex items-center gap-2">
+                    <span class="material-icons-outlined text-blue-500">email</span> 9. Contact Us
+                </h2>
+                <p class="text-gray-400">If you have any questions about these Terms, please contact us at:</p>
+                <p class="mt-2 text-xl font-bold text-white">campusnotes@bitbros.in</p>
+            </section>
+        </div>
+        
+    </div>
+  </div>

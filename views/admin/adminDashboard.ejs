@@ -4,244 +4,331 @@
   <meta charset="UTF-8">
   <title>Admin Dashboard • CampusNotes</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
 
-  <link rel="stylesheet" href="/css/admin.css">
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#FF5722", 
+            "primary-hover": "#F4511E",
+            "background-dark": "#050505",
+            "surface-dark": "#0A0A0A", 
+            "surface-dark-lighter": "#171717",
+            "border-dark": "#27272A",
+            "accent-purple": "#8A2BE2",
+            "accent-blue": "#2979FF"
+          },
+          fontFamily: {
+            "display": ["Inter", "system-ui", "sans-serif"]
+          },
+          animation: {
+            "fade-in": "fadeIn 0.5s ease-out forwards",
+          },
+          keyframes: {
+            fadeIn: {
+              "0%": { opacity: "0", transform: "translateY(10px)" },
+              "100%": { opacity: "1", transform: "translateY(0)" },
+            }
+          }
+        },
+      },
+    }
+  </script>
 
-
+  <style>
+    body {
+      background-color: #050505;
+      color: #e5e7eb;
+      font-family: 'Inter', sans-serif;
+    }
+    .glass-card {
+      background: rgba(10, 10, 10, 0.6);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #050505; }
+    ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #555; }
+  </style>
 </head>
-<body>
+<body class="min-h-screen p-4 mt-14 md:p-8">
 
-<div class="container">
+  <div class="max-w-7xl mx-auto space-y-8 animate-fade-in">
 
-  <!-- HEADER -->
-  <div class="header">
-    <h1><i class="fa-solid fa-gauge-high" style="color:var(--accent2)"></i> Admin Dashboard</h1>
+    <!-- HEADER -->
+    <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
+      <div class="flex items-center gap-3">
+        <div class="p-3 bg-primary/10 rounded-xl border border-primary/20">
+            <i class="fa-solid fa-gauge-high text-primary text-xl"></i>
+        </div>
+        <div>
+            <h1 class="text-2xl font-bold text-white tracking-tight">Admin Dashboard</h1>
+            <p class="text-gray-500 text-sm">Overview of platform performance</p>
+        </div>
+      </div>
 
-    <a href="/logout">
-      <button class="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
-    </a>
+      
+    </div>
+
+    <!-- MAIN STAT CARDS -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <!-- Total Users -->
+      <div class="glass-card rounded-xl p-5 relative overflow-hidden group">
+        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+            <i class="fa-solid fa-users text-4xl text-blue-500"></i>
+        </div>
+        <p class="text-gray-500 text-xs font-medium uppercase tracking-wider mb-1">Total Users</p>
+        <div class="text-2xl font-bold text-white"><%= totalUsers %></div>
+      </div>
+
+      <!-- Total Notes -->
+      <div class="glass-card rounded-xl p-5 relative overflow-hidden group">
+        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+            <i class="fa-solid fa-file-lines text-4xl text-purple-500"></i>
+        </div>
+        <p class="text-gray-500 text-xs font-medium uppercase tracking-wider mb-1">Total Notes</p>
+        <div class="text-2xl font-bold text-white"><%= totalNotes %></div>
+      </div>
+
+      <!-- Total Downloads -->
+      <div class="glass-card rounded-xl p-5 relative overflow-hidden group">
+        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+            <i class="fa-solid fa-download text-4xl text-green-500"></i>
+        </div>
+        <p class="text-gray-500 text-xs font-medium uppercase tracking-wider mb-1">Total Downloads</p>
+        <div class="text-2xl font-bold text-white"><%= totalDownloads %></div>
+      </div>
+
+      <!-- Recent Downloads -->
+      <div class="glass-card rounded-xl p-5 relative overflow-hidden group">
+        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+            <i class="fa-solid fa-calendar-week text-4xl text-orange-500"></i>
+        </div>
+        <p class="text-gray-500 text-xs font-medium uppercase tracking-wider mb-1">Downloads (7d)</p>
+        <div class="text-2xl font-bold text-white"><%= downloadsLast7Days %></div>
+      </div>
+    </div>
+
+    <!-- UNIQUE TRAFFIC -->
+    <div>
+        <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <i class="fa-solid fa-fingerprint text-accent-purple text-sm"></i> Unique Traffic
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="glass-card rounded-xl p-5">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-gray-500 text-xs uppercase">Unique Downloads</p>
+                        <h3 class="text-xl font-bold text-white mt-1"><%= totalUniqueDownloads %></h3>
+                    </div>
+                    <div class="p-2 bg-purple-500/10 rounded-lg text-purple-400"><i class="fa-solid fa-fingerprint"></i></div>
+                </div>
+            </div>
+            <div class="glass-card rounded-xl p-5">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-gray-500 text-xs uppercase">Unique Sessions</p>
+                        <h3 class="text-xl font-bold text-white mt-1"><%= uniqueSessions %></h3>
+                    </div>
+                    <div class="p-2 bg-blue-500/10 rounded-lg text-blue-400"><i class="fa-solid fa-stopwatch"></i></div>
+                </div>
+            </div>
+            <div class="glass-card rounded-xl p-5">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-gray-500 text-xs uppercase">Unique IPs</p>
+                        <h3 class="text-xl font-bold text-white mt-1"><%= uniqueIps %></h3>
+                    </div>
+                    <div class="p-2 bg-green-500/10 rounded-lg text-green-400"><i class="fa-solid fa-network-wired"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- USER ENGAGEMENT & CONTENT -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Engagement -->
+        <div>
+            <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-users text-primary text-sm"></i> Engagement
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="glass-card rounded-xl p-4 text-center">
+                    <i class="fa-solid fa-user-plus text-primary mb-2"></i>
+                    <div class="text-2xl font-bold text-white"><%= newSignups %></div>
+                    <p class="text-xs text-gray-500">New Signups (7d)</p>
+                </div>
+                <div class="glass-card rounded-xl p-4 text-center">
+                    <i class="fa-solid fa-circle-check text-green-500 mb-2"></i>
+                    <div class="text-2xl font-bold text-white"><%= verifiedUsers %></div>
+                    <p class="text-xs text-gray-500">Verified Users</p>
+                </div>
+                <div class="glass-card rounded-xl p-4 text-center">
+                    <i class="fa-solid fa-circle-xmark text-red-500 mb-2"></i>
+                    <div class="text-2xl font-bold text-white"><%= unverifiedUsers %></div>
+                    <p class="text-xs text-gray-500">Unverified</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Moderation -->
+        <div>
+            <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-shield-halved text-yellow-500 text-sm"></i> Moderation
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="glass-card rounded-xl p-5 flex items-center gap-4">
+                    <div class="p-3 bg-yellow-500/10 rounded-full text-yellow-500">
+                        <i class="fa-solid fa-hourglass-half text-xl"></i>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold text-white"><%= notesPendingVerification %></div>
+                        <p class="text-xs text-gray-500">Pending Verification</p>
+                    </div>
+                </div>
+                <div class="glass-card rounded-xl p-5 flex items-center gap-4">
+                    <div class="p-3 bg-blue-500/10 rounded-full text-blue-500">
+                        <i class="fa-solid fa-cloud-arrow-up text-xl"></i>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold text-white"><%= newNoteUploads %></div>
+                        <p class="text-xs text-gray-500">Uploads (7d)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- CHART SECTION -->
+        <div class="lg:col-span-2">
+            <h2 class="text-lg font-semibold text-white mb-4">Notes Distribution</h2>
+            <div class="glass-card rounded-xl p-4 h-[300px] flex items-center justify-center">
+                <canvas id="courseChart" style="max-height: 100%; width: 100%;"></canvas>
+            </div>
+        </div>
+
+        <!-- TOP CONTRIBUTORS -->
+        <div>
+            <h2 class="text-lg font-semibold text-white mb-4">Top Contributors</h2>
+            <div class="space-y-3">
+                <% topContributors.forEach(user => { %>
+                    <div class="glass-card rounded-xl p-3 flex items-center gap-3 hover:bg-surface-dark-lighter transition-colors cursor-default">
+                        <img src="<%= user.avatar || '/images/dummy_profile.avif' %>" class="w-10 h-10 rounded-full object-cover border border-border-dark" alt="">
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-sm font-medium text-white truncate"><%= user.name %></h3>
+                            <p class="text-xs text-gray-500 truncate">@<%= user.username %></p>
+                        </div>
+                        <div class="text-primary font-bold text-sm bg-primary/10 px-2 py-1 rounded-md">
+                            <i class="fa-solid fa-file-pen text-xs mr-1"></i><%= user.notesCount %>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- TABLES GRID -->
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+        
+        <!-- TOP NOTES -->
+        <div>
+            <h2 class="text-lg font-semibold text-white mb-4">Top Notes</h2>
+            <div class="glass-card rounded-xl overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm text-gray-400">
+                        <thead class="bg-surface-dark-lighter text-xs uppercase text-gray-500">
+                            <tr>
+                                <th class="px-6 py-3 font-medium">Title</th>
+                                <th class="px-6 py-3 font-medium">Course</th>
+                                <th class="px-6 py-3 font-medium text-right">Downloads</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-border-dark">
+                            <% topNotes.forEach(note => { %>
+                                <tr class="hover:bg-white/5 transition-colors">
+                                    <td class="px-6 py-3 font-medium text-white truncate max-w-[150px]"><%= note.title %></td>
+                                    <td class="px-6 py-3"><span class="bg-border-dark px-2 py-0.5 rounded text-xs text-gray-300"><%= note.course %></span></td>
+                                    <td class="px-6 py-3 text-right text-primary"><i class="fa-solid fa-download mr-1"></i><%= note.downloadCount %></td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- RECENT ACTIVITY -->
+        <div class="space-y-8">
+            
+            <!-- Recent Users -->
+            <div>
+                <h2 class="text-lg font-semibold text-white mb-4">Recent Users</h2>
+                <div class="glass-card rounded-xl overflow-hidden">
+                    <table class="w-full text-left text-sm text-gray-400">
+                        <thead class="bg-surface-dark-lighter text-xs uppercase text-gray-500">
+                            <tr>
+                                <th class="px-4 py-3">User</th>
+                                <th class="px-4 py-3 text-right">Joined</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-border-dark">
+                            <% fiveLastUsers.forEach(u => { %>
+                                <tr class="hover:bg-white/5 transition-colors">
+                                    <td class="px-4 py-3">
+                                        <div class="font-medium text-white"><%= u.name %></div>
+                                        <div class="text-xs text-gray-500">@<%= u.username %></div>
+                                    </td>
+                                    <td class="px-4 py-3 text-right text-xs"><%= new Date(u.createdAt).toLocaleDateString() %></td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Recent Downloads -->
+            <div>
+                <h2 class="text-lg font-semibold text-white mb-4">Recent Downloads</h2>
+                <div class="glass-card rounded-xl overflow-hidden">
+                    <table class="w-full text-left text-sm text-gray-400">
+                        <thead class="bg-surface-dark-lighter text-xs uppercase text-gray-500">
+                            <tr>
+                                <th class="px-4 py-3">Note</th>
+                                <th class="px-4 py-3 text-right">Time</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-border-dark">
+                            <% LastDownloads.forEach(dl => { %>
+                                <tr class="hover:bg-white/5 transition-colors">
+                                    <td class="px-4 py-3 truncate max-w-[200px] text-white"><%= dl.note ? dl.note.title : 'Unknown' %></td>
+                                    <td class="px-4 py-3 text-right text-xs"><%= new Date(dl.downloadedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) %></td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
   </div>
-
-  <!-- MAIN STAT CARDS -->
-  <div class="grid grid-4">
-    <div class="card stat">
-      <div>
-        <p class="stat-title">Total Users</p>
-        <div class="stat-number"><%= totalUsers %></div>
-      </div>
-      <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
-    </div>
-
-    <div class="card stat">
-      <div>
-        <p class="stat-title">Total Notes</p>
-        <div class="stat-number"><%= totalNotes %></div>
-      </div>
-      <div class="stat-icon"><i class="fa-solid fa-file-lines"></i></div>
-    </div>
-
-    <div class="card stat">
-      <div>
-        <p class="stat-title">Total Downloads</p>
-        <div class="stat-number"><%= totalDownloads %></div>
-      </div>
-      <div class="stat-icon"><i class="fa-solid fa-download"></i></div>
-    </div>
-
-    <div class="card stat">
-      <div>
-        <p class="stat-title">Downloads (7d)</p>
-        <div class="stat-number"><%= downloadsLast7Days %></div>
-      </div>
-      <div class="stat-icon"><i class="fa-solid fa-calendar-week"></i></div>
-    </div>
-  </div>
-
-
-
-  <!-- UNIQUE TRAFFIC -->
-  <h2 class="sec-title">Unique Traffic</h2>
-  <div class="grid grid-3">
-    <div class="card stat">
-      <div>
-        <p class="stat-title">Unique Downloads</p>
-        <div class="stat-number"><%= totalUniqueDownloads %></div>
-      </div>
-      <div class="stat-icon"><i class="fa-solid fa-fingerprint"></i></div>
-    </div>
-
-    <div class="card stat">
-      <div>
-        <p class="stat-title">Unique Sessions</p>
-        <div class="stat-number"><%= uniqueSessions %></div>
-      </div>
-      <div class="stat-icon"><i class="fa-solid fa-stopwatch"></i></div>
-    </div>
-
-    <div class="card stat">
-      <div>
-        <p class="stat-title">Unique IPs</p>
-        <div class="stat-number"><%= uniqueIps %></div>
-      </div>
-      <div class="stat-icon"><i class="fa-solid fa-network-wired"></i></div>
-    </div>
-  </div>
-
-
-
-  <!-- USER ENGAGEMENT -->
-  <h2 class="sec-title">User Engagement</h2>
-  <div class="grid grid-3">
-    <div class="card stat">
-      <div>
-        <p class="stat-title">New Signups (7d)</p>
-        <div class="stat-number"><%= newSignups %></div>
-      </div>
-      <div class="stat-icon"><i class="fa-solid fa-user-plus"></i></div>
-    </div>
-
-    <div class="card stat">
-      <div>
-        <p class="stat-title">Verified Users</p>
-        <div class="stat-number"><%= verifiedUsers %></div>
-      </div>
-      <div class="stat-icon"><i class="fa-solid fa-circle-check"></i></div>
-    </div>
-
-    <div class="card stat">
-      <div>
-        <p class="stat-title">Unverified Users</p>
-        <div class="stat-number"><%= unverifiedUsers %></div>
-      </div>
-      <div class="stat-icon"><i class="fa-solid fa-circle-xmark"></i></div>
-    </div>
-  </div>
-
-
-
-  <!-- CONTENT & MODERATION -->
-  <h2 class="sec-title">Content & Moderation</h2>
-  <div class="grid grid-2">
-    <div class="card stat">
-      <div>
-        <p class="stat-title">Pending Verification</p>
-        <div class="stat-number"><%= notesPendingVerification %></div>
-      </div>
-      <div class="stat-icon"><i class="fa-solid fa-hourglass-half"></i></div>
-    </div>
-
-    <div class="card stat">
-      <div>
-        <p class="stat-title">New Note Uploads (7d)</p>
-        <div class="stat-number"><%= newNoteUploads %></div>
-      </div>
-      <div class="stat-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
-    </div>
-  </div>
-
-
-
-
-  <!-- TOP CONTRIBUTORS -->
-  <h2 class="sec-title">Top Contributors</h2>
-  <div class="grid grid-3">
-    <% topContributors.forEach(user => { %>
-      <div class="card contrib">
-        <img src="<%= user.avatar || '/images/default-avatar.png' %>" alt="">
-        <h3 style="margin:6px 0;"><%= user.name %></h3>
-        <p style="color:var(--muted);">@<%= user.username %></p>
-        <p style="margin-top:6px; color:var(--accent2); font-weight:700;">
-          <i class="fa-solid fa-file-pen"></i> <%= user.notesCount %>
-        </p>
-      </div>
-    <% }) %>
-  </div>
-
-
-
-  <!-- TOP NOTES TABLE -->
-  <h2 class="sec-title">Top Notes</h2>
-  <div class="table-wrap card">
-    <table>
-      <thead>
-        <tr>
-          <th>Title</th>
-          <th>Course</th>
-          <th>Downloads</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% topNotes.forEach(note => { %>
-          <tr>
-            <td><%= note.title %></td>
-            <td><%= note.course %></td>
-            <td><i class="fa-solid fa-download" style="color:var(--accent)"></i> <%= note.downloadCount %></td>
-          </tr>
-        <% }) %>
-      </tbody>
-    </table>
-  </div>
-
-
-
-  <!-- CHART -->
-  <h2 class="sec-title">Notes by Course</h2>
-  <div class="chart-box">
-    <canvas id="courseChart"></canvas>
-  </div>
-
-
-
-  <!-- RECENT USERS -->
-  <h2 class="sec-title">Recent Users</h2>
-  <div class="table-wrap card">
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Username</th>
-          <th>Joined</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% fiveLastUsers.forEach(u => { %>
-          <tr>
-            <td><%= u.name %></td>
-            <td>@<%= u.username %></td>
-            <td><%= new Date(u.createdAt).toLocaleDateString() %></td>
-          </tr>
-        <% }) %>
-      </tbody>
-    </table>
-  </div>
-
-
-
-  <!-- RECENT DOWNLOADS -->
-  <h2 class="sec-title">Recent Downloads</h2>
-  <div class="table-wrap card">
-    <table>
-      <thead>
-        <tr>
-          <th>Note</th>
-          <th>Downloaded At</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% LastDownloads.forEach(dl => { %>
-          <tr>
-            <td><%= dl.note ? dl.note.title : 'Unknown' %></td>
-            <td><%= new Date(dl.downloadedAt).toLocaleString('en-IN', { timeZone:'Asia/Kolkata' }) %></td>
-          </tr>
-        <% }) %>
-      </tbody>
-    </table>
-  </div>
-
-</div>
 
 
 <script>
@@ -255,14 +342,37 @@
       datasets: [{
         label: "Notes",
         data: data.map(c => c.notes),
-        backgroundColor: "rgba(138,47,255,0.5)",
-        borderRadius: 8
+        backgroundColor: "rgba(255, 87, 34, 0.6)", // Primary Orange
+        borderColor: "rgba(255, 87, 34, 1)",
+        borderWidth: 1,
+        borderRadius: 6,
+        hoverBackgroundColor: "rgba(255, 87, 34, 0.8)",
       }]
     },
     options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+            backgroundColor: '#171717',
+            titleColor: '#fff',
+            bodyColor: '#ccc',
+            borderColor: '#333',
+            borderWidth: 1,
+            padding: 10
+        }
+      },
       scales: {
-        y: { beginAtZero: true, ticks:{ color:"#cfe3ff" } },
-        x: { ticks:{ color:"#cfe3ff" } }
+        y: { 
+            beginAtZero: true, 
+            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+            ticks: { color: "#9ca3af" } 
+        },
+        x: { 
+            grid: { display: false },
+            ticks: { color: "#9ca3af" } 
+        }
       }
     }
   });

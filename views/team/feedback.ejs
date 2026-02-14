@@ -1,5 +1,62 @@
-<div class="feedback" style="display: flex; justify-content: center;">
-    <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScYAkD1ouzollLd7hyRvd7EWQcKmE2GbWOW4ko1KWa1W9Qz2g/viewform?embedded=true" width="640" height="1787" frameborder="0" marginheight="0" marginwidth="0">
-        Loading…
-    </iframe>
-</div>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    
+    <!-- Google Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+    
+    <!-- Tailwind CSS & Config -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#FF5722",
+              "primary-hover": "#F4511E",
+              "background-dark": "#050505",
+              "surface-dark": "#0A0A0A",
+              "surface-dark-lighter": "#171717",
+              "border-dark": "#27272A",
+            },
+            fontFamily: {
+              "display": ["Inter", "system-ui", "sans-serif"]
+            }
+          },
+        },
+      }
+    </script>
+    <style>
+      body {
+        background-color: #050505 !important;
+        color: #d1d5db;
+        font-family: 'Inter', sans-serif;
+      }
+      iframe {
+          border-radius: 12px;
+          background-color: white; /* Forms look better on white usually */
+          width: 100%;
+          max-width: 640px;
+          min-height: 100vh;
+      }
+    </style>
+  </head>
+  
+  <div class="min-h-screen bg-background-dark font-display antialiased py-20 px-4 sm:px-6 lg:px-8 flex flex-col items-center">
+    
+    <div class="text-center mb-10 w-full max-w-2xl">
+        <h1 class="text-3xl md:text-4xl font-extrabold text-white mb-4">Feedback</h1>
+        <p class="text-gray-400">
+            We value your thoughts! Let us know how we can improve CampusNotes.
+        </p>
+    </div>
+  
+    <div class="w-full flex justify-center">
+         <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScYAkD1ouzollLd7hyRvd7EWQcKmE2GbWOW4ko1KWa1W9Qz2g/viewform?embedded=true" frameborder="0" marginheight="0" marginwidth="0">
+            Loading…
+        </iframe>
+    </div>
+  
+  </div>
