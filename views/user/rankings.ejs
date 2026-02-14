@@ -1,194 +1,265 @@
-<style>
-  /* ===========================
-   DARK NEON — RANKING PAGE
-   =========================== */
-
-.ranking-section {
-  padding: 70px 20px;
-  text-align: center;
-  color: var(--text);
-}
-
-.ranking-title {
-  font-size: 2.4rem;
-  font-weight: 700;
-  color: var(--accent);
-  margin-bottom: 8px;
-}
-
-.ranking-sub {
-  color: var(--muted);
-  font-size: 1rem;
-  margin-bottom: 40px;
-}
-
-/* MAIN GRID */
-.ranking-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 26px;
-}
-
-/* CARD */
-.rank-card {
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  border-radius: 18px;
-  border: 1px solid rgba(255,255,255,0.05);
-  padding: 10px 10px;
-
-  display: flex;
-  align-items: center;
-  gap: 5px;
-
-  box-shadow: 0 6px 20px rgba(0,0,0,0.35);
-  transition: 0.2s ease;
-}
-
-.rank-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 25px rgba(0,255,213,0.15);
-}
-
-/* LEFT RANK NUMBER */
-.rank-number {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--accent);
-  width: 48px;
-  text-align: center;
-}
-
-/* AVATAR */
-.rank-avatar {
-  width: 54px;
-  height: 54px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid var(--accent);
-}
-
-/* USER INFO */
-.rank-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  text-align: left;
-  gap: 2px;
-}
-
-/* NAME */
-.rank-name {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-/* Username */
-.rank-username {
-  font-size: 0.85rem;
-  color: var(--muted);
-}
-
-/* Course */
-.rank-course {
-  font-size: 0.75rem;
-  color: #9ca3af;
-}
-
-/* Upload count */
-.rank-uploads {
-  text-align: right;
-}
-
-.rank-uploads span {
-  font-size: 1.7rem;
-  font-weight: 700;
-  color: #19ffb3;
-}
-
-.rank-uploads small {
-  display: block;
-  font-size: 0.75rem;
-  color: var(--muted);
-}
-
-/* MOBILE FIX */
-@media (max-width: 430px) {
-  .rank-card {
-    flex-direction: column;
-    text-align: center;
-    gap: 12px;
-    padding: 10px;
-  }
-  .rank-info {
-    text-align: center;
-    align-items: center;
-  }
-  .rank-name {
-    justify-content: center;
-  }
-  .rank-uploads {
-    text-align: center;
-    width: 100%;
-  }
-}
-
-</style>
-
-
-
-
-<section class="ranking-section">
-  <h1 class="ranking-title">🏆 Top Contributors</h1>
-  <p class="ranking-sub">Based on number of notes uploaded</p>
-
-<div class="ranking-container">
-    <% topUsers.forEach((u, i) => { %>      
-      <a href="/profile/<%= u._id %>">
-        <% 
-        let avatarUrl = u.avatar || '/images/dummy_profile.avif';
-
-        // 1. Cloudinary Logic (Same as before)
-        if (avatarUrl.includes('cloudinary.com')) {
-          if (!avatarUrl.includes('w_100')) {
-             avatarUrl = avatarUrl.replace(/(\/upload\/)/, '$1w_100,h_100,c_fill,q_auto,f_auto/');
-          }
-        } 
-      %>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    
+    <!-- Google Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+    
+    <!-- Tailwind CSS & Config -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#FF5722", // Core Orange
+              "primary-hover": "#F4511E",
+              "background-dark": "#050505", // Deep Black
+              "surface-dark": "#0A0A0A",
+              "surface-dark-lighter": "#171717",
+              "border-dark": "#27272A",
+            },
+            fontFamily: {
+              "display": ["Inter", "system-ui", "sans-serif"]
+            }
+          },
+        },
+      }
+    </script>
+    <style>
+      ::-webkit-scrollbar { width: 6px; }
+      ::-webkit-scrollbar-track { background: #050505; }
+      ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+      ::-webkit-scrollbar-thumb:hover { background: #555; }
       
-      <div class="rank-card">
-
-        <div class="rank-number">#<%= i+1 %></div>
-
-        <img src="<%= avatarUrl %>" class="rank-avatar" loading="lazy" alt="<%= u.username %>" />
-
-        <div class="rank-info">
-          <div class="rank-name">
-            <%= u.name || u.username %>
+      body {
+        background-color: #050505 !important;
+        color: #ffffff;
+        font-family: 'Inter', sans-serif;
+      }
+      
+      /* Simplified Cards - Removed heavy blur/shadows */
+      .rank-card-base {
+        background-color: #0A0A0A;
+        border: 1px solid #27272A;
+      }
+      
+      .rank-card-1 {
+        border-color: rgba(255, 215, 0, 0.4);
+        background: linear-gradient(to bottom, rgba(255, 215, 0, 0.05), #0A0A0A);
+      }
+      
+      .rank-card-2 {
+        border-color: rgba(226, 232, 240, 0.3);
+        background: linear-gradient(to bottom, rgba(226, 232, 240, 0.05), #0A0A0A);
+      }
+      
+      .rank-card-3 {
+        border-color: rgba(249, 115, 22, 0.3);
+        background: linear-gradient(to bottom, rgba(249, 115, 22, 0.05), #0A0A0A);
+      }
+    </style>
+  </head>
+  
+  <div class="min-h-screen bg-background-dark font-display text-gray-300 antialiased py-20 px-4 sm:px-6 lg:px-8">
+    
+    <div class="max-w-6xl mx-auto space-y-12">
+        
+        <!-- HEADER -->
+        <div class="text-center space-y-3">
+            <h2 class="text-4xl font-bold text-white tracking-tight">
+                Hall of Fame
+            </h2>
+            <p class="text-gray-400 max-w-xl mx-auto">
+                Celebrating our top contributors.
+            </p>
+        </div>
+  
+        <% if (topUsers.length === 0) { %>
+            <!-- EMPTY STATE -->
+            <div class="flex flex-col items-center justify-center py-20 bg-surface-dark border border-border-dark rounded-xl border-dashed">
+                <div class="w-16 h-16 bg-surface-dark-lighter rounded-full flex items-center justify-center mb-4">
+                    <span class="material-icons-outlined text-3xl text-gray-600">group_off</span>
+                </div>
+                <h3 class="text-lg font-bold text-white">No Contributors Yet</h3>
+                <a href="/upload" class="mt-4 px-5 py-2 bg-primary hover:bg-primary-hover text-white rounded-lg transition-colors text-sm font-medium">
+                    Upload Note
+                </a>
+            </div>
+        <% } else { %>
             
-            <% if (u.roles && u.roles.isModerator) { %>
-              <img src="/images/blueCheckmark.svg" width="18">
-            <% } else if (u.roles && u.roles.isDev) { %>
-              <img src="/images/icons8-checkmark.svg" width="18">
-            <% } else if (u.verification && u.verification.verified) { %>
-              <span style="color:#19ffb3;">✔</span>
+            <!-- TOP 3 HERO SECTION -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end justify-center px-2">
+                
+                <% 
+                   const first = topUsers[0] || null;
+                   const second = topUsers[1] || null;
+                   const third = topUsers[2] || null;
+                %>
+  
+                <!-- #2 SILVER -->
+                <% if (second) { %>
+                    <div class="order-2 md:order-1 rank-card-2 rounded-xl p-6 flex flex-col items-center text-center rank-card-base transition-colors hover:bg-white/5">
+                        <div class="text-gray-400 font-bold mb-3 text-xs uppercase tracking-wider">Runner Up</div>
+                        
+                        <a href="/profile/<%= second._id %>" class="relative">
+                            <div class="w-20 h-20 rounded-full border-2 border-gray-400 p-0.5">
+                                <div class="w-full h-full rounded-full overflow-hidden bg-surface-dark-lighter">
+                                    <% if (second.avatar) { %>
+                                        <img src="<%= second.avatar %>" class="w-full h-full object-cover">
+                                    <% } else { %>
+                                        <div class="w-full h-full flex items-center justify-center text-xl font-bold text-white"><%= second.username?.charAt(0).toUpperCase() %></div>
+                                    <% } %>
+                                </div>
+                            </div>
+                            <div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-gray-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">#2</div>
+                        </a>
+                        
+                        <div class="mt-4">
+                            <h3 class="text-base font-bold text-white truncate max-w-[150px]">
+                                <%= second.name || second.username %>
+                            </h3>
+                            <p class="text-xs text-gray-500 font-mono">@<%= second.username %></p>
+                        </div>
+                        
+                        <div class="mt-4 text-center">
+                            <div class="text-lg font-bold text-white"><%= second.uploaded %></div>
+                            <div class="text-[10px] uppercase text-gray-500">Uploads</div>
+                        </div>
+                    </div>
+                <% } else { %><div class="hidden md:block"></div><% } %>
+  
+                <!-- #1 GOLD -->
+                <% if (first) { %>
+                    <div class="order-1 md:order-2 rank-card-1 rounded-xl p-8 flex flex-col items-center text-center rank-card-base transform md:-translate-y-4 shadow-xl shadow-black/50">
+                         <div class="text-yellow-500 font-bold mb-4 text-sm uppercase flex items-center gap-2 tracking-wider">
+                             <span class="material-icons text-sm">emoji_events</span> Champion
+                         </div>
+                        
+                        <a href="/profile/<%= first._id %>" class="relative">
+                            <div class="w-28 h-28 rounded-full border-4 border-yellow-500 p-1">
+                                <div class="w-full h-full rounded-full overflow-hidden bg-surface-dark-lighter">
+                                    <% if (first.avatar) { %>
+                                        <img src="<%= first.avatar %>" class="w-full h-full object-cover">
+                                    <% } else { %>
+                                        <div class="w-full h-full flex items-center justify-center text-3xl font-bold text-white"><%= first.username?.charAt(0).toUpperCase() %></div>
+                                    <% } %>
+                                </div>
+                            </div>
+                             <div class="absolute -bottom-3 left-1/2 transform -translate-x-1/2 bg-yellow-600 text-white text-xs font-bold px-3 py-1 rounded-full">#1</div>
+                        </a>
+                        
+                        <div class="mt-6">
+                            <h3 class="text-xl font-bold text-white truncate max-w-[200px]">
+                                <%= first.name || first.username %>
+                            </h3>
+                            <p class="text-sm text-gray-500 font-mono">@<%= first.username %></p>
+                        </div>
+                        
+                        <div class="mt-6 text-center">
+                            <div class="text-3xl font-bold text-yellow-500"><%= first.uploaded %></div>
+                            <div class="text-xs uppercase text-yellow-500/70 font-bold">Total Uploads</div>
+                        </div>
+                    </div>
+                <% } %>
+  
+                <!-- #3 BRONZE -->
+                <% if (third) { %>
+                    <div class="order-3 rank-card-3 rounded-xl p-6 flex flex-col items-center text-center rank-card-base transition-colors hover:bg-white/5">
+                        <div class="text-orange-500 font-bold mb-3 text-xs uppercase tracking-wider">3rd Place</div>
+                        
+                        <a href="/profile/<%= third._id %>" class="relative">
+                            <div class="w-20 h-20 rounded-full border-2 border-orange-500 p-0.5">
+                                <div class="w-full h-full rounded-full overflow-hidden bg-surface-dark-lighter">
+                                    <% if (third.avatar) { %>
+                                        <img src="<%= third.avatar %>" class="w-full h-full object-cover">
+                                    <% } else { %>
+                                        <div class="w-full h-full flex items-center justify-center text-xl font-bold text-white"><%= third.username?.charAt(0).toUpperCase() %></div>
+                                    <% } %>
+                                </div>
+                            </div>
+                             <div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-orange-700 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">#3</div>
+                        </a>
+                        
+                        <div class="mt-4">
+                            <h3 class="text-base font-bold text-white truncate max-w-[150px]">
+                                <%= third.name || third.username %>
+                            </h3>
+                            <p class="text-xs text-gray-500 font-mono">@<%= third.username %></p>
+                        </div>
+                        
+                        <div class="mt-4 text-center">
+                            <div class="text-lg font-bold text-white"><%= third.uploaded %></div>
+                            <div class="text-[10px] uppercase text-gray-500">Uploads</div>
+                        </div>
+                    </div>
+                <% } else { %><div class="hidden md:block"></div><% } %>
+                
+            </div>
+            
+            <!-- THE REST (LEADERBOARD TABLE) - OPTIMIZED -->
+            <% const rest = topUsers.slice(3); %>
+            <% if (rest.length > 0) { %>
+                <div class="mt-12 max-w-4xl mx-auto">
+                    <div class="bg-surface-dark border border-border-dark rounded-lg overflow-hidden">
+                        
+                        <div class="px-6 py-3 bg-surface-dark-lighter border-b border-border-dark flex items-center justify-between">
+                            <h3 class="font-bold text-white text-sm">Honorable Mentions</h3>
+                        </div>
+  
+                        <!-- List -->
+                        <div class="divide-y divide-border-dark">
+                            <% rest.forEach((u, idx) => { %>
+                                <div class="flex items-center px-6 py-3 hover:bg-white/5 transition-colors">
+                                    
+                                    <!-- Rank -->
+                                    <div class="w-10 flex-shrink-0 text-center font-mono font-bold text-gray-600 text-sm">
+                                        #<%= idx + 4 %>
+                                    </div>
+                                    
+                                    <!-- Avatar -->
+                                    <div class="w-12 flex-shrink-0">
+                                        <div class="w-9 h-9 rounded-full bg-gray-800 overflow-hidden">
+                                            <% if (u.avatar) { %>
+                                                <img src="<%= u.avatar %>" class="w-full h-full object-cover" loading="lazy">
+                                            <% } else { %>
+                                                <div class="w-full h-full flex items-center justify-center text-xs font-bold text-white">
+                                                    <%= u.username?.charAt(0).toUpperCase() %>
+                                                </div>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Name & Info -->
+                                    <div class="flex-grow min-w-0 mr-4">
+                                        <a href="/profile/<%= u._id %>" class="font-bold text-gray-200 hover:text-white text-sm truncate block">
+                                            <%= u.name || u.username %>
+                                        </a>
+                                        <div class="text-[10px] text-gray-600 font-mono truncate">@<%= u.username %></div>
+                                    </div>
+                                    
+                                    <!-- Stats -->
+                                    <div class="flex-shrink-0 text-right">
+                                        <div class="text-sm font-bold text-white"><%= u.uploaded %></div>
+                                    </div>
+                                    
+                                    <!-- Action -->
+                                    <div class="w-8 flex-shrink-0 flex justify-end">
+                                        <a href="/profile/<%= u._id %>" class="text-gray-500 hover:text-white">
+                                            <span class="material-icons-outlined text-sm">chevron_right</span>
+                                        </a>
+                                    </div>
+                                    
+                                </div>
+                            <% }) %>
+                        </div>
+                        
+                    </div>
+                </div>
             <% } %>
-          </div>
-
-          <div class="rank-username">@<%= u.username %></div>
-          <div class="rank-course"><%= u.course || '-' %></div>
-        </div>
-
-        <div class="rank-uploads">
-          <span><%= u.uploaded %></span>
-          <small>Uploads</small>
-        </div>
-
-      </div>
-      </a>
-    <% }) %>
-</div>
-</section>
+  
+        <% } %>
+    </div>
+  </div>

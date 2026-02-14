@@ -1,62 +1,225 @@
-<link rel="stylesheet" href="/css/mostVoted.css" />
-
-<div class="mostvoted-wrapper">
-
-  <h1 class="mostvoted-heading">Most Downloaded Notes</h1>
-
-  <% if (notes.length === 0) { %>
-    <p style="text-align: center; color: var(--muted); font-size: 1.1rem;">
-      No notes have been downloaded yet.
-    </p>
-  <% } else { %>
-
-  <div class="note-grid">
-    <% notes.forEach(note => { %>
-
-      <article class="card">
-
-        <div class="card-top">
-          <div>
-            <h3 class="card-title"><%= note.title %></h3>
-            <div class="card-sub"><%= note.subject?.name %> • <%= note.course %></div>
-          </div>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    
+    <!-- Google Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+    
+    <!-- Tailwind CSS & Config -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#FF5722", // Core Orange
+              "primary-hover": "#F4511E",
+              "background-dark": "#050505", // Deep Black
+              "surface-dark": "#0A0A0A",
+              "surface-dark-lighter": "#171717",
+              "border-dark": "#27272A",
+            },
+            fontFamily: {
+              "display": ["Inter", "system-ui", "sans-serif"]
+            },
+            animation: {
+              "fade-in-up": "fadeInUp 0.5s ease-out forwards",
+            },
+            keyframes: {
+              fadeInUp: {
+                "0%": { opacity: "0", transform: "translateY(10px)" },
+                "100%": { opacity: "1", transform: "translateY(0)" },
+              }
+            }
+          },
+        },
+      }
+    </script>
+    <style>
+      ::-webkit-scrollbar { width: 6px; }
+      ::-webkit-scrollbar-track { background: #050505; }
+      ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+      ::-webkit-scrollbar-thumb:hover { background: #555; }
+      
+      body {
+        background-color: #050505 !important;
+        color: #ffffff;
+        font-family: 'Inter', sans-serif;
+      }
+      
+      .rank-1 { background: radial-gradient(circle at top, rgba(255, 215, 0, 0.15), transparent 70%); border-color: rgba(255, 215, 0, 0.5); }
+      .rank-2 { background: radial-gradient(circle at top, rgba(192, 192, 192, 0.1), transparent 70%); border-color: rgba(192, 192, 192, 0.4); }
+      .rank-3 { background: radial-gradient(circle at top, rgba(205, 127, 50, 0.1), transparent 70%); border-color: rgba(205, 127, 50, 0.4); }
+      
+      .rank-badge-1 { background: linear-gradient(135deg, #FFD700, #FDB931); color: black; }
+      .rank-badge-2 { background: linear-gradient(135deg, #E0E0E0, #BDBDBD); color: black; }
+      .rank-badge-3 { background: linear-gradient(135deg, #CD7F32, #A0522D); color: white; }
+    </style>
+  </head>
+  
+  <div class="min-h-screen bg-background-dark font-display text-gray-300 antialiased py-24 px-4 sm:px-6 lg:px-8">
+    
+    <div class="max-w-6xl mx-auto space-y-12 animate-fade-in-up">
+        
+        <!-- HEADER -->
+        <div class="text-center space-y-4">
+            <h2 class="text-4xl font-bold text-white tracking-tight flex items-center justify-center gap-3">
+                <span class="p-3 rounded-xl bg-surface-dark-lighter border border-border-dark text-orange-500 shadow-lg shadow-orange-500/10">
+                    <span class="material-icons-outlined text-3xl">emoji_events</span>
+                </span>
+                Hall of Fame
+            </h2>
+            <p class="text-gray-400 max-w-xl mx-auto text-lg">Top downloaded resources making an impact.</p>
         </div>
-
-        <div class="card-body">
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
-
-            <div class="tag-download">
-              ⬇ <strong><%= note.downloadCount %></strong>
+  
+        <% if (notes.length === 0) { %>
+            <!-- EMPTY STATE -->
+            <div class="flex flex-col items-center justify-center py-20 bg-surface-dark border border-border-dark rounded-xl border-dashed">
+                <div class="w-20 h-20 bg-surface-dark-lighter rounded-full flex items-center justify-center mb-4">
+                    <span class="material-icons-outlined text-4xl text-gray-600">cloud_off</span>
+                </div>
+                <h3 class="text-xl font-bold text-white">No Downloads Yet</h3>
+                <p class="text-gray-500 mt-2">Check back later or upload your own notes!</p>
+                <a href="/upload" class="mt-6 px-6 py-2 bg-primary hover:bg-primary-hover text-white rounded-lg transition-colors text-sm font-medium">
+                    Upload Note
+                </a>
             </div>
-
-            <div class="tag-date">
-              <strong><%= note.createdAt?.toDateString() %></strong>
+        <% } else { %>
+            
+            <!-- TOP 3 PODIUM -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-end relative px-4 md:px-12">
+                
+                <% 
+                   // Helper to get safe note object
+                   const getNote = (idx) => notes[idx] || null;
+                   const first = getNote(0);
+                   const second = getNote(1);
+                   const third = getNote(2);
+                %>
+  
+                <!-- RANK 2 -->
+                <% if (second) { %>
+                    <div class="order-2 md:order-1 relative bg-surface-dark border border-border-dark rounded-xl p-6 flex flex-col items-center text-center shadow-2xl rank-2 transform hover:-translate-y-2 transition-transform duration-300">
+                        <div class="absolute -top-4 w-10 h-10 rounded-full rank-badge-2 flex items-center justify-center font-bold text-lg shadow-lg border-2 border-surface-dark">2</div>
+                        
+                        <div class="mb-4 mt-2">
+                             <div class="w-16 h-16 rounded-full bg-surface-dark border-2 border-gray-600 flex items-center justify-center text-xl font-bold text-white overflow-hidden">
+                                <%= second.uploadedBy?.username?.charAt(0).toUpperCase() || 'U' %>
+                             </div>
+                        </div>
+                        
+                        <h3 class="text-lg font-bold text-white line-clamp-1 mb-1"><%= second.title %></h3>
+                        <p class="text-xs text-gray-500 mb-4"><%= second.subject?.name || 'Subject' %></p>
+                        
+                        <div class="px-3 py-1 bg-surface-dark-lighter rounded-full border border-border-dark flex items-center gap-2 text-sm text-gray-300">
+                             <span class="material-icons-outlined text-sm text-gray-400">download</span> <%= second.downloadCount %>
+                        </div>
+                        
+                        <a href="/notes/<%= second._id %>" class="mt-4 text-xs font-bold text-gray-400 hover:text-white uppercase tracking-wider">View</a>
+                    </div>
+                <% } else { %><div class="hidden md:block"></div><% } %>
+  
+                <!-- RANK 1 -->
+                <% if (first) { %>
+                    <div class="order-1 md:order-2 relative bg-surface-dark border border-border-dark rounded-xl p-8 flex flex-col items-center text-center shadow-2xl shadow-orange-500/20 rank-1 transform scale-110 z-10">
+                        <div class="absolute -top-6 w-14 h-14 rounded-full rank-badge-1 flex items-center justify-center font-bold text-2xl shadow-lg border-4 border-surface-dark">
+                            <span class="material-icons text-xl">emoji_events</span>
+                        </div>
+                        
+                        <div class="mb-5 mt-4">
+                             <div class="w-24 h-24 rounded-full bg-surface-dark border-4 border-yellow-500/50 flex items-center justify-center text-3xl font-bold text-white overflow-hidden shadow-lg shadow-yellow-500/20">
+                                <%= first.uploadedBy?.username?.charAt(0).toUpperCase() || 'U' %>
+                             </div>
+                        </div>
+                        
+                        <h3 class="text-xl font-bold text-white line-clamp-2 mb-1"><%= first.title %></h3>
+                        <p class="text-sm text-gray-400 mb-6"><%= first.subject?.name || 'Subject' %></p>
+                        
+                        <div class="px-5 py-2 bg-surface-dark-lighter rounded-full border border-yellow-500/30 flex items-center gap-2 text-base text-yellow-500 font-bold mb-4">
+                             <span class="material-icons-outlined text-lg">local_fire_department</span> <%= first.downloadCount %> Downloads
+                        </div>
+                        
+                        <a href="/notes/<%= first._id %>" class="w-full py-2 rounded-lg bg-orange-600 hover:bg-orange-700 text-white font-bold text-sm transition-colors shadow-lg">View Note</a>
+                    </div>
+                <% } %>
+  
+                <!-- RANK 3 -->
+                <% if (third) { %>
+                    <div class="order-3 relative bg-surface-dark border border-border-dark rounded-xl p-6 flex flex-col items-center text-center shadow-2xl rank-3 transform hover:-translate-y-2 transition-transform duration-300">
+                        <div class="absolute -top-4 w-10 h-10 rounded-full rank-badge-3 flex items-center justify-center font-bold text-lg shadow-lg border-2 border-surface-dark">3</div>
+                        
+                        <div class="mb-4 mt-2">
+                             <div class="w-16 h-16 rounded-full bg-surface-dark border-2 border-orange-900 flex items-center justify-center text-xl font-bold text-white overflow-hidden">
+                                <%= third.uploadedBy?.username?.charAt(0).toUpperCase() || 'U' %>
+                             </div>
+                        </div>
+                        
+                        <h3 class="text-lg font-bold text-white line-clamp-1 mb-1"><%= third.title %></h3>
+                        <p class="text-xs text-gray-500 mb-4"><%= third.subject?.name || 'Subject' %></p>
+                        
+                        <div class="px-3 py-1 bg-surface-dark-lighter rounded-full border border-border-dark flex items-center gap-2 text-sm text-gray-300">
+                             <span class="material-icons-outlined text-sm text-orange-800">download</span> <%= third.downloadCount %>
+                        </div>
+                         
+                        <a href="/notes/<%= third._id %>" class="mt-4 text-xs font-bold text-gray-400 hover:text-white uppercase tracking-wider">View</a>
+                    </div>
+                <% } else { %><div class="hidden md:block"></div><% } %>
+                
             </div>
-
-          </div>
-        </div>
-
-        <div class="card-footer">
-          <a href="/notes/<%= note._id %>" class="view-btn">View</a>
-
-          <div class="badge">
-            By <span style="color:var(--accent); margin-left:6px;"><%= note.uploadedBy?.username %></span>
-
-            <% if (note.uploadedBy?.roles?.isModerator) { %>
-              <img src="/images/blueCheckmark.svg" class="badge-icon" style="width: 20px;">
-            <% } else if (note.uploadedBy?.roles?.isDev) { %>
-              <img src="/images/icons8-checkmark.svg" class="badge-icon" style="width: 20px;">
-            <% } else if (note.uploadedBy?.verification?.verified) { %>
-              <span class="verified-tick">✔</span>
+            
+            <!-- THE REST (LIST LIST) -->
+            <% const rest = notes.slice(3); %>
+            <% if (rest.length > 0) { %>
+                <div class="mt-12">
+                    <div class="bg-surface-dark border border-border-dark rounded-xl overflow-hidden shadow-lg">
+                        
+                        <!-- Table Header -->
+                        <div class="grid grid-cols-12 gap-4 px-6 py-4 bg-surface-dark-lighter border-b border-border-dark text-xs font-bold text-gray-500 uppercase tracking-wider">
+                            <div class="col-span-1 text-center">#</div>
+                            <div class="col-span-6 md:col-span-5">Note Title</div>
+                            <div class="col-span-3 hidden md:block">Subject</div>
+                            <div class="col-span-4 md:col-span-2 text-right">Downloads</div>
+                            <div class="col-span-1 hidden md:block text-right"></div>
+                        </div>
+  
+                        <!-- Table Rows -->
+                        <div class="divide-y divide-border-dark">
+                            <% rest.forEach((note, idx) => { %>
+                                <div class="grid grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-white/5 transition-colors group">
+                                    <div class="col-span-1 text-center font-mono text-gray-500 font-bold"><%= idx + 4 %></div>
+                                    
+                                    <div class="col-span-6 md:col-span-5">
+                                        <a href="/notes/<%= note._id %>" class="font-bold text-white group-hover:text-primary transition-colors line-clamp-1">
+                                            <%= note.title %>
+                                        </a>
+                                        <p class="text-xs text-gray-500 md:hidden mt-0.5"><%= note.subject?.name || 'General' %></p>
+                                    </div>
+                                    
+                                    <div class="col-span-3 hidden md:block text-sm text-gray-400">
+                                        <span class="px-2 py-1 rounded bg-surface-dark-lighter border border-border-dark text-xs">
+                                            <%= note.subject?.name || 'General' %>
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="col-span-4 md:col-span-2 text-right">
+                                        <span class="font-mono text-gray-300"><%= note.downloadCount %></span>
+                                    </div>
+                                    
+                                    <div class="col-span-1 hidden md:flex justify-end opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <a href="/notes/<%= note._id %>" class="w-8 h-8 flex items-center justify-center rounded-full bg-surface-dark-lighter border border-border-dark text-gray-400 hover:text-white hover:border-primary">
+                                            <span class="material-icons-outlined text-sm">visibility</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            <% }) %>
+                        </div>
+                        
+                    </div>
+                </div>
             <% } %>
-          </div>
-        </div>
-
-      </article>
-
-    <% }) %>
+  
+        <% } %>
+    </div>
   </div>
-
-  <% } %>
-
-</div>

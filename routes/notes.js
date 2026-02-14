@@ -366,10 +366,24 @@ router.get("/notes/:nid/edit", isLoggedIn, async (req, res) => {
       "BCA"
     ];
 
+    const semester = [
+      "I",
+      "II",
+      "III",
+      "IV",
+      "V",
+      "VI",
+      "VII",
+      "VIII",
+      "IX",
+      "X"
+    ];
+
     res.render("notes/editNote", {
       note: file,
       subjects,
       courses,
+      semester,
       title: `${file.title} | campusnotes`
     });
   } catch (e) {

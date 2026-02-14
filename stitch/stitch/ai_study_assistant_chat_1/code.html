@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CampusNotes - AI Study Assistant</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+            extend: {
+                colors: {
+                "primary": "#f59f0a",
+                "primary-dark": "#b47506",
+                "background-light": "#f8f7f5",
+                "background-dark": "#221c10",
+                "surface-dark": "#2d261a", // Slightly lighter for sidebar/cards
+                "surface-darker": "#1a150c", // Darker for contrast
+                },
+                fontFamily: {
+                "display": ["Inter", "sans-serif"]
+                },
+                borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+            },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4b4639; 
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b6352; 
+        }
+        
+        .message-bubble-user {
+            border-bottom-right-radius: 0;
+        }
+        .message-bubble-ai {
+            border-bottom-left-radius: 0;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-100 h-screen flex overflow-hidden selection:bg-primary/30 selection:text-primary">
+<!-- Global Navigation Rail -->
+<nav class="w-16 flex flex-col items-center py-6 border-r border-gray-200 dark:border-white/10 bg-white dark:bg-background-dark z-20 flex-shrink-0">
+<div class="mb-8">
+<div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-primary/20">
+                C
+            </div>
+</div>
+<div class="flex flex-col gap-6 w-full items-center flex-1">
+<button class="p-3 rounded-lg text-gray-400 hover:text-primary hover:bg-primary/10 transition-colors group relative">
+<span class="material-icons">dashboard</span>
+<span class="absolute left-14 bg-gray-800 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap border border-white/10">Dashboard</span>
+</button>
+<button class="p-3 rounded-lg text-gray-400 hover:text-primary hover:bg-primary/10 transition-colors group relative">
+<span class="material-icons">folder_open</span>
+<span class="absolute left-14 bg-gray-800 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap border border-white/10">Notes</span>
+</button>
+<button class="p-3 rounded-lg text-primary bg-primary/10 transition-colors group relative shadow-[inset_0_0_0_1px_rgba(245,159,10,0.2)]">
+<span class="material-icons">chat_bubble_outline</span>
+<span class="absolute left-14 bg-gray-800 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap border border-white/10">AI Chat</span>
+</button>
+<button class="p-3 rounded-lg text-gray-400 hover:text-primary hover:bg-primary/10 transition-colors group relative">
+<span class="material-icons">style</span>
+<span class="absolute left-14 bg-gray-800 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap border border-white/10">Flashcards</span>
+</button>
+</div>
+<div class="mt-auto flex flex-col gap-4 items-center">
+<button class="p-1 rounded-full border-2 border-transparent hover:border-primary/50 transition-colors">
+<img alt="User Avatar" class="w-8 h-8 rounded-full object-cover" data-alt="Portrait of a young woman" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3-seCRdLAok8DXg97dCy487IW3bHef_yb-AdjmrrRh6XFVnBduPJx9hOKeyxZqFh7WwlB1tQeKM_3R_y6GAhQBgLLlOb90Erc-Cn6WJi2_d25WOH2gwG1vB2W-dFBNxB4PMMBVxDbnDJCO2BfQFecLhMWxxrs6pLi6i0cBGSvPn8O93ezZAXE8VLW3fUlazptjt2BqZpX9LHAjnAvzvKXihUoK3XOWqv7q35ev-Mt8WrAJJ0fsGJiQW1mibAQXD_dfR0ADsqc-QU"/>
+</button>
+</div>
+</nav>
+<!-- Chat History Sidebar -->
+<aside class="w-80 flex flex-col bg-gray-50 dark:bg-surface-dark border-r border-gray-200 dark:border-white/5 flex-shrink-0 transition-all duration-300">
+<!-- Sidebar Header -->
+<div class="p-4 border-b border-gray-200 dark:border-white/5">
+<div class="flex items-center justify-between mb-4">
+<h2 class="text-lg font-semibold tracking-tight">Study Sessions</h2>
+<button class="text-gray-400 hover:text-white transition-colors">
+<span class="material-icons text-xl">tune</span>
+</button>
+</div>
+<button class="w-full bg-primary hover:bg-primary-dark text-white font-medium py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 transition-all shadow-lg shadow-primary/20 group">
+<span class="material-icons text-sm group-hover:rotate-90 transition-transform">add</span>
+                New Study Session
+            </button>
+</div>
+<!-- Search -->
+<div class="px-4 py-3">
+<div class="relative group">
+<span class="material-icons absolute left-3 top-2.5 text-gray-500 text-lg group-focus-within:text-primary transition-colors">search</span>
+<input class="w-full bg-white dark:bg-background-dark border border-gray-200 dark:border-white/10 rounded-lg py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary placeholder-gray-500 transition-all" placeholder="Search chats..." type="text"/>
+</div>
+</div>
+<!-- History List -->
+<div class="flex-1 overflow-y-auto px-2 pb-4 space-y-6">
+<!-- Today Section -->
+<div>
+<h3 class="px-3 text-xs font-medium text-gray-500 uppercase tracking-wider mb-2 mt-2">Today</h3>
+<ul class="space-y-1">
+<li>
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg bg-white dark:bg-white/5 border border-gray-200 dark:border-white/5 group relative hover:border-primary/30 transition-all shadow-sm" href="#">
+<span class="material-icons text-primary text-lg">science</span>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-medium truncate text-gray-900 dark:text-gray-100">Cellular Respiration Review</p>
+<p class="text-xs text-gray-500 dark:text-gray-400 truncate">Krebs cycle summary &amp; quiz</p>
+</div>
+<div class="absolute right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-background-light dark:bg-surface-dark shadow-sm rounded p-1">
+<span class="material-icons text-gray-400 hover:text-red-400 text-base">more_horiz</span>
+</div>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 transition-colors group relative" href="#">
+<span class="material-icons text-gray-400 text-lg">history_edu</span>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-medium truncate text-gray-700 dark:text-gray-300">Rome History Essay</p>
+<p class="text-xs text-gray-500 dark:text-gray-500 truncate">Outline generation</p>
+</div>
+</a>
+</li>
+</ul>
+</div>
+<!-- Yesterday Section -->
+<div>
+<h3 class="px-3 text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Yesterday</h3>
+<ul class="space-y-1">
+<li>
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 transition-colors group relative" href="#">
+<span class="material-icons text-gray-400 text-lg">functions</span>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-medium truncate text-gray-700 dark:text-gray-300">Calculus II: Derivatives</p>
+<p class="text-xs text-gray-500 dark:text-gray-500 truncate">Chain rule practice problems</p>
+</div>
+</a>
+</li>
+</ul>
+</div>
+<!-- Previous 7 Days -->
+<div>
+<h3 class="px-3 text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Previous 7 Days</h3>
+<ul class="space-y-1">
+<li>
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 transition-colors group relative" href="#">
+<span class="material-icons text-gray-400 text-lg">psychology</span>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-medium truncate text-gray-700 dark:text-gray-300">Cognitive Psych Exam Prep</p>
+<p class="text-xs text-gray-500 dark:text-gray-500 truncate">Memory models comparison</p>
+</div>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 transition-colors group relative" href="#">
+<span class="material-icons text-gray-400 text-lg">code</span>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-medium truncate text-gray-700 dark:text-gray-300">Python Data Structures</p>
+<p class="text-xs text-gray-500 dark:text-gray-500 truncate">Binary search tree implementation</p>
+</div>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<!-- User Context/Plan -->
+<div class="p-4 border-t border-gray-200 dark:border-white/5">
+<div class="rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 p-3">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-xs font-bold text-primary uppercase mb-1">Pro Plan</p>
+<p class="text-xs text-gray-600 dark:text-gray-400">GPT-4 Enabled</p>
+</div>
+<span class="material-icons text-primary text-sm">bolt</span>
+</div>
+<div class="w-full bg-gray-200 dark:bg-white/10 h-1.5 rounded-full mt-3 overflow-hidden">
+<div class="bg-primary h-full w-3/4 rounded-full"></div>
+</div>
+<p class="text-[10px] text-gray-500 mt-1 text-right">75% Monthly Usage</p>
+</div>
+</div>
+</aside>
+<!-- Main Chat Area -->
+<main class="flex-1 flex flex-col h-full relative">
+<!-- Chat Header -->
+<header class="h-16 border-b border-gray-200 dark:border-white/5 flex items-center justify-between px-6 bg-white/50 dark:bg-background-dark/80 backdrop-blur-md z-10 sticky top-0">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-green-500/10 flex items-center justify-center text-green-500">
+<span class="material-icons text-sm">science</span>
+</div>
+<div>
+<h1 class="font-semibold text-gray-900 dark:text-white leading-tight">Biology 101 - Cell Structure</h1>
+<div class="flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+<span class="text-xs text-gray-500">AI Tutor Online</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-gray-400 hover:text-primary transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-white/5" title="Pin Chat">
+<span class="material-icons text-xl">push_pin</span>
+</button>
+<button class="p-2 text-gray-400 hover:text-primary transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-white/5" title="Export Chat">
+<span class="material-icons text-xl">ios_share</span>
+</button>
+<div class="h-4 w-px bg-gray-200 dark:bg-white/10 mx-1"></div>
+<button class="p-2 text-gray-400 hover:text-red-400 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-white/5" title="Delete Session">
+<span class="material-icons text-xl">delete_outline</span>
+</button>
+</div>
+</header>
+<!-- Messages Stream -->
+<div class="flex-1 overflow-y-auto p-4 md:p-8 space-y-8 scroll-smooth" id="chat-container">
+<!-- Date Divider -->
+<div class="flex items-center justify-center">
+<span class="text-xs font-medium text-gray-400 bg-gray-100 dark:bg-white/5 px-3 py-1 rounded-full">Today, 10:23 AM</span>
+</div>
+<!-- AI Welcome Message -->
+<div class="flex gap-4 max-w-4xl mx-auto">
+<div class="flex-shrink-0 mt-1">
+<div class="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-orange-600 flex items-center justify-center shadow-lg shadow-primary/20">
+<span class="material-icons text-white text-sm">smart_toy</span>
+</div>
+</div>
+<div class="flex flex-col gap-1 max-w-[85%]">
+<div class="flex items-baseline gap-2">
+<span class="text-sm font-semibold text-gray-900 dark:text-white">Campus AI</span>
+<span class="text-xs text-gray-500">10:23 AM</span>
+</div>
+<div class="p-5 rounded-lg rounded-tl-none bg-white dark:bg-surface-dark border border-gray-200 dark:border-white/5 shadow-sm text-gray-700 dark:text-gray-200 text-base leading-relaxed message-bubble-ai">
+<p>Hello! I'm ready to help you review your notes on <span class="text-primary font-medium">Cellular Respiration</span>. I've analyzed the PDF you uploaded.</p>
+<p class="mt-3">Would you like to start with a summary of the key concepts, or should we jump straight into quiz questions?</p>
+<!-- Suggestion Chips -->
+<div class="mt-4 flex flex-wrap gap-2">
+<button class="text-xs bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 px-3 py-1.5 rounded-full transition-colors font-medium">Summarize Key Concepts</button>
+<button class="text-xs bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300 border border-transparent px-3 py-1.5 rounded-full transition-colors">Create Quiz</button>
+<button class="text-xs bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300 border border-transparent px-3 py-1.5 rounded-full transition-colors">Explain Glycolysis</button>
+</div>
+</div>
+</div>
+</div>
+<!-- User Message -->
+<div class="flex gap-4 flex-row-reverse max-w-4xl mx-auto">
+<div class="flex-shrink-0 mt-1">
+<img alt="User Avatar" class="w-8 h-8 rounded-full object-cover ring-2 ring-gray-200 dark:ring-white/10" data-alt="Portrait of a young woman" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDtr_dhMB7paWcUyZNrGt9nujIWK865g6kEwi8xlq-OxjgjNib1mG-aaxWuqaB2UDKLFymkWDKvQy3J2g5L68a8MQaJzGFQmyifiOnPYh-w8W6nfNEuuqxUSy8ZvlWHya5JpWn3v5Fyb7_4gHgEH4aT_qha8XyFuKQ5JTwF4_ljztU2MKcFxKVNeU1Jjaq1VAM7dPvMo5-zOnei1p45cYRxxWi12dM0jOUjRIFC8FUhnsu1OM5dOzSHAPyPdevBry5-pvfv18IukYY"/>
+</div>
+<div class="flex flex-col gap-1 items-end max-w-[85%]">
+<div class="flex items-baseline gap-2 flex-row-reverse">
+<span class="text-sm font-semibold text-gray-900 dark:text-white">You</span>
+<span class="text-xs text-gray-500">10:25 AM</span>
+</div>
+<div class="p-4 rounded-lg rounded-tr-none bg-primary text-white shadow-md text-base leading-relaxed message-bubble-user">
+<p>Can you summarize the Krebs cycle based on the PDF I uploaded? Please highlight the inputs and outputs.</p>
+</div>
+</div>
+</div>
+<!-- AI Response with structured content -->
+<div class="flex gap-4 max-w-4xl mx-auto">
+<div class="flex-shrink-0 mt-1">
+<div class="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-orange-600 flex items-center justify-center shadow-lg shadow-primary/20">
+<span class="material-icons text-white text-sm">smart_toy</span>
+</div>
+</div>
+<div class="flex flex-col gap-1 max-w-[85%]">
+<div class="flex items-baseline gap-2">
+<span class="text-sm font-semibold text-gray-900 dark:text-white">Campus AI</span>
+<span class="text-xs text-gray-500">10:26 AM</span>
+</div>
+<div class="p-6 rounded-lg rounded-tl-none bg-white dark:bg-surface-dark border border-gray-200 dark:border-white/5 shadow-sm text-gray-700 dark:text-gray-200 text-base leading-relaxed message-bubble-ai">
+<h3 class="text-lg font-bold text-gray-900 dark:text-white mb-3">The Krebs Cycle (Citric Acid Cycle)</h3>
+<p class="mb-4">Based on your notes, the Krebs cycle occurs in the <span class="text-primary font-medium">mitochondrial matrix</span> and is the second stage of cellular respiration. Here is the summary you requested:</p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+<div class="bg-gray-50 dark:bg-background-dark p-4 rounded-lg border border-gray-200 dark:border-white/5">
+<h4 class="text-sm font-bold text-gray-500 uppercase tracking-wide mb-2 flex items-center gap-2">
+<span class="material-icons text-base text-green-500">input</span> Inputs
+                                </h4>
+<ul class="list-disc list-inside space-y-1 text-sm">
+<li>2 Acetyl CoA molecules</li>
+<li>6 NAD+</li>
+<li>2 FAD</li>
+<li>2 ADP + Pi</li>
+</ul>
+</div>
+<div class="bg-gray-50 dark:bg-background-dark p-4 rounded-lg border border-gray-200 dark:border-white/5">
+<h4 class="text-sm font-bold text-gray-500 uppercase tracking-wide mb-2 flex items-center gap-2">
+<span class="material-icons text-base text-primary">output</span> Outputs (Per Glucose)
+                                </h4>
+<ul class="list-disc list-inside space-y-1 text-sm">
+<li>4 CO₂ (waste)</li>
+<li>6 NADH (energy carrier)</li>
+<li>2 FADH₂ (energy carrier)</li>
+<li>2 ATP (energy)</li>
+</ul>
+</div>
+</div>
+<p class="mb-2"><strong>Key Takeaway:</strong> The main purpose is not to generate large amounts of ATP directly, but to load electron carriers (NADH and FADH₂) for the <span class="bg-primary/20 text-primary px-1 rounded">Electron Transport Chain</span>.</p>
+<!-- Actions -->
+<div class="flex items-center gap-3 mt-4 pt-4 border-t border-gray-200 dark:border-white/5">
+<button class="text-gray-400 hover:text-primary transition-colors" title="Copy Text"><span class="material-icons text-lg">content_copy</span></button>
+<button class="text-gray-400 hover:text-primary transition-colors" title="Regenerate"><span class="material-icons text-lg">refresh</span></button>
+<button class="text-gray-400 hover:text-green-500 transition-colors ml-auto" title="Good Response"><span class="material-icons text-lg">thumb_up</span></button>
+<button class="text-gray-400 hover:text-red-500 transition-colors" title="Bad Response"><span class="material-icons text-lg">thumb_down</span></button>
+</div>
+</div>
+</div>
+</div>
+<!-- Spacer for bottom input -->
+<div class="h-24"></div>
+</div>
+<!-- Floating Input Area -->
+<div class="absolute bottom-6 left-0 right-0 px-4 md:px-8 max-w-4xl mx-auto z-20">
+<!-- Helper Tooltip (Context Aware) -->
+<div class="absolute -top-10 left-1/2 -translate-x-1/2">
+<button class="bg-primary text-white text-xs font-medium px-3 py-1.5 rounded-full shadow-lg shadow-primary/20 animate-bounce flex items-center gap-1 hover:bg-primary-dark transition-colors">
+<span class="material-icons text-xs">auto_awesome</span>
+                    Generate Practice Quiz based on this
+                </button>
+</div>
+<div class="relative bg-white dark:bg-surface-dark rounded-xl shadow-2xl border border-gray-200 dark:border-white/10 overflow-hidden ring-1 ring-black/5 dark:ring-white/5">
+<!-- Text Area -->
+<textarea class="w-full bg-transparent border-0 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:ring-0 resize-none py-4 pl-4 pr-16 max-h-48 min-h-[60px]" placeholder="Ask a follow-up question..." rows="1"></textarea>
+<!-- Input Actions -->
+<div class="absolute bottom-3 right-3 flex items-center gap-2">
+<button class="p-2 text-gray-400 hover:text-primary transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-white/5" title="Upload File">
+<span class="material-icons text-xl">attach_file</span>
+</button>
+<button class="p-2 bg-primary hover:bg-primary-dark text-white rounded-lg transition-colors shadow-md shadow-primary/20 flex items-center justify-center">
+<span class="material-icons text-xl">arrow_upward</span>
+</button>
+</div>
+<!-- Advanced Mode Toggle -->
+<div class="absolute bottom-3 left-4 flex items-center gap-2">
+<button class="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-primary transition-colors py-1 px-2 rounded hover:bg-gray-100 dark:hover:bg-white/5">
+<span class="material-icons text-sm">picture_as_pdf</span>
+<span>Lecture_Notes_Ch4.pdf</span>
+<span class="material-icons text-xs">close</span>
+</button>
+</div>
+</div>
+<p class="text-center text-[10px] text-gray-400 mt-2">AI can make mistakes. Please verify important information.</p>
+</div>
+</main>
+</body></html>

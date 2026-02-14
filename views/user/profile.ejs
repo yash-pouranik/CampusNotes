@@ -1,115 +1,364 @@
-<link rel="stylesheet" href="/css/profile.css" />
+<!-- Google Material Icons -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
 
-<div class="profile-page">
+<!-- Tailwind CSS & Config for this page -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#FF5722", // Core Orange
+          "primary-hover": "#F4511E",
+          "accent-blue": "#3B82F6",
+          "accent-green": "#22C55E",
+          "accent-purple": "#A855F7",
+          "background-dark": "#050505", // Deep Black
+          "surface-dark": "#0A0A0A",
+          "surface-dark-lighter": "#171717",
+          "border-dark": "#27272A", // Zinc-800
+        },
+        fontFamily: {
+          "display": ["Inter", "system-ui", "sans-serif"]
+        },
+        backgroundImage: {
+          'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        }
+      },
+    },
+  }
+</script>
 
-  <!-- 🌟 PROFILE HEADER CARD -->
-  <section class="profile-card">
+<style>
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #050505; 
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #333; 
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555; 
+  }
+  
+  body {
+    background-color: #050505 !important;
+    color: #ffffff;
+    font-family: 'Inter', sans-serif;
+  }
+  
+  .saas-card {
+    background: rgba(23, 23, 23, 0.6) !important;
+    backdrop-filter: blur(12px);
+    border: 1px solid #27272A;
+  }
+</style>
 
-    <div class="profile-left">
-      <div class="profile-avatar-wrapper">
-        <img src="<%= user.avatar %>" class="profile-avatar" />
+<div class="min-h-screen bg-background-dark font-display text-gray-300 antialiased pb-12">
+  
+  <!-- Main Content Container -->
+  <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="max-w-5xl mx-auto space-y-8">
+      
+      <!-- PROFILE HEADER CARD -->
+      <div class="relative overflow-hidden bg-surface-dark rounded-xl border border-border-dark shadow-sm">
+        <!-- Cover Image (Gradient + Pattern) -->
+        <div class="h-48 w-full bg-gradient-to-r from-zinc-900 via-black to-zinc-900 relative border-b border-border-dark">
+          <div class="absolute inset-0 bg-primary/5"></div>
+          <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#FF5722 1px, transparent 1px); background-size: 24px 24px;"></div>
+        </div>
 
-        <% if(currUser && currUser._id.toString() === user._id.toString()) { %>
-          <button class="avatar-edit-btn" onclick="openAvatarModal()">✎</button>
-        <% } %>
+        <div class="px-6 pb-6 relative">
+          <!-- Avatar & Info Row -->
+          <div class="flex flex-col md:flex-row items-start md:items-end -mt-16 mb-4 gap-6">
+            
+            <!-- Avatar -->
+            <div class="relative group">
+              <div class="h-32 w-32 rounded-xl border-4 border-background-dark overflow-hidden shadow-2xl bg-zinc-800 ring-1 ring-border-dark z-10 relative">
+                <% 
+                  let avatarUrl = user.avatar || '/images/dummy_profile.avif';
+                  // Optimize if cloudinary
+                  if(avatarUrl.includes('cloudinary')) {
+                    avatarUrl = avatarUrl.replace('/upload/', '/upload/w_300,h_300,c_fill,q_auto,f_auto/');
+                  }
+                %>
+                <img alt="<%= user.name %>" class="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500" src="<%= avatarUrl %>"/>
+              </div>
+              <!-- Online/Status Indicator (Optional) -->
+              <div class="absolute bottom-2 right-2 h-4 w-4 bg-accent-green border-2 border-background-dark rounded-full shadow-[0_0_8px_rgba(34,197,94,0.5)] z-20" title="Active"></div>
+              
+              <% if(currUser && currUser._id.toString() === user._id.toString()) { %>
+                <button onclick="openAvatarModal()" class="absolute bottom-0 right-0 p-1.5 bg-surface-dark border border-border-dark text-white rounded-full translate-x-1/2 translate-y-1/2 hover:bg-primary hover:border-primary transition-colors z-30 shadow-lg" title="Change Avatar">
+                  <span class="material-icons-outlined text-sm">edit</span>
+                </button>
+              <% } %>
+            </div>
+
+            <!-- Profile Info -->
+            <div class="flex-1 pt-2 md:pt-0 w-full">
+              <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                
+                <!-- Name & Details -->
+                <div>
+                  <h1 class="text-3xl font-bold text-white tracking-tight flex items-center gap-2">
+                    <%= user.name %>
+                    <% if (user.roles.isModerator) { %>
+                      <img src="/images/blueCheckmark.svg" class="w-5 h-5" title="Moderator">
+                    <% } else if (user.roles.isDev) { %>
+                      <img src="/images/icons8-checkmark.svg" class="w-5 h-5" title="Developer">
+                    <% } else if (user.verification && user.verification.verified) { %>
+                      <span class="material-icons text-accent-blue text-xl" title="Verified Student">verified</span>
+                    <% } %>
+                  </h1>
+                  
+                  <div class="flex flex-wrap items-center gap-x-4 gap-y-2 mt-1 text-sm text-gray-400">
+                    <div class="flex items-center gap-1">
+                      <span class="material-icons-outlined text-base text-gray-500">email</span>
+                      <span><%= user.email %></span>
+                    </div>
+                    <% if (user.course) { %>
+                      <div class="w-1 h-1 rounded-full bg-gray-600 hidden sm:block"></div>
+                      <div class="flex items-center gap-1">
+                        <span class="material-icons-outlined text-base text-gray-500">school</span>
+                        <span><%= user.course %></span>
+                      </div>
+                    <% } %>
+                  </div>
+
+                  <!-- Role Badges -->
+                  <div class="flex gap-2 mt-4">
+                    <% if (user.uploaded > 5) { %>
+                      <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-primary/10 text-primary border border-primary/20">
+                        Top Contributor
+                      </span>
+                    <% } %>
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-surface-dark-lighter text-gray-300 border border-border-dark">
+                      Student
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex items-center gap-3 w-full md:w-auto mt-2 md:mt-0">
+                  <% if(currUser && currUser._id.toString() === user._id.toString()) { %>
+                    <a href="/profile/<%= user._id %>/edit" class="flex-1 md:flex-none justify-center px-4 py-2 text-sm font-medium text-gray-300 bg-black border border-border-dark rounded-lg hover:bg-surface-dark-lighter hover:text-white transition-colors flex items-center gap-2">
+                       <span class="material-icons-outlined text-sm">edit</span>
+                       Edit Profile
+                    </a>
+                  <% } %>
+                  
+                  <button onclick="navigator.clipboard.writeText(window.location.href); alert('Profile link copied!')" class="flex-1 md:flex-none justify-center px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary-hover rounded-lg shadow-[0_0_15px_rgba(255,87,34,0.2)] transition-colors flex items-center gap-2">
+                    <span class="material-icons-outlined text-sm">share</span>
+                    Share Profile
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
 
-    <div class="profile-right">
-
-      <div class="profile-name-line">
-        <h2><%= user.name %></h2>
-
-        <% if (user.roles.isModerator) { %>
-          <img src="/images/blueCheckmark.svg" class="verify-icon">
-        <% } else if (user.roles.isDev) { %>
-          <img src="/images/icons8-checkmark.svg" class="verify-icon">
-        <% } else if (user.verification.verified) { %>
-          <span class="text-verified">✔</span>
-        <% } %>
-      </div>
-
-      <p class="profile-email"><%= user.email %></p>
-
-      <% if(currUser && currUser._id.toString() === user._id.toString()) { %>
-      <a href="/profile/<%= user._id %>/edit" class="profile-edit-btn">Edit Profile</a>
-      <% } %>
-
-      <div class="profile-stats">
-        <div class="stat-box">Uploads: <strong><%= user.uploaded %></strong></div>
-      </div>
-
-      <div class="social-links">
-        <p>🔗 LinkedIn: 
-          <% if (user.socialLinks?.linkedin) { %>
-            <a href="<%= user.socialLinks.linkedin %>" target="_blank">View</a>
-          <% } else { %> Not added <% } %>
-        </p>
-
-        <p>💻 GitHub:
-          <% if (user.socialLinks?.github) { %>
-            <a href="<%= user.socialLinks.github %>" target="_blank">View</a>
-          <% } else { %> Not added <% } %>
-        </p>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- ⭐ Uploaded Notes Section -->
-  <h2 class="note-section-title">Uploaded Notes</h2>
-
-  <div class="note-grid">
-    <% notes.forEach(note => { %>
-
-      <article class="card">
-
-        <div class="card-top">
-          <div>
-            <h3 class="title"><%= note.title %></h3>
-            <div class="subtitle">
-              <%= note.subject?.name %> • <%= note.course %>
+      <!-- STATS GRID -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Total Uploads -->
+        <div class="bg-surface-dark p-5 rounded-lg border border-border-dark hover:border-primary/30 transition-colors duration-300 group">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs uppercase tracking-wider font-semibold text-gray-500 group-hover:text-primary transition-colors">Total Uploads</p>
+              <p class="text-2xl font-bold text-white mt-1"><%= user.uploaded %></p>
+            </div>
+            <div class="h-10 w-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-accent-blue group-hover:bg-blue-500/20 transition-colors">
+              <span class="material-icons-outlined">upload_file</span>
             </div>
           </div>
         </div>
 
-        <div class="card-body">
-          <div style="display:flex; gap:8px;">
-            <div class="tag"><i class="fa-solid fa-download"></i> <strong><%= note.downloadCount %></strong></div>
-            <div class="tag"><strong><%= note.createdAt?.toDateString() %></strong></div>
+        <!-- Total Downloads (Calculated) -->
+        <% const totalDownloads = notes.reduce((acc, note) => acc + (note.downloadCount || 0), 0); %>
+        <div class="bg-surface-dark p-5 rounded-lg border border-border-dark hover:border-primary/30 transition-colors duration-300 group">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs uppercase tracking-wider font-semibold text-gray-500 group-hover:text-primary transition-colors">Total Downloads</p>
+              <p class="text-2xl font-bold text-white mt-1"><%= totalDownloads %></p>
+            </div>
+            <div class="h-10 w-10 rounded-lg bg-emerald-500/10 flex items-center justify-center text-accent-green group-hover:bg-emerald-500/20 transition-colors">
+              <span class="material-icons-outlined">download</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Social: LinkedIn -->
+        <div class="bg-surface-dark p-5 rounded-lg border border-border-dark hover:border-primary/30 transition-colors duration-300 group">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs uppercase tracking-wider font-semibold text-gray-500 group-hover:text-primary transition-colors">LinkedIn</p>
+              <p class="text-sm font-medium text-white mt-1 truncate max-w-[120px]">
+                <% if (user.socialLinks?.linkedin) { %>
+                  <a href="<%= user.socialLinks.linkedin %>" target="_blank" class="hover:underline">View Profile</a>
+                <% } else { %>
+                  <span class="text-gray-600">Not linked</span>
+                <% } %>
+              </p>
+            </div>
+            <div class="h-10 w-10 rounded-lg bg-blue-700/10 flex items-center justify-center text-blue-500 group-hover:bg-blue-700/20 transition-colors">
+              <i class="fa-brands fa-linkedin text-xl"></i>
+            </div>
           </div>
         </div>
 
-        <div class="card-footer">
-          <a class="view-btn" href="/notes/<%= note._id %>">View</a>
+        <!-- Social: GitHub -->
+        <div class="bg-surface-dark p-5 rounded-lg border border-border-dark hover:border-primary/30 transition-colors duration-300 group">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs uppercase tracking-wider font-semibold text-gray-500 group-hover:text-primary transition-colors">GitHub</p>
+              <p class="text-sm font-medium text-white mt-1 truncate max-w-[120px]">
+                <% if (user.socialLinks?.github) { %>
+                  <a href="<%= user.socialLinks.github %>" target="_blank" class="hover:underline">View Profile</a>
+                <% } else { %>
+                  <span class="text-gray-600">Not linked</span>
+                <% } %>
+              </p>
+            </div>
+            <div class="h-10 w-10 rounded-lg bg-purple-500/10 flex items-center justify-center text-accent-purple group-hover:bg-purple-500/20 transition-colors">
+              <i class="fa-brands fa-github text-xl"></i>
+            </div>
+          </div>
+        </div>
+      </div>
 
-         
+      <!-- UPLOADED NOTES SECTION -->
+      <div class="space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4">
+          <h2 class="text-xl font-bold text-primary flex items-center gap-2">
+            <span class="w-1.5 h-6 bg-primary rounded-full"></span>
+            Uploaded Notes (<%= notes.length %>)
+          </h2>
+          
+          <div class="flex items-center gap-3">
+             <% if(currUser && currUser._id.toString() === user._id.toString()) { %>
+              <a href="/upload" class="px-4 py-2 text-sm font-medium text-black bg-white hover:bg-gray-200 rounded-lg transition-colors flex items-center gap-2">
+                  <span class="material-icons-outlined text-sm">add</span>
+                  Upload Note
+              </a>
+             <% } %>
+          </div>
         </div>
 
-      </article>
+        <!-- Notes List -->
+        <div class="bg-surface-dark rounded-xl border border-border-dark overflow-hidden">
+          <% if (notes.length > 0) { %>
+            <div class="divide-y divide-border-dark">
+              <% notes.forEach(note => { %>
+                <div class="p-4 sm:p-5 hover:bg-white/[0.02] transition-colors group flex flex-col sm:flex-row sm:items-center gap-4">
+                  <!-- Icon -->
+                  <div class="h-12 w-12 flex-shrink-0 rounded-lg bg-red-500/10 flex items-center justify-center text-red-500 border border-red-500/10">
+                    <span class="material-icons-outlined text-2xl">picture_as_pdf</span>
+                  </div>
+                  
+                  <!-- Note Details -->
+                  <div class="flex-1 min-w-0" onclick="window.location.href='/notes/<%= note._id %>'" style="cursor: pointer;">
+                    <div class="flex items-center gap-2 mb-1.5">
+                      <h3 class="text-base font-semibold text-white truncate group-hover:text-primary transition-colors max-w-md"><%= note.title %></h3>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-surface-dark-lighter text-gray-400 border border-border-dark">
+                        <%= note.subject?.name || 'General' %>
+                      </span>
+                    </div>
+                    
+                    <div class="flex items-center text-sm text-gray-500 gap-4">
+                      <span class="flex items-center gap-1.5">
+                        <span class="material-icons-outlined text-[14px]">calendar_today</span>
+                        <%= note.createdAt ? new Date(note.createdAt).toLocaleDateString() : 'Unknown' %>
+                      </span>
+                      <span class="flex items-center gap-1.5">
+                         <span class="material-icons-outlined text-[14px]">school</span>
+                         <%= note.course %>
+                      </span>
+                    </div>
+                  </div>
 
-    <% }) %>
-  </div>
+                  <!-- Stats & Actions -->
+                  <div class="flex items-center justify-between sm:justify-end sm:gap-6 mt-2 sm:mt-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-border-dark">
+                    <div class="hidden sm:flex flex-col items-end">
+                      <span class="text-sm font-semibold text-white"><%= note.downloadCount || 0 %></span>
+                      <span class="text-xs text-gray-500">Downloads</span>
+                    </div>
+                    
+                    <!-- View Button (Visible to all) -->
+                    <a href="/notes/<%= note._id %>" class="p-2 text-gray-500 hover:text-white hover:bg-white/10 rounded-lg transition-colors" title="View Note">
+                        <span class="material-icons-outlined text-xl">visibility</span>
+                    </a>
 
+                    <% if(currUser && currUser._id.toString() === user._id.toString()) { %>
+                      <!-- Edit/Delete (Only Owner) -->
+                      <!-- Assuming edit route exists or will be added. Placeholder for now -->
+                      <a href="/notes/<%= note._id %>/edit" class="p-2 text-gray-500 hover:text-accent-blue hover:bg-blue-500/10 rounded-lg transition-colors" title="Edit">
+                        <span class="material-icons-outlined text-xl">edit</span>
+                      </a>
+                    <% } %>
+                  </div>
+                </div>
+              <% }) %>
+            </div>
+          <% } else { %>
+            <div class="p-12 text-center">
+              <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-surface-dark-lighter border border-border-dark mb-4">
+                <span class="material-icons-outlined text-3xl text-gray-600">note_add</span>
+              </div>
+              <h3 class="text-lg font-medium text-white">No notes uploaded yet</h3>
+              <p class="text-gray-500 mt-2">This user hasn't contributed any study materials yet.</p>
+            </div>
+          <% } %>
+        </div>
+      </div>
+
+    </div>
+  </main>
 </div>
 
+<!-- Avatar Modal (Preserved Logic, New Style) -->
+<div id="avatarModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+  <div class="bg-surface-dark border border-border-dark rounded-xl w-full max-w-md p-6 shadow-2xl relative">
+    <button onclick="closeAvatarModal()" class="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors">
+      <span class="material-icons-outlined">close</span>
+    </button>
+    
+    <h3 class="text-xl font-bold text-white mb-6">Update Profile Picture</h3>
+    
+    <div class="flex justify-center mb-6">
+      <img src="<%= user.avatar %>" class="w-32 h-32 rounded-full object-cover border-4 border-border-dark">
+    </div>
 
-<!-- Avatar Modal -->
-<div id="avatarModal" class="avatar-modal" style="display:none;">
-  <div class="avatar-modal-content">
-    <h3>Edit Profile Picture</h3>
-    <img src="<%= user.avatar %>" class="modal-avatar">
-
-    <form action="/profile/avatar?_method=PUT" method="POST" enctype="multipart/form-data">
-      <input type="file" name="avatar" accept="image/*" required>
-      <button class="profile-edit-btn">Upload</button>
+    <form action="/profile/avatar?_method=PUT" method="POST" enctype="multipart/form-data" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-400 mb-2">Choose New Image</label>
+        <input type="file" name="avatar" accept="image/*" required class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer border border-border-dark rounded-lg bg-black/50 focus:outline-none focus:border-primary transition-colors">
+      </div>
+      
+      <div class="flex gap-3 justify-end mt-6">
+        <button type="button" onclick="closeAvatarModal()" class="px-4 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white border border-border-dark hover:bg-white/5 transition-colors">Cancel</button>
+        <button type="submit" class="px-4 py-2 rounded-lg text-sm font-bold text-white bg-primary hover:bg-primary-hover shadow-lg shadow-primary/20 transition-all">Upload New Picture</button>
+      </div>
     </form>
-
-    <div class="modal-close" onclick="closeAvatarModal()">Cancel</div>
   </div>
 </div>
 
 <script>
-function openAvatarModal(){ document.getElementById("avatarModal").style.display="flex"; }
-function closeAvatarModal(){ document.getElementById("avatarModal").style.display="none"; }
+  function openAvatarModal(){ 
+    const modal = document.getElementById("avatarModal");
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+  }
+  function closeAvatarModal(){ 
+    const modal = document.getElementById("avatarModal");
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+  }
 </script>

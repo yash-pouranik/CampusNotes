@@ -1,111 +1,230 @@
-<link rel="stylesheet" href="/css/auth.css">
-
-<section class="auth-section">
-
-  <h2>Forgot Password</h2>
-  <p class="sub">Enter your registered email — we’ll send an OTP.</p>
-
-  <% if (typeof flash !== "undefined" && flash && flash.message) { %>
-    <div class="alert <%= flash.type === 'success' ? 'success' : 'error' %>">
-      <%= flash.message %>
-    </div>
-  <% } %>
-
-  <% if (step === "otp") { %>
-
-    <!-- Step 2: OTP + reset new password -->
-    <div class="readonly-chip">
-      <span><strong>Email:</strong> <%= email %></span>
-      <a href="/forgot">Change</a>
-    </div>
-
-    <form action="/forgot/verify" method="POST">
-      <% if (typeof csrfToken !== "undefined") { %>
-        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-      <% } %>
-
-      <input type="hidden" name="email" value="<%= email %>">
-
-      <input type="text" name="otp" placeholder="Enter 6-digit OTP" maxlength="6" required />
-
-      <input type="password" name="password" placeholder="New password" required />
-      <input type="password" name="confirmPassword" placeholder="Confirm new password" required />
-
-      <button type="submit">Reset Password</button>
-    </form>
-
-    <form action="/forgot/resend" method="POST" class="row" style="margin-top:10px;">
-      <% if (typeof csrfToken !== "undefined") { %>
-        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-      <% } %>
-      <input type="hidden" name="email" value="<%= email %>">
-      <button class="btn-secondary flex-1" type="submit" id="resendBtn">Resend OTP</button>
-    </form>
-
-    <p class="muted">Didn’t get OTP? Request again.</p>
-
-  <% } else { %>
-
-    <!-- Step 1: Email -->
-    <form action="/forgot/send-otp" method="POST">
-      <% if (typeof csrfToken !== "undefined") { %>
-        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-      <% } %>
-
-      <input 
-        type="email" 
-        name="email" 
-        placeholder="Registered Email" 
-        value="<%= typeof email !== 'undefined' ? email : '' %>" 
-        required 
-      />
-      <button type="submit">Send OTP</button>
-    </form>
-
-    <p class="muted"><a href="/login-n">Back to Login</a></p>
-
-  <% } %>
-</section>
-
-<script>
-  // OTP resend UX cooldown
-  const btn = document.getElementById("resendBtn");
-  if (btn) {
-    let original = btn.textContent;
-    btn.addEventListener("click", () => {
-      let s = 30;
-      btn.disabled = true;
-      btn.textContent = `Resend in ${s}s`;
-      let t = setInterval(() => {
-        s--;
-        if (s <= 0) {
-          clearInterval(t);
-          btn.disabled = false;
-          btn.textContent = original;
-        } else {
-          btn.textContent = `Resend in ${s}s`;
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    
+    <!-- Google Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+    
+    <!-- Tailwind CSS & Config -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#FF5722", // Core Orange
+              "primary-hover": "#F4511E",
+              "background-dark": "#050505", // Deep Black
+              "surface-dark": "#0A0A0A",
+              "surface-dark-lighter": "#171717",
+              "border-dark": "#27272A",
+            },
+            fontFamily: {
+              "display": ["Inter", "system-ui", "sans-serif"]
+            },
+            animation: {
+              "fade-in-up": "fadeInUp 0.5s ease-out forwards",
+            },
+            keyframes: {
+              fadeInUp: {
+                "0%": { opacity: "0", transform: "translateY(10px)" },
+                "100%": { opacity: "1", transform: "translateY(0)" },
+              }
+            }
+          },
+        },
+      }
+    </script>
+    <style>
+      body {
+        background-color: #050505 !important;
+        color: #ffffff;
+        font-family: 'Inter', sans-serif;
+      }
+    </style>
+  </head>
+  
+  <div class="min-h-screen bg-background-dark font-display text-gray-300 antialiased py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center relative overflow-hidden">
+      
+      <!-- Background Blobs -->
+      <div class="absolute top-0 right-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[100px] -translate-y-1/2"></div>
+      <div class="absolute bottom-0 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-[100px] translate-y-1/2"></div>
+  
+      <div class="max-w-md w-full space-y-8 animate-fade-in-up relative z-10">
+          
+          <!-- BRAND HEADER -->
+          <div class="text-center">
+              <a href="/" class="inline-block mb-4">
+                  <h1 class="text-3xl font-bold text-white tracking-tighter">
+                      Campus<span class="text-primary">Notes</span><span class="text-primary">.</span>
+                  </h1>
+              </a>
+              <h2 class="text-2xl font-bold text-white tracking-tight">Recover Password</h2>
+              <p class="mt-2 text-sm text-gray-500">
+                  <% if (typeof step !== "undefined" && step === "otp") { %>
+                      Enter the OTP sent to your email.
+                  <% } else { %>
+                      Enter your email to receive a recovery code.
+                  <% } %>
+              </p>
+          </div>
+  
+          <!-- AUTH CARD -->
+          <div class="bg-surface-dark border border-border-dark rounded-xl shadow-2xl p-8">
+              
+              <% if (typeof flash !== "undefined" && flash && flash.message) { %>
+                  <div class="mb-6 p-4 rounded-lg text-sm font-medium border <%= flash.type === 'success' ? 'bg-green-500/10 border-green-500/50 text-green-400' : 'bg-red-500/10 border-red-500/50 text-red-400' %> flex items-center gap-2">
+                       <span class="material-icons-outlined text-base"><%= flash.type === 'success' ? 'check_circle' : 'error' %></span>
+                       <%= flash.message %>
+                  </div>
+              <% } %>
+  
+              <% if (typeof step !== "undefined" && step === "otp") { %>
+                  
+                  <!-- STEP 2: VERIFY OTP -->
+                  <div class="mb-6 p-3 bg-surface-dark-lighter rounded-lg border border-border-dark flex items-center justify-between">
+                      <div class="flex items-center gap-3 overflow-hidden">
+                          <div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+                              <span class="material-icons-outlined text-sm">email</span>
+                          </div>
+                          <div class="truncate">
+                              <p class="text-xs text-gray-500">Sent to</p>
+                              <p class="text-sm font-medium text-white truncate"><%= email %></p>
+                          </div>
+                      </div>
+                      <a href="/forgot" class="text-xs font-bold text-primary hover:text-white transition-colors">Change</a>
+                  </div>
+  
+                  <form action="/forgot/verify" method="POST" id="verifyForm" class="space-y-5">
+                      <% if (typeof csrfToken !== "undefined") { %>
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                      <% } %>
+                      <input type="hidden" name="email" value="<%= email %>">
+  
+                      <div>
+                          <label class="block text-sm font-medium text-gray-400 mb-1">One-Time Password (OTP)</label>
+                          <input type="text" name="otp" placeholder="123456" maxlength="6" required 
+                                 class="w-full bg-surface-dark-lighter border border-border-dark rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-colors text-center font-mono text-lg tracking-widest">
+                      </div>
+  
+                      <div class="grid grid-cols-1 gap-4">
+                          <div>
+                              <label class="block text-sm font-medium text-gray-400 mb-1">New Password</label>
+                              <input type="password" name="password" placeholder="Min 8 chars" required 
+                                     class="w-full bg-surface-dark-lighter border border-border-dark rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-colors">
+                          </div>
+                          <div>
+                              <label class="block text-sm font-medium text-gray-400 mb-1">Confirm Password</label>
+                              <input type="password" name="confirmPassword" placeholder="Confirm password" required 
+                                     class="w-full bg-surface-dark-lighter border border-border-dark rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-colors">
+                          </div>
+                      </div>
+  
+                      <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-lg text-sm font-bold text-white bg-gradient-to-r from-primary to-orange-600 hover:from-primary-hover hover:to-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all transform hover:-translate-y-0.5">
+                          Reset Password
+                      </button>
+                  </form>
+  
+                  <form action="/forgot/resend" method="POST" class="mt-4 text-center">
+                    <% if (typeof csrfToken !== "undefined") { %>
+                      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <% } %>
+                    <input type="hidden" name="email" value="<%= email %>">
+                    <p class="text-sm text-gray-500">
+                        Didn't receive code? 
+                        <button type="submit" id="resendBtn" class="font-medium text-primary hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed">Resend OTP</button>
+                    </p>
+                  </form>
+  
+              <% } else { %>
+                  
+                  <!-- STEP 1: SEND EMAIL -->
+                  <form action="/forgot/send-otp" method="POST" class="space-y-6">
+                      <% if (typeof csrfToken !== "undefined") { %>
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                      <% } %>
+  
+                      <div>
+                          <label for="email" class="block text-sm font-medium text-gray-400 mb-1">Email address</label>
+                          <div class="relative">
+                              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                  <span class="material-icons-outlined text-gray-500 text-lg">mail</span>
+                              </div>
+                              <input 
+                                type="email" 
+                                name="email" 
+                                id="email"
+                                placeholder="name@example.com" 
+                                value="<%= typeof email !== 'undefined' ? email : '' %>" 
+                                required 
+                                class="w-full bg-surface-dark-lighter border border-border-dark rounded-lg pl-10 pr-4 py-3 text-white placeholder-gray-600 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-colors"
+                              />
+                          </div>
+                      </div>
+  
+                      <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-lg text-sm font-bold text-white bg-gradient-to-r from-primary to-orange-600 hover:from-primary-hover hover:to-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all transform hover:-translate-y-0.5">
+                          Send Recovery Code
+                      </button>
+                  </form>
+                  
+                  <div class="mt-6 border-t border-border-dark pt-6 text-center">
+                      <a href="/login-n" class="inline-flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-white transition-colors">
+                          <span class="material-icons-outlined text-sm">arrow_back</span> Back to Login
+                      </a>
+                  </div>
+  
+              <% } %>
+  
+          </div>
+      </div>
+  </div>
+  
+  <script>
+    // --- OTP RESEND TIMER ---
+    const btn = document.getElementById("resendBtn");
+    if (btn) {
+      let original = btn.textContent;
+      btn.addEventListener("click", () => {
+        let s = 30;
+        // The form submits immediately, but if we wanted to prevent default:
+        // e.preventDefault(); 
+        // For UI feedback only (assuming backend handles logic):
+        setTimeout(() => {
+            btn.disabled = true;
+            btn.textContent = `Resend in ${s}s`;
+            let t = setInterval(() => {
+              s--;
+              if (s <= 0) {
+                clearInterval(t);
+                btn.disabled = false;
+                btn.textContent = original;
+              } else {
+                btn.textContent = `Resend in ${s}s`;
+              }
+            }, 1000);
+        }, 100);
+      });
+    }
+  
+    // --- PASSWORD VALIDATION ---
+    const verifyForm = document.getElementById('verifyForm');
+    if (verifyForm) {
+      verifyForm.addEventListener("submit", e => {
+        const pwd = verifyForm.querySelector('input[name="password"]').value;
+        const confirm = verifyForm.querySelector('input[name="confirmPassword"]').value;
+  
+        if (pwd.length < 8) {
+          alert("Password must be at least 8 characters.");
+          e.preventDefault();
+          return;
         }
-      }, 1000);
-    });
-  }
-
-  // Password validations
-  const verifyForm = document.querySelector('form[action="/forgot/verify"]');
-  if (verifyForm) {
-    verifyForm.addEventListener("submit", e => {
-      const pwd = verifyForm.password.value;
-      const confirm = verifyForm.confirmPassword.value;
-
-      if (pwd.length < 8) {
-        alert("Password must be at least 8 characters.");
-        e.preventDefault();
-        return;
-      }
-
-      if (pwd !== confirm) {
-        alert("Passwords do not match.");
-        e.preventDefault();
-      }
-    });
-  }
-</script>
+  
+        if (pwd !== confirm) {
+          alert("Passwords do not match.");
+          e.preventDefault();
+        }
+      });
+    }
+  </script>
