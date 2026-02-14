@@ -1,116 +1,163 @@
-<link rel="stylesheet" href="/css/form.css" />
-<style>
-  .verify-container {
-    max-width: 550px;
-    margin: 60px auto;
-    padding: 40px;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-    text-align: center;
-  }
-  .verify-container h2 {
-    color: #1e3a8a;
-    margin-bottom: 15px;
-  }
-  #question-text {
-    font-size: 1.1rem;
-    font-style: italic;
-    color: #333;
-    background-color: #f9fafb;
-    padding: 20px;
-    border-radius: 8px;
-    min-height: 50px;
-    margin: 25px 0;
-  }
-  #answer-input {
-    width: 95%;
-    padding: 12px;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-  }
-  #submit-answer-btn {
-    margin-top: 20px;
-    padding: 12px 25px;
-    font-size: 1rem;
-    font-weight: bold;
-    color: #fff;
-    background-color: #2563eb;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  #submit-answer-btn:hover {
-    background-color: #1d4ed8;
-  }
-  .response-message {
-    margin-top: 15px;
-    font-weight: bold;
-  }
-  .success {
-    color: #16a34a;
-  }
-  .error {
-    color: #dc2626;
-  }
-</style>
-
-<div class="verify-container">
-  <h2>Campus Trivia Verification 🧠</h2>
-  <p>To prove you're an SVVV student, please answer the following question:</p>
-  <p>(answer only in lowercase without spaces, all together.)</p>
-
-  <p id="question-text">Loading question...</p>
-
-  <form id="trivia-form">
-    <input type="text" id="answer-input" placeholder="Your answer here..." required autocomplete="off">
-    <button type="submit" id="submit-answer-btn">Submit Answer</button>
-  </form>
-  
-  <p id="response-message" class="response-message"></p>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script>
-  const questionText = document.getElementById('question-text');
-  const triviaForm = document.getElementById('trivia-form');
-  const answerInput = document.getElementById('answer-input');
-  const responseMessage = document.getElementById('response-message');
-
-  // 1. Page load hone par question fetch karein
-  window.addEventListener('load', async () => {
-    try {
-      const res = await axios.get('/api/trivia-question');
-      questionText.textContent = res.data.question;
-      console.log(res.data.question);
-    } catch (err) {
-      questionText.textContent = 'Could not load question. You might be already verified or not logged in.';
-      document.getElementById('submit-answer-btn').disabled = true;
-      console.log(questionText);
-    }
-  });
-
-  // 2. Form submit hone par answer verify karein
-  triviaForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const userAnswer = answerInput.value;
-    responseMessage.textContent = ''; // Clear previous messages
-
-    try {
-      const res = await axios.post('/api/verify-trivia', { answer: userAnswer });
-      if (res.data.success) {
-        responseMessage.className = 'response-message success';
-        responseMessage.textContent = '✅ Correct! You are now verified. Redirecting...';
-        // Redirect to profile page after 2 seconds
-        setTimeout(() => {
-          window.location.href = '/explore';
-        }, 2000);
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    
+    <!-- Google Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+    
+    <!-- Tailwind CSS & Config -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#FF5722",
+              "primary-hover": "#F4511E",
+              "background-dark": "#050505",
+              "surface-dark": "#0A0A0A",
+              "surface-dark-lighter": "#171717",
+              "border-dark": "#27272A",
+            },
+            fontFamily: {
+              "display": ["Inter", "system-ui", "sans-serif"]
+            },
+            animation: {
+                "fade-in-up": "fadeInUp 0.5s ease-out forwards",
+            },
+            keyframes: {
+                fadeInUp: {
+                    "0%": { opacity: "0", transform: "translateY(20px)" },
+                    "100%": { opacity: "1", transform: "translateY(0)" },
+                }
+            }
+          },
+        },
       }
-    } catch (err) {
-      responseMessage.className = 'response-message error';
-      responseMessage.textContent = `❌ ${err.response.data.error || 'Something went wrong.'}`;
+    </script>
+    <style>
+      body {
+        background-color: #050505 !important;
+        color: #ffffff;
+        font-family: 'Inter', sans-serif;
+      }
+      /* Custom scrollbar for better look */
+      input::-webkit-outer-spin-button,
+      input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+      }
+    </style>
+  </head>
+  
+  <div class="min-h-screen bg-background-dark font-display antialiased flex flex-col items-center justify-center p-4">
+    
+    <!-- Background Glow -->
+    <div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[120px] pointer-events-none"></div>
+  
+    <!-- Main Card -->
+    <div class="relative w-full max-w-lg bg-surface-dark border border-border-dark rounded-2xl p-8 sm:p-10 shadow-2xl animate-fade-in-up">
+        
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-extrabold text-white mb-2">Student Verification</h1>
+            <p class="text-gray-400 text-sm">Verify your SVVV enrollment to unlock full access.</p>
+        </div>
+        
+        <!-- Flash Messages -->
+        <% if(typeof success_msg !== 'undefined' && success_msg && success_msg.length) { %>
+            <div class="mb-6 bg-green-500/10 border border-green-500/20 text-green-400 px-4 py-3 rounded-xl flex items-center gap-3 animate-fade-in-up">
+                <span class="material-icons text-sm">check_circle</span>
+                <span class="text-sm font-medium"><%= success_msg %></span>
+            </div>
+        <% } %>
+        
+        <% if(typeof error_msg !== 'undefined' && error_msg && error_msg.length) { %>
+             <div class="mb-6 bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl flex items-center gap-3 animate-fade-in-up">
+                <span class="material-icons text-sm">error</span>
+                <span class="text-sm font-medium"><%= error_msg %></span>
+            </div>
+        <% } %>
+  
+        <!-- Note -->
+        <div class="bg-surface-dark-lighter border border-border-dark rounded-xl p-4 mb-8 flex gap-3 text-sm text-gray-400">
+             <span class="material-icons text-primary text-base mt-0.5">info</span>
+             <p>This process verifies your identity using SVVV-specific trivia. Please answer carefully.</p>
+        </div>
+  
+        <!-- Form -->
+        <form action="/verify/check-answer" method="POST" id="verifyForm" class="space-y-6">
+            
+            <!-- Step 1: User Details (If not already stored, but usually this page assumes logged in) -->
+            
+            <!-- Question Container -->
+            <div id="questionContainer" class="space-y-4">
+                 <label class="block text-sm font-bold text-gray-300" id="questionLabel">
+                    Loading question...
+                </label>
+                
+                <input 
+                    type="text" 
+                    name="answer" 
+                    id="answerInput"
+                    placeholder="Type your answer here..." 
+                    class="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                    required
+                >
+                <input type="hidden" name="questionId" id="questionId">
+            </div>
+  
+            <!-- Submit Button -->
+            <button 
+                type="submit" 
+                class="w-full bg-primary hover:bg-primary-hover text-white font-bold py-3.5 rounded-xl shadow-lg shadow-primary/25 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
+            >
+                <span>Verify Answer</span>
+                <span class="material-icons text-sm">arrow_forward</span>
+            </button>
+  
+        </form>
+        
+        <!-- Helper -->
+        <div class="mt-6 text-center">
+            <button onclick="fetchQuestion()" class="text-sm text-gray-500 hover:text-white underline transition-colors">
+                Get a different question
+            </button>
+        </div>
+        
+    </div>
+    
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    async function fetchQuestion() {
+        const label = document.getElementById('questionLabel');
+        const hiddenId = document.getElementById('questionId');
+        const input = document.getElementById('answerInput');
+        
+        // Show loading state
+        label.innerText = "Fetching new question...";
+        input.value = "";
+        
+        try {
+            const res = await axios.get('/verify/question'); 
+            // Assuming endpoint returns { question: "...", id: "..." }
+            
+            if (res.data && res.data.question) {
+                label.innerText = res.data.question;
+                hiddenId.value = res.data.id;
+            } else {
+                label.innerText = "Error loading question. Please try again.";
+            }
+        } catch (e) {
+            console.error(e);
+            label.innerText = "Failed to load question. Check your connection.";
+        }
     }
-  });
-</script>
+  
+    // Load initial question
+    window.addEventListener('DOMContentLoaded', fetchQuestion);
+  </script>

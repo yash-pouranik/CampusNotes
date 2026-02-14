@@ -1,153 +1,163 @@
-<style>
-    /* faq.css */
-.faq-container {
-  max-width: 850px;
-  margin: 3rem auto;
-  padding: 2rem;
-  background: rgba(255, 255, 255, 0.75);
-  border-radius: 20px;
-  backdrop-filter: blur(12px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-  font-family: 'Segoe UI', 'Urbanist', sans-serif;
-}
-
-.faq-container h1 {
-  text-align: center;
-  font-size: 2.3rem;
-  font-weight: 700;
-  color: #1e3a8a;
-  margin-bottom: 2rem;
-}
-
-.faq-item {
-  margin-bottom: 1.5rem;
-  padding: 1rem 1.2rem;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 12px;
-  border: 1px solid rgba(229, 231, 235, 0.6);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.faq-item:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
-}
-
-.faq-item h3 {
-  color: #111827;
-  font-size: 1.15rem;
-  font-weight: 600;
-  margin-bottom: 0.4rem;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.faq-item p {
-  color: #374151;
-  font-size: 0.95rem;
-  line-height: 1.5;
-}
-
-.faq-item a {
-  color: #2563eb;
-  font-weight: 500;
-  text-decoration: none;
-}
-
-.faq-item a:hover {
-  text-decoration: underline;
-}
-
-</style>
-
-
-<div class="faq-container">
-  <h1>Frequently Asked Questions</h1>
-
-  <div class="faq-item">
-    <h3>1. How do I upload notes?</h3>
-    <p>You must be logged in and have a verified account. Go to <a href="/upload">Upload Notes</a>, fill in details like title, subject, semester, course, and upload a PDF file (max 15MB).</p>
-  </div>
-
-  <div class="faq-item">
-    <h3>2. Why do I need verification?</h3>
-    <p>Verification ensures that only genuine SVVV students contribute. You can verify by submitting your Student ID document at <a href="/verify">Verify Account</a>.</p>
-  </div>
-
-  <div class="faq-item">
-    <h3>3. How can I explore available notes?</h3>
-    <p>Visit <a href="/explore">Explore</a> to browse all verified notes. You can search, filter by course, semester etc.</p>
-  </div>
-
-    <div class="faq-item">
-        <h3>4. What file formats can I upload?</h3>
-        <p>Currently, only PDF files are supported (maximum size 15MB).</p>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    
+    <!-- Google Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+    
+    <!-- Tailwind CSS & Config -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#FF5722",
+              "primary-hover": "#F4511E",
+              "background-dark": "#050505",
+              "surface-dark": "#0A0A0A",
+              "surface-dark-lighter": "#171717",
+              "border-dark": "#27272A",
+            },
+            fontFamily: {
+              "display": ["Inter", "system-ui", "sans-serif"]
+            }
+          },
+        },
+      }
+    </script>
+    <style>
+      body {
+        background-color: #050505 !important;
+        color: #ffffff;
+        font-family: 'Inter', sans-serif;
+      }
+      
+      details > summary {
+        list-style: none;
+      }
+      details > summary::-webkit-details-marker {
+        display: none;
+      }
+      
+      details[open] summary ~ * {
+        animation: fadeIn 0.2s ease-in-out;
+      }
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-5px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+    </style>
+  </head>
+  
+  <div class="min-h-screen bg-background-dark font-display text-gray-300 antialiased py-20 px-4 sm:px-6 lg:px-8">
+    
+    <div class="max-w-4xl mx-auto space-y-12">
+        
+        <!-- HEADER -->
+        <div class="text-center space-y-4 mb-16 animate-fade-in-up">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-white tracking-tight">
+                Frequently Asked <span class="text-primary">Questions</span>
+            </h1>
+            <p class="text-xl text-gray-400 max-w-2xl mx-auto">
+                Got questions? We've got answers.
+            </p>
+        </div>
+        
+        <!-- FAQ GRID -->
+        <div class="space-y-4">
+            
+            <!-- Q1 -->
+            <details class="group bg-surface-dark border border-border-dark rounded-xl overflow-hidden transition-all duration-300 hover:border-primary/50 open:border-primary/50 open:bg-surface-dark-lighter">
+                <summary class="flex items-center justify-between p-6 cursor-pointer select-none">
+                    <h3 class="text-lg font-bold text-white group-hover:text-primary transition-colors">How do I upload notes?</h3>
+                    <span class="material-icons text-gray-400 group-open:rotate-180 transition-transform duration-300">expand_more</span>
+                </summary>
+                <div class="px-6 pb-6 text-gray-400 leading-relaxed border-t border-border-dark/50 pt-4">
+                    You must be logged in and have a verified account. Go to <a href="/upload" class="text-primary hover:underline">Upload Notes</a>, fill in details like title, subject, semester, course, and upload a PDF file (max 15MB).
+                </div>
+            </details>
+  
+            <!-- Q2 -->
+            <details class="group bg-surface-dark border border-border-dark rounded-xl overflow-hidden transition-all duration-300 hover:border-primary/50 open:border-primary/50 open:bg-surface-dark-lighter">
+                <summary class="flex items-center justify-between p-6 cursor-pointer select-none">
+                    <h3 class="text-lg font-bold text-white group-hover:text-primary transition-colors">Why do I need verification?</h3>
+                    <span class="material-icons text-gray-400 group-open:rotate-180 transition-transform duration-300">expand_more</span>
+                </summary>
+                <div class="px-6 pb-6 text-gray-400 leading-relaxed border-t border-border-dark/50 pt-4">
+                     Verification ensures that only genuine SVVV students contribute. You can verify by submitting your details at <a href="/verify" class="text-primary hover:underline">Verify Account</a>.
+                </div>
+            </details>
+            
+            <!-- Q3 -->
+            <details class="group bg-surface-dark border border-border-dark rounded-xl overflow-hidden transition-all duration-300 hover:border-primary/50 open:border-primary/50 open:bg-surface-dark-lighter">
+                <summary class="flex items-center justify-between p-6 cursor-pointer select-none">
+                    <h3 class="text-lg font-bold text-white group-hover:text-primary transition-colors">How can I explore available notes?</h3>
+                    <span class="material-icons text-gray-400 group-open:rotate-180 transition-transform duration-300">expand_more</span>
+                </summary>
+                <div class="px-6 pb-6 text-gray-400 leading-relaxed border-t border-border-dark/50 pt-4">
+                    Visit <a href="/explore" class="text-primary hover:underline">Explore</a> to browse all verified notes. You can search, and filter by course, semester etc.
+                </div>
+            </details>
+            
+            <!-- Q4 -->
+            <details class="group bg-surface-dark border border-border-dark rounded-xl overflow-hidden transition-all duration-300 hover:border-primary/50 open:border-primary/50 open:bg-surface-dark-lighter">
+                <summary class="flex items-center justify-between p-6 cursor-pointer select-none">
+                    <h3 class="text-lg font-bold text-white group-hover:text-primary transition-colors">What file formats can I upload?</h3>
+                    <span class="material-icons text-gray-400 group-open:rotate-180 transition-transform duration-300">expand_more</span>
+                </summary>
+                <div class="px-6 pb-6 text-gray-400 leading-relaxed border-t border-border-dark/50 pt-4">
+                    Currently, only PDF files are supported (maximum size 15MB).
+                </div>
+            </details>
+  
+            <!-- Q5 -->
+            <details class="group bg-surface-dark border border-border-dark rounded-xl overflow-hidden transition-all duration-300 hover:border-primary/50 open:border-primary/50 open:bg-surface-dark-lighter">
+                <summary class="flex items-center justify-between p-6 cursor-pointer select-none">
+                    <h3 class="text-lg font-bold text-white group-hover:text-primary transition-colors">What is the Contributor Leaderboard?</h3>
+                    <span class="material-icons text-gray-400 group-open:rotate-180 transition-transform duration-300">expand_more</span>
+                </summary>
+                <div class="px-6 pb-6 text-gray-400 leading-relaxed border-t border-border-dark/50 pt-4">
+                    Our <a href="/rankings" class="text-primary hover:underline">Contributor Leaderboard</a> highlights the top users who uploaded the most notes.
+                </div>
+            </details>
+            
+             <!-- Q6 -->
+            <details class="group bg-surface-dark border border-border-dark rounded-xl overflow-hidden transition-all duration-300 hover:border-primary/50 open:border-primary/50 open:bg-surface-dark-lighter">
+                <summary class="flex items-center justify-between p-6 cursor-pointer select-none">
+                    <h3 class="text-lg font-bold text-white group-hover:text-primary transition-colors">Can I request notes I don’t find?</h3>
+                    <span class="material-icons text-gray-400 group-open:rotate-180 transition-transform duration-300">expand_more</span>
+                </summary>
+                <div class="px-6 pb-6 text-gray-400 leading-relaxed border-t border-border-dark/50 pt-4">
+                    Yes! Go to <a href="/requestnotes" class="text-primary hover:underline">Request Notes</a> and post your request. Other users may upload it.
+                </div>
+            </details>
+            
+             <!-- Q7 -->
+            <details class="group bg-surface-dark border border-border-dark rounded-xl overflow-hidden transition-all duration-300 hover:border-primary/50 open:border-primary/50 open:bg-surface-dark-lighter">
+                <summary class="flex items-center justify-between p-6 cursor-pointer select-none">
+                    <h3 class="text-lg font-bold text-white group-hover:text-primary transition-colors">I forgot my password. What should I do?</h3>
+                    <span class="material-icons text-gray-400 group-open:rotate-180 transition-transform duration-300">expand_more</span>
+                </summary>
+                <div class="px-6 pb-6 text-gray-400 leading-relaxed border-t border-border-dark/50 pt-4">
+                    Go to <a href="/forgot" class="text-primary hover:underline">Forgot Password</a>. You will receive an OTP on your registered email to reset your password.
+                </div>
+            </details>
+            
+             <!-- Q8 -->
+            <details class="group bg-surface-dark border border-border-dark rounded-xl overflow-hidden transition-all duration-300 hover:border-primary/50 open:border-primary/50 open:bg-surface-dark-lighter">
+                <summary class="flex items-center justify-between p-6 cursor-pointer select-none">
+                    <h3 class="text-lg font-bold text-white group-hover:text-primary transition-colors">Are downloads free?</h3>
+                    <span class="material-icons text-gray-400 group-open:rotate-180 transition-transform duration-300">expand_more</span>
+                </summary>
+                <div class="px-6 pb-6 text-gray-400 leading-relaxed border-t border-border-dark/50 pt-4">
+                    Yes, downloading notes and all the available activities on CampusNotes is completely free for all users.
+                </div>
+            </details>
+            
+        </div>
+        
     </div>
-
-
-
-  <div class="faq-item">
-    <h3>5. What is the Contributor Leaderboard?</h3>
-    <p>Our <a href="/rankings">Contributor Leaderboard</a> highlights the top users who uploaded the most notes.</p>
   </div>
-
-  <div class="faq-item">
-    <h3>6. Can I request notes I don’t find?</h3>
-    <p>Yes! Go to <a href="/requestnotes">Request Notes</a> and post your request. Other users may upload it.</p>
-  </div>
-
-  <div class="faq-item">
-    <h3>7. I forgot my password. What should I do?</h3>
-    <p>Go to <a href="/forgot">Forgot Password</a>. You will receive an OTP on your registered email to reset your password.</p>
-  </div>
-
-  <div class="faq-item">
-    <h3>8. Can I edit or delete my notes?</h3>
-    <p>Yes, go to the note page and click edit or delete (only available if you are the owner or a moderator).</p>
-  </div>
-
-  <div class="faq-item">
-    <h3>9. How do I update my profile?</h3>
-    <p>You can edit your profile details or upload a new avatar from your <a href="/profile/<%= currUser?._id %>">profile page</a>.</p>
-  </div>
-
-  <div class="faq-item">
-    <h3>10. Who manages verifications and notes?</h3>
-    <p>Our moderator and admin team review user verification requests and uploaded notes to maintain quality and authenticity.</p>
-  </div>
-
-  <div class="faq-item">
-    <h3>4. Where can I find popular notes?</h3>
-    <p>You can find the most downloaded notes in the <a href="/most-downloaded">Most Downloaded</a> section.</p>
-  </div>
-
-  <div class="faq-item">
-    <h3>12. Can I upload notes without logging in?</h3>
-    <p>No, you must log in and verify your account before uploading notes.</p>
-  </div>
-
-  <div class="faq-item">
-    <h3>13. What happens if my note gets rejected?</h3>
-    <p>If moderators find issues (irrelevant, spam, or low quality), the note may be rejected. You can improve it and re-upload.</p>
-  </div>
-
-  <div class="faq-item">
-    <h3>14. Are downloads free?</h3>
-    <p>Yes, downloading notes and all the available activites on CampusNotes is completely free for all users.</p>
-  </div>
-
-  <div class="faq-item">
-    <h3>15. Can I delete my account?</h3>
-    <p>Currently, you can edit your profile. For account deletion, please contact our support team.</p>
-  </div>
-
-  <div class="faq-item">
-    <h3>16. How do I report inappropriate content?</h3>
-    <p>Use the <a href="/feedback">Feedback</a> page or contact us via email/Discord to report any inappropriate content.</p>
-  </div>
-</div>
-
-
-
-</div>

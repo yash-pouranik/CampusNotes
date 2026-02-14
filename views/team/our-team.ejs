@@ -1,61 +1,120 @@
-<link rel="stylesheet" href="/css/our-team.css">
-
-<section class="team-section">
-
-  <div class="section-header">
-    <h1>Meet Our Team</h1>
-    <p>Passionate minds behind CampusNotes</p>
-  </div>
-
-  <div class="team-container">
-    <% teamMembers.forEach(member => { %>
-
-      <div class="team-card">
-
-        <div class="avatar-wrapper">
-          <img src="<%= member.avatar %>" alt="<%= member.name %>" class="avatar">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    
+    <!-- Google Material Icons && Font Awesome -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    
+    <!-- Tailwind CSS & Config -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#FF5722",
+              "primary-hover": "#F4511E",
+              "background-dark": "#050505",
+              "surface-dark": "#0A0A0A",
+              "surface-dark-lighter": "#171717",
+              "border-dark": "#27272A",
+            },
+            fontFamily: {
+              "display": ["Inter", "system-ui", "sans-serif"]
+            }
+          },
+        },
+      }
+    </script>
+    <style>
+      body {
+        background-color: #050505 !important;
+        color: #ffffff;
+        font-family: 'Inter', sans-serif;
+      }
+      .team-card:hover .avatar-ring {
+        border-color: #FF5722;
+        transform: scale(1.05);
+      }
+    </style>
+  </head>
+  
+  <div class="min-h-screen bg-background-dark font-display text-gray-300 antialiased py-20 px-4 sm:px-6 lg:px-8">
+    
+    <div class="max-w-6xl mx-auto space-y-12">
+        
+        <!-- HEADER -->
+        <div class="text-center space-y-4 mb-16 animate-fade-in-up">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-white tracking-tight">
+                Meet Our Team
+            </h1>
+            <p class="text-xl text-gray-400 max-w-2xl mx-auto">
+                Passionate minds behind CampusNotes, dedicated to making education collaborative.
+            </p>
         </div>
-
-        <h2 class="member-name">
-          <%= member.name %>
-          <% if (member.roles.isModerator) { %>
-            <img src="/images/blueCheckmark.svg" class="role-icon">
-          <% } else if (member.roles.isDev) { %>
-            <img src="/images/icons8-checkmark.svg" class="role-icon">
-          <% } else if (member.verification?.verified) { %>
-            <span class="verified-icon">✔</span>
-          <% } %>
-        </h2>
-
-        <p class="username">@<%= member.username %></p>
-
-        <p class="role">
-          <%= member.roles.isDev 
-              ? "Developer" 
-              : member.roles.isModerator 
-                ? "Moderator" 
-                : "Team Member" 
-          %>
-        </p>
-
-       
-
-        <div class="social-links">
-          <% if (member.socialLinks?.linkedin) { %>
-            <a href="<%= member.socialLinks.linkedin %>" target="_blank" class="social-link linkedin">
-              <i class="fa-brands fa-linkedin"></i>
-            </a>
-          <% } %>
-
-          <% if (member.socialLinks?.github) { %>
-            <a href="<%= member.socialLinks.github %>" target="_blank" class="social-link github">
-              <i class="fa-brands fa-github"></i>
-            </a>
-          <% } %>
+        
+        <!-- TEAM GRID -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+            
+            <% teamMembers.forEach(member => { %>
+                <div class="group bg-surface-dark border border-border-dark rounded-2xl p-8 flex flex-col items-center text-center hover:border-primary/30 transition-all duration-300 team-card relative overflow-hidden">
+                    
+                    <!-- Background decoration -->
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+  
+                    <!-- Avatar -->
+                    <div class="w-24 h-24 rounded-full p-1 border-2 border-border-dark bg-background-dark mb-6 avatar-ring transition-transform duration-300">
+                        <div class="w-full h-full rounded-full overflow-hidden bg-surface-dark-lighter">
+                             <img src="<%= member.avatar %>" alt="<%= member.name %>" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                    
+                    <!-- Name & Badge -->
+                    <div class="mb-1">
+                        <h2 class="text-lg font-bold text-white flex items-center justify-center gap-1.5">
+                            <%= member.name %>
+                            <% if (member.roles.isModerator) { %>
+                                <span class="material-icons text-blue-500 text-sm" title="Moderator">verified</span>
+                            <% } else if (member.roles.isDev) { %>
+                                 <span class="material-icons text-primary text-sm" title="Developer">code</span>
+                            <% } else if (member.verification?.verified) { %>
+                                <span class="material-icons text-green-500 text-sm" title="Verified">check_circle</span>
+                            <% } %>
+                        </h2>
+                    </div>
+                    
+                    <!-- Handle & Role -->
+                    <p class="text-xs text-primary font-mono mb-2">@<%= member.username %></p>
+                    <div class="px-3 py-1 rounded-full bg-surface-dark-lighter border border-border-dark text-xs text-gray-400 font-medium mb-6">
+                         <%= member.roles.isDev 
+                            ? "Developer" 
+                            : member.roles.isModerator 
+                              ? "Moderator" 
+                              : "Contributor" 
+                        %>
+                    </div>
+                    
+                    <!-- Social Links -->
+                    <div class="flex items-center gap-4 mt-auto">
+                        <% if (member.socialLinks?.linkedin) { %>
+                            <a href="<%= member.socialLinks.linkedin %>" target="_blank" class="text-gray-500 hover:text-[#0077b5] transition-colors text-xl">
+                                <i class="fa-brands fa-linkedin"></i>
+                            </a>
+                        <% } %>
+            
+                        <% if (member.socialLinks?.github) { %>
+                             <a href="<%= member.socialLinks.github %>" target="_blank" class="text-gray-500 hover:text-white transition-colors text-xl">
+                                <i class="fa-brands fa-github"></i>
+                            </a>
+                        <% } %>
+                    </div>
+                    
+                </div>
+            <% }) %>
+            
         </div>
-
-      </div>
-
-    <% }) %>
+        
+    </div>
   </div>
-</section>

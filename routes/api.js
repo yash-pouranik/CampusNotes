@@ -134,51 +134,8 @@ router.get("/notes/:sec", async (req, res) => {
 
 
 
-router.get("/trivia-question", isLoggedIn, (req, res) => {
-    // Check if user is already verified
-    if (req.user.verification.verified) {
-        return res.status(400).json({ error: "You are already verified." });
-    }
-
-    // Get a random question
-    const randomQuestion = triviaQuestions[Math.floor(Math.random() * triviaQuestions.length)];
-
-    // Store the question ID in the user's session to prevent cheating
-    req.session.triviaQuestionId = randomQuestion.id;
-
-    // Send only the question to the frontend, not the answer
-    res.json({ question: randomQuestion.question });
-});
-
-// 2. NAYA ROUTE: Answer Verify Karne Ke Liye
-router.post("/verify-trivia", isLoggedIn, async (req, res) => {
-    const { answer } = req.body;
-    const questionId = req.session.triviaQuestionId;
-
-    if (!questionId) {
-        return res.status(400).json({ error: "No question was provided. Please refresh." });
-    }
-
-    // Find the question from our config file
-    const question = triviaQuestions.find(q => q.id === questionId);
-
-    // Clean up and compare the answers
-    const isCorrect = answer && question && (answer.trim().toLowerCase() === question.answer);
-
-    if (isCorrect) {
-        // If answer is correct, update the user's profile
-        await User.findByIdAndUpdate(req.user._id, {
-            "verification.verified": true,
-            "verification.verifiedAt": new Date()
-        });
-        // Clear the question ID from the session
-        delete req.session.triviaQuestionId;
-        return res.json({ success: true, message: "Verification successful!" });
-    } else {
-        // If incorrect, send an error message
-        return res.status(400).json({ error: "Incorrect answer. Please try again. OR if you are facing any issue mail to: campusnotes@bitbros.in" });
-    }
-});
+// 2. Answer Verify Karne Ke Liye (Deleted - Moved to verify.js)
+// router.post("/verify-trivia", ...)
 
 // ok
 

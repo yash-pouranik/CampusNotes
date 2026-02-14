@@ -50,6 +50,69 @@ img {
   display: block
 }
 
+/* ---------- Flash Messages ---------- */
+.flash {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  max-width: 400px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  z-index: 10000;
+  backdrop-filter: blur(12px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+  animation: slideInRight 0.3s ease-out;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.flash::before {
+  content: '';
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+  font-size: 18px;
+}
+
+.flash-success {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(34, 197, 94, 0.05));
+  border-color: rgba(34, 197, 94, 0.3);
+  color: #4ade80;
+}
+
+.flash-success::before {
+  content: '\f058';
+  /* fa-check-circle */
+  color: #4ade80;
+}
+
+.flash-error {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(239, 68, 68, 0.05));
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #f87171;
+}
+
+.flash-error::before {
+  content: '\f06a';
+  /* fa-exclamation-circle */
+  color: #f87171;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
 /* ---------- Container ---------- */
 .container,
 .page-container,

@@ -1,255 +1,231 @@
-<style>
-  body {
-    font-family: 'Inter', sans-serif;
-    margin: 0;
-    background: #f9fafb;
-    color: #1f2937;
-  }
-
-  /* HERO */
-  .about-hero {
-    background: linear-gradient(135deg, #2563eb, #1e3a8a);
-    color: white;
-    text-align: center;
-    padding: 90px 20px 100px;
-  }
-  .about-hero h1 {
-    font-size: 3rem;
-    font-weight: 800;
-    margin-bottom: 18px;
-  }
-  .about-hero p {
-    font-size: 1.2rem;
-    max-width: 720px;
-    margin: 0 auto;
-    opacity: 0.9;
-    line-height: 1.6;
-  }
-
-  /* HIGHLIGHTS */
-  .highlights {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 28px;
-    max-width: 1100px;
-    margin: -60px auto 60px;
-    padding: 0 20px;
-  }
-  .highlight {
-    flex: 1 1 240px;
-    background: white;
-    border-radius: 20px;
-    padding: 30px 22px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-    text-align: center;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-  }
-  .highlight:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 10px 28px rgba(0,0,0,0.12);
-  }
-  .highlight h3 {
-    font-size: 1.3rem;
-    margin-bottom: 8px;
-    color: #2563eb;
-  }
-  .highlight p {
-    font-size: 0.95rem;
-    color: #555;
-  }
-
-  /* SECTIONS */
-  section {
-    padding: 70px 20px;
-  }
-  section h2 {
-    text-align: center;
-    font-size: 2rem;
-    font-weight: 700;
-    margin-bottom: 40px;
-    color: #1e3a8a;
-  }
-
-  /* HOW IT WORKS */
-  .steps {
-    background: #f0f4ff;
-  }
-  .steps-list {
-    max-width: 800px;
-    margin: 0 auto;
-    display: grid;
-    gap: 24px;
-  }
-  .step {
-    background: white;
-    padding: 18px 24px;
-    border-radius: 14px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-    font-size: 1.05rem;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .step span {
-    background: #2563eb;
-    color: white;
-    font-weight: 600;
-    border-radius: 50%;
-    width: 34px;
-    height: 34px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-
-  /* FEATURES GRID */
-  .features-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 28px;
-    max-width: 1100px;
-    margin: 0 auto;
-  }
-  .feature {
-    background: white;
-    border-radius: 18px;
-    padding: 26px 22px;
-    box-shadow: 0 6px 16px rgba(0,0,0,0.06);
-    transition: transform 0.25s ease;
-  }
-  .feature:hover {
-    transform: translateY(-6px);
-  }
-  .feature h3 {
-    color: #2563eb;
-    margin-bottom: 10px;
-    font-size: 1.2rem;
-  }
-  .feature p, .feature ul {
-    color: #444;
-    font-size: 0.95rem;
-    line-height: 1.6;
-  }
-
-  /* CTA */
-  .cta {
-    text-align: center;
-    padding: 70px 20px;
-    background: linear-gradient(135deg, #2563eb, #1e3a8a);
-    color: white;
-  }
-  .cta h2 {
-    font-size: 2rem;
-    margin-bottom: 25px;
-  }
-  .cta a {
-    display: inline-block;
-    padding: 14px 28px;
-    margin: 10px;
-    background: white;
-    color: #1e3a8a;
-    border-radius: 10px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: transform 0.25s ease, background 0.25s ease;
-  }
-  .cta a:hover {
-    transform: translateY(-3px);
-    background: #f3f4f6;
-  }
-  @media (max-width: 600px) {
-  h1{
-    font-size: 2rem !important;
-  }
-}
-</style>
-
-<!-- HERO -->
-<div class="about-hero">
-  <h1>About CampusNotes</h1>
-  <p>A student-driven platform where knowledge flows freely. Upload, explore, and request notes — making learning collaborative and accessible for everyone.</p>
-</div>
-
-<!-- HIGHLIGHTS -->
-<div class="highlights">
-  <div class="highlight">
-    <h3>📚 Easy Access</h3>
-    <p>All notes in one place, organized and always available.</p>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    
+    <!-- Google Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+    
+    <!-- Tailwind CSS & Config -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#FF5722",
+              "primary-hover": "#F4511E",
+              "background-dark": "#050505",
+              "surface-dark": "#0A0A0A",
+              "surface-dark-lighter": "#171717",
+              "border-dark": "#27272A",
+            },
+            fontFamily: {
+              "display": ["Inter", "system-ui", "sans-serif"]
+            }
+          },
+        },
+      }
+    </script>
+    <style>
+      body {
+        background-color: #050505 !important;
+        color: #ffffff;
+        font-family: 'Inter', sans-serif;
+      }
+      .gradient-text {
+        background: linear-gradient(135deg, #FF5722 0%, #ffffff 50%, #FF5722 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-size: 200% auto;
+        animation: shine 5s linear infinite;
+      }
+      @keyframes shine { to { background-position: 200% center; } }
+      .feature-card:hover { transform: translateY(-5px); }
+    </style>
+  </head>
+  
+  <div class="min-h-screen bg-background-dark font-display text-gray-300 antialiased py-20 px-4 sm:px-6 lg:px-8">
+    
+    <!-- HERO -->
+    <div class="text-center max-w-4xl mx-auto space-y-6 mb-20 animate-fade-in-up">
+        <h1 class="text-5xl md:text-6xl font-extrabold tracking-tight text-white mb-4">
+            About <span class="gradient-text">CampusNotes</span>
+        </h1>
+        <p class="text-xl text-gray-400 leading-relaxed max-w-2xl mx-auto">
+            A student-driven platform where knowledge flows freely. Upload, explore, and request notes — making learning collaborative and accessible for everyone.
+        </p>
+    </div>
+  
+    <!-- HIGHLIGHTS -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto mb-24">
+        <!-- Card 1 -->
+        <div class="bg-surface-dark border border-border-dark p-6 rounded-xl hover:border-primary/50 transition-colors group">
+            <div class="w-12 h-12 bg-surface-dark-lighter rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <span class="material-icons text-primary">library_books</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Easy Access</h3>
+            <p class="text-sm text-gray-500">All notes in one place, organized and always available.</p>
+        </div>
+        <!-- Card 2 -->
+        <div class="bg-surface-dark border border-border-dark p-6 rounded-xl hover:border-primary/50 transition-colors group">
+            <div class="w-12 h-12 bg-surface-dark-lighter rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <span class="material-icons text-blue-500">groups</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Community Driven</h3>
+            <p class="text-sm text-gray-500">Students helping students with practical notes.</p>
+        </div>
+        <!-- Card 3 -->
+        <div class="bg-surface-dark border border-border-dark p-6 rounded-xl hover:border-primary/50 transition-colors group">
+            <div class="w-12 h-12 bg-surface-dark-lighter rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <span class="material-icons text-green-500">verified_user</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Verified Uploads</h3>
+            <p class="text-sm text-gray-500">Only verified students can upload, ensuring trust.</p>
+        </div>
+        <!-- Card 4 -->
+        <div class="bg-surface-dark border border-border-dark p-6 rounded-xl hover:border-primary/50 transition-colors group">
+            <div class="w-12 h-12 bg-surface-dark-lighter rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                 <span class="material-icons text-yellow-500">emoji_events</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Leaderboard</h3>
+            <p class="text-sm text-gray-500">Top contributors get recognized for their uploads.</p>
+        </div>
+    </div>
+  
+    <!-- HOW IT WORKS -->
+    <div class="max-w-5xl mx-auto mb-24">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-white">How It Works</h2>
+            <p class="text-gray-500 mt-2">Simple steps to get started</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative">
+            <!-- Connecting Line (Desktop) -->
+            <div class="hidden md:block absolute left-1/2 top-0 bottom-0 w-px bg-border-dark transform -translate-x-1/2"></div>
+            
+            <!-- Step 1 -->
+            <div class="relative flex items-center justify-end md:pr-12 text-right">
+                <div class="bg-surface-dark border border-border-dark p-6 rounded-xl w-full max-w-md hover:border-primary/30 transition-colors">
+                    <h3 class="text-lg font-bold text-white flex items-center justify-end gap-2">
+                        Login & Verify <span class="material-icons text-primary text-sm">login</span>
+                    </h3>
+                    <p class="text-gray-500 text-sm mt-1">Create an account and verify your student status to unlock full access.</p>
+                </div>
+                <div class="absolute right-[-24px] md:right-[-42px] w-5 h-5 md:w-8 md:h-8 rounded-full bg-primary border-4 border-background-dark flex items-center justify-center text-[10px] md:text-xs font-bold text-white z-10">1</div>
+            </div>
+            
+            <!-- Step 2 -->
+             <div class="relative flex items-center md:pl-12">
+                <div class="absolute left-[-20px] md:left-[-42px] w-5 h-5 md:w-8 md:h-8 rounded-full bg-surface-dark-lighter border-4 border-background-dark flex items-center justify-center text-[10px] md:text-xs font-bold text-gray-400 z-10">2</div>
+                <div class="bg-surface-dark border border-border-dark p-6 rounded-xl w-full max-w-md hover:border-primary/30 transition-colors">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                         <span class="material-icons text-blue-500 text-sm">cloud_upload</span> Upload Notes
+                    </h3>
+                    <p class="text-gray-500 text-sm mt-1">Share your PDFs. Fill in details like subject and semester.</p>
+                </div>
+            </div>
+            
+            <!-- Step 3 -->
+            <div class="relative flex items-center justify-end md:pr-12 text-right">
+                <div class="bg-surface-dark border border-border-dark p-6 rounded-xl w-full max-w-md hover:border-primary/30 transition-colors">
+                    <h3 class="text-lg font-bold text-white flex items-center justify-end gap-2">
+                        Admin Review <span class="material-icons text-yellow-500 text-sm">gavel</span>
+                    </h3>
+                    <p class="text-gray-500 text-sm mt-1">Our team checks for quality and relevance before approval.</p>
+                </div>
+                <div class="absolute right-[-24px] md:right-[-42px] w-5 h-5 md:w-8 md:h-8 rounded-full bg-surface-dark-lighter border-4 border-background-dark flex items-center justify-center text-[10px] md:text-xs font-bold text-gray-400 z-10">3</div>
+            </div>
+            
+             <!-- Step 4 -->
+             <div class="relative flex items-center md:pl-12">
+                <div class="absolute left-[-20px] md:left-[-42px] w-5 h-5 md:w-8 md:h-8 rounded-full bg-primary border-4 border-background-dark flex items-center justify-center text-[10px] md:text-xs font-bold text-white z-10">4</div>
+                <div class="bg-surface-dark border border-border-dark p-6 rounded-xl w-full max-w-md hover:border-primary/30 transition-colors">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                         <span class="material-icons text-green-500 text-sm">public</span> Public Access
+                    </h3>
+                    <p class="text-gray-500 text-sm mt-1">Your notes become available for everyone to learn from!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+  
+    <!-- FEATURES GRID -->
+    <div class="max-w-7xl mx-auto mb-24">
+         <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-white">Core Features</h2>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- F1 -->
+            <div class="bg-surface-dark border border-border-dark p-6 rounded-xl hover:bg-surface-dark-lighter transition-colors feature-card duration-300">
+                <span class="material-icons text-primary mb-3">cloud_upload</span>
+                <h3 class="text-white font-bold mb-2">Upload Notes</h3>
+                <p class="text-sm text-gray-500">Upload PDFs easily. Every upload is reviewed before going public.</p>
+            </div>
+            <!-- F2 -->
+             <div class="bg-surface-dark border border-border-dark p-6 rounded-xl hover:bg-surface-dark-lighter transition-colors feature-card duration-300">
+                <span class="material-icons text-blue-500 mb-3">download</span>
+                <h3 class="text-white font-bold mb-2">Download & Request</h3>
+                <p class="text-sm text-gray-500">Download approved notes. Missing something? Request it from peers.</p>
+            </div>
+             <!-- F3 -->
+             <div class="bg-surface-dark border border-border-dark p-6 rounded-xl hover:bg-surface-dark-lighter transition-colors feature-card duration-300">
+                <span class="material-icons text-purple-500 mb-3">campaign</span>
+                <h3 class="text-white font-bold mb-2">Request Notes</h3>
+                <p class="text-sm text-gray-500">Post a request and the community can respond by uploading it.</p>
+            </div>
+             <!-- F4 -->
+             <div class="bg-surface-dark border border-border-dark p-6 rounded-xl hover:bg-surface-dark-lighter transition-colors feature-card duration-300">
+                <span class="material-icons text-yellow-500 mb-3">leaderboard</span>
+                <h3 class="text-white font-bold mb-2">Ranking System</h3>
+                <p class="text-sm text-gray-500">Upvotes + uploads = Contributor leaderboard for recognition.</p>
+            </div>
+             <!-- F5 -->
+             <div class="bg-surface-dark border border-border-dark p-6 rounded-xl hover:bg-surface-dark-lighter transition-colors feature-card duration-300">
+                <span class="material-icons text-pink-500 mb-3">person</span>
+                <h3 class="text-white font-bold mb-2">User Profiles</h3>
+                <p class="text-sm text-gray-500">Profiles show uploaded & downloaded notes with social links.</p>
+            </div>
+             <!-- F6 -->
+             <div class="bg-surface-dark border border-border-dark p-6 rounded-xl hover:bg-surface-dark-lighter transition-colors feature-card duration-300">
+                <span class="material-icons text-teal-500 mb-3">folder</span>
+                <h3 class="text-white font-bold mb-2">Organized Notes</h3>
+                <p class="text-sm text-gray-500">Notes are sorted by Course, Semester, and Subject.</p>
+            </div>
+             <!-- F7 -->
+             <div class="bg-surface-dark border border-border-dark p-6 rounded-xl hover:bg-surface-dark-lighter transition-colors feature-card duration-300">
+                <span class="material-icons text-red-500 mb-3">lock</span>
+                <h3 class="text-white font-bold mb-2">Secure & Reliable</h3>
+                <p class="text-sm text-gray-500">Password encryption + OTP reset keep accounts safe.</p>
+            </div>
+             <!-- F8 -->
+             <div class="bg-surface-dark border border-border-dark p-6 rounded-xl hover:bg-surface-dark-lighter transition-colors feature-card duration-300">
+                <span class="material-icons text-indigo-500 mb-3">smartphone</span>
+                <h3 class="text-white font-bold mb-2">Mobile Friendly</h3>
+                <p class="text-sm text-gray-500">Upload & download smooth on all devices.</p>
+            </div>
+        </div>
+    </div>
+  
+    <!-- CTA -->
+    <div class="max-w-4xl mx-auto text-center bg-gradient-to-r from-surface-dark to-surface-dark-lighter border border-border-dark rounded-2xl p-12 relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2"></div>
+        
+        <h2 class="text-3xl font-bold text-white mb-6 relative z-10">Start Sharing Knowledge Today 🚀</h2>
+        <div class="flex flex-wrap items-center justify-center gap-4 relative z-10">
+            <a href="/upload" class="px-6 py-3 bg-primary hover:bg-primary-hover text-white font-bold rounded-lg transition-colors">
+                Upload Notes
+            </a>
+            <a href="/explore" class="px-6 py-3 bg-surface-dark border border-border-dark hover:bg-surface-dark-lighter text-white font-medium rounded-lg transition-colors">
+                Explore Notes
+            </a>
+        </div>
+    </div>
+    
+    <div class="text-center mt-20 text-gray-600 text-sm font-mono">
+        Made with ❤️ by Yash & Contributors
+    </div>
+  
   </div>
-  <div class="highlight">
-    <h3>👥 Community Driven</h3>
-    <p>Students helping students with practical notes.</p>
-  </div>
-  <div class="highlight">
-    <h3>✔ Verified Uploads</h3>
-    <p>Only verified students can upload, ensuring trust.</p>
-  </div>
-  <div class="highlight">
-    <h3>⭐ Leaderboard</h3>
-    <p>Top contributors get recognized for their uploads.</p>
-  </div>
-</div>
-
-<!-- HOW IT WORKS -->
-<section class="steps">
-  <h2>How It Works</h2>
-  <div class="steps-list">
-    <div class="step"><span>1</span> Login and verify your account</div>
-    <div class="step"><span>2</span> Upload your notes in seconds</div>
-    <div class="step"><span>3</span> Admin reviews for quality</div>
-    <div class="step"><span>4</span> Notes become public for downloads & sharing</div>
-  </div>
-</section>
-
-<!-- FEATURES -->
-<section>
-  <h2>Core Features</h2>
-  <div class="features-grid">
-    <div class="feature">
-      <h3>📤 Upload Notes</h3>
-      <p>Upload PDFs easily. Every upload is reviewed before going public.</p>
-    </div>
-    <div class="feature">
-      <h3>📥 Download & Request</h3>
-      <p>Download approved notes. Missing something? Request it from peers.</p>
-    </div>
-    <div class="feature">
-      <h3>📝 Request Notes</h3>
-      <p>Post a request and the community can respond by uploading it.</p>
-    </div>
-    <div class="feature">
-      <h3>⭐ Ranking System</h3>
-      <p>Upvotes + uploads = Contributor leaderboard for recognition.</p>
-    </div>
-    <div class="feature">
-      <h3>👤 User Profiles</h3>
-      <p>Profiles show uploaded & downloaded notes with social links.</p>
-    </div>
-    <div class="feature">
-      <h3>📂 Organized Notes</h3>
-      <p>Notes are sorted by Course, Semester, and Subject.</p>
-    </div>
-    <div class="feature">
-      <h3>🔒 Secure & Reliable</h3>
-      <p>Password encryption + OTP reset keep accounts safe.</p>
-    </div>
-    <div class="feature">
-      <h3>📱 Mobile Friendly</h3>
-      <p>Upload & download smooth on all devices. Notes open as proper PDFs.</p>
-    </div>
-  </div>
-</section>
-
-<!-- CTA -->
-<div class="cta">
-  <h2>Start Sharing Knowledge Today 🚀</h2>
-  <a href="/upload">Upload Notes</a>
-  <a href="/explore">Explore Notes</a>
-  <a href="/requestnotes">Request Notes</a>
-</div>
-
-<p style="text-align:center; padding: 20px 0;">
-  <strong>Made with ❤️ by Yash & Contributors</strong>
-</p>

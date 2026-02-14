@@ -5,9 +5,9 @@
     right: 30px;
     width: 60px;
     height: 60px;
-    background: linear-gradient(135deg, var(--accent-2), #6366f1);
+    background: linear-gradient(135deg, var(--accent), #ff7043);
     border-radius: 50%;
-    box-shadow: 0 0 20px rgba(138, 47, 255, 0.4);
+    box-shadow: 0 0 20px rgba(255, 87, 34, 0.4);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -16,12 +16,12 @@
     cursor: pointer;
     z-index: 9999;
     transition: all 0.3s ease;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .ai-chat-toggle:hover {
     transform: scale(1.1) translateY(-5px);
-    box-shadow: 0 0 30px rgba(138, 47, 255, 0.6);
+    box-shadow: 0 0 30px rgba(255, 87, 34, 0.6);
 }
 
 /* Chat Container */
@@ -31,8 +31,8 @@
     right: 30px;
     width: 380px;
     height: 550px;
-    background: rgba(13, 24, 42, 0.95);
-    backdrop-filter: blur(16px);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
+    backdrop-filter: blur(16px) saturate(140%);
     border-radius: 20px;
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
     display: flex;
@@ -43,7 +43,7 @@
     transform: translateY(20px) scale(0.95);
     pointer-events: none;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .ai-chat-container.active {
@@ -54,7 +54,7 @@
 
 /* Header */
 .ai-chat-header {
-    background: linear-gradient(90deg, rgba(138, 47, 255, 0.2), rgba(0, 255, 213, 0.1));
+    background: rgba(255, 255, 255, 0.02);
     padding: 15px 20px;
     color: var(--text);
     display: flex;
@@ -71,7 +71,7 @@
     align-items: center;
     gap: 10px;
     color: var(--accent);
-    text-shadow: 0 0 10px rgba(0, 255, 213, 0.4);
+    text-shadow: 0 0 10px rgba(255, 87, 34, 0.3);
 }
 
 .ai-chat-close {
@@ -111,11 +111,11 @@
 
 .message.user {
     align-self: flex-end;
-    background: linear-gradient(135deg, rgba(138, 47, 255, 0.8), rgba(99, 102, 241, 0.8));
+    background: linear-gradient(135deg, var(--accent), #ff7043);
     color: white;
     border-bottom-right-radius: 4px;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 4px 15px rgba(138, 47, 255, 0.2);
+    box-shadow: 0 4px 15px rgba(255, 87, 34, 0.3);
 }
 
 .message.ai {
@@ -149,13 +149,13 @@
     display: none;
     align-items: center;
     gap: 8px;
-    background: rgba(0, 255, 213, 0.1);
+    background: rgba(255, 87, 34, 0.1);
     color: var(--accent);
     padding: 6px 12px;
     border-radius: 20px;
     font-size: 12px;
     margin-bottom: 10px;
-    border: 1px solid rgba(0, 255, 213, 0.2);
+    border: 1px solid rgba(255, 87, 34, 0.2);
     width: fit-content;
     max-width: 100%;
 }
@@ -198,7 +198,7 @@
     background: rgba(255, 255, 255, 0.1);
     color: var(--accent);
     border-color: var(--accent);
-    box-shadow: 0 0 10px rgba(0, 255, 213, 0.2);
+    box-shadow: 0 0 10px rgba(255, 87, 34, 0.2);
 }
 
 .chat-input {
@@ -220,7 +220,7 @@
 .chat-input:focus {
     border-color: var(--accent);
     background: rgba(0, 0, 0, 0.3);
-    box-shadow: 0 0 15px rgba(0, 255, 213, 0.1);
+    box-shadow: 0 0 15px rgba(255, 87, 34, 0.1);
 }
 
 .send-btn {
@@ -252,8 +252,9 @@
     left: 15px;
     width: 280px;
     max-height: 250px;
-    background: #0d182a;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 12px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
     overflow-y: auto;
@@ -271,7 +272,8 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     position: sticky;
     top: 0;
-    background: #0d182a;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(8px);
 }
 
 .dropdown-search input {
@@ -656,12 +658,14 @@
     font-size: 80px;
     margin-bottom: 20px;
     background: -webkit-linear-gradient(45deg, var(--accent-2), var(--accent));
+    background: linear-gradient(45deg, var(--accent-2), var(--accent));
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     filter: drop-shadow(0 0 30px rgba(138, 47, 255, 0.3));
 }
 
 .ai-chat-toggle:hover {
     transform: scale(1.1);
-    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
+    box-shadow: 0 6px 20px rgba(255, 87, 34, 0.6);
 }

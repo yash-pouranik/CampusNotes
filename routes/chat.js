@@ -143,6 +143,71 @@ router.post("/api/chat/:id/message", isLoggedIn, async (req, res) => {
     }
 });
 
+// 3b. API: Send Message & Get Streaming Response (NEW)
+router.post("/api/chat/:id/message/stream", isLoggedIn, async (req, res) => {
+    try {
+        const chatId = req.params.id;
+        const { message } = req.body;
+        const chat = await Chat.findOne({ _id: chatId, user: req.user._id });
+
+        if (!chat) return res.status(404).json({ error: "Chat not found." });
+
+        // Save User Message
+        chat.messages.push({ role: 'user', content: message });
+        chat.lastActivity = Date.now();
+        await chat.save();
+
+        // Set SSE headers
+        res.setHeader('Content-Type', 'text/event-stream');
+        res.setHeader('Cache-Control', 'no-cache');
+        res.setHeader('Connection', 'keep-alive');
+
+        // Fetch context
+        let contextText = "";
+        if (chat.noteId) {
+            const note = await Note.findById(chat.noteId);
+            if (note && note.fileUrl) {
+                try {
+                    const response = await axios.get(note.fileUrl, { responseType: 'arraybuffer' });
+                    const data = await pdf(response.data);
+                    contextText = data.text.trim().substring(0, 12000);
+                } catch (e) {
+                    console.log("Context fetch error:", e.message);
+                }
+            }
+        }
+
+        // Stream response
+        const history = chat.messages.slice(-10);
+        let fullResponse = "";
+
+        try {
+            for await (const chunk of aiService.generateResponseStream(history, contextText)) {
+                fullResponse += chunk;
+                // Send chunk as SSE
+                res.write(`data: ${JSON.stringify({ chunk })}\n\n`);
+            }
+
+            // Send completion signal
+            res.write(`data: [DONE]\n\n`);
+
+            // Save complete AI response to database
+            chat.messages.push({ role: 'ai', content: fullResponse });
+            await chat.save();
+
+            res.end();
+        } catch (streamError) {
+            console.error("Streaming error:", streamError);
+            res.write(`data: ${JSON.stringify({ error: "Streaming failed" })}\n\n`);
+            res.end();
+        }
+
+    } catch (error) {
+        console.error("Chat Streaming Error:", error);
+        res.status(500).json({ error: "AI failed to respond." });
+    }
+});
+
 // 4. API: Delete Chat
 router.delete("/api/chat/:id", isLoggedIn, async (req, res) => {
     try {

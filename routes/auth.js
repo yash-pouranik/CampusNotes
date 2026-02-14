@@ -2,7 +2,7 @@ const express = require('express');
 const passport = require('passport');
 const router = express.Router();
 const User = require("../models/user")
-const {notLoggedIn} = require("../middlewares");
+const { notLoggedIn } = require("../middlewares");
 const { OAuth2Client } = require("google-auth-library");
 
 const { sendOTP } = require("../config/mailer");
@@ -56,12 +56,12 @@ router.get("/auth/linkedin", (req, res) => {
 
 
 router.get("/login-n", notLoggedIn, (req, res) => {
-    res.render("auth/login", {title: "Login | campusnotes", showAds: false});
+  res.render("auth/login", { title: "Login | campusnotes", showAds: false });
 })
 
 
 router.get("/register-n", notLoggedIn, (req, res) => {
-    res.render("auth/signup", {title: "Signup | campusnotes", showAds: false});
+  res.render("auth/signup", { title: "Signup | campusnotes", showAds: false });
 })
 
 
@@ -69,11 +69,36 @@ router.get("/register-n", notLoggedIn, (req, res) => {
 router.post("/register", notLoggedIn, async (req, res) => {
   const { username, email, password, course, name, gender } = req.body;
   try {
-    const user = new User({ username, name, email, password, course, gender });
+    // Check if username or email already exists
+    const existingUser = await User.findOne({
+      $or: [{ username }, { email: email.toLowerCase() }]
+    });
+
+    if (existingUser) {
+      req.flash("error", "Username or email already exists. Please try a different one.");
+      return res.redirect("/register-n");
+    }
+
+    // Create new user
+    const user = new User({
+      username,
+      name,
+      email: email.toLowerCase(),
+      password,
+      course,
+      gender
+    });
     await user.save();
-    res.redirect("/");
+
+    req.flash("success", "Account created successfully! Please login.");
+    res.redirect("/login-n");
   } catch (err) {
-    res.send("Error: " + err.message);
+    // Log error server-side for debugging
+    console.error("Registration error:", err);
+
+    // Send generic error message to user
+    req.flash("error", "Registration failed. Please try again.");
+    res.redirect("/register-n");
   }
 });
 
@@ -91,13 +116,14 @@ router.post("/login",
 router.get('/logout', (req, res, next) => {
   req.logout(err => {
     if (err) return next(err); // handle error
+    req.flash("success", "Logged you out successfully!");
     res.redirect('/login-n'); // redirect after logout
   });
 });
 
 // forgot page
 router.get("/forgot", (req, res) => {
-  res.render("auth/forgot", { step: "email", title: "forgot password", showAds: false});
+  res.render("auth/forgot", { step: "email", title: "forgot password", showAds: false });
 });
 
 
@@ -107,10 +133,10 @@ router.post("/forgot/send-otp", async (req, res) => {
   const { email } = req.body;
   const user = await User.findOne({ email });
   if (!user) {
-    return res.render("auth/forgot", { 
+    return res.render("auth/forgot", {
       step: "email",
       flash: { type: "error", message: "Email not registered." },
-      title: "forgot password" 
+      title: "forgot password"
     });
   }
 
@@ -123,11 +149,11 @@ router.post("/forgot/send-otp", async (req, res) => {
   console.log("OTP for", email, "is", otp);
   sendOTP(email, otp);
 
-  res.render("auth/forgot", { 
-    step: "otp", 
-    email, 
+  res.render("auth/forgot", {
+    step: "otp",
+    email,
     flash: { type: "success", message: "OTP sent to your email." },
-    title: "forgot password" 
+    title: "forgot password"
   });
 });
 
@@ -139,7 +165,7 @@ router.post("/forgot/verify", async (req, res) => {
 
   const user = await User.findOne({ email });
   if (!user) {
-    return res.render("auth/forgot", { 
+    return res.render("auth/forgot", {
       step: "email",
       flash: { type: "error", message: "Invalid request." },
       title: "forgot password"
@@ -147,11 +173,11 @@ router.post("/forgot/verify", async (req, res) => {
   }
 
   if (password.trim() !== confirmPassword.trim()) {
-    return res.render("auth/forgot", { 
-      step: "otp", 
+    return res.render("auth/forgot", {
+      step: "otp",
       email,
       flash: { type: "error", message: "Passwords do not match." },
-      title: "forgot password" 
+      title: "forgot password"
     });
   }
 
@@ -160,11 +186,11 @@ router.post("/forgot/verify", async (req, res) => {
     !user.otpExpiry ||
     user.otpExpiry < Date.now()
   ) {
-    return res.render("auth/forgot", { 
-      step: "otp", 
+    return res.render("auth/forgot", {
+      step: "otp",
       email,
       flash: { type: "error", message: "Invalid or expired OTP." },
-      title: "forgot password"  
+      title: "forgot password"
     });
   }
 
@@ -193,10 +219,10 @@ router.post("/forgot/resend", async (req, res) => {
   const { email } = req.body;
   const user = await User.findOne({ email });
   if (!user) {
-    return res.render("auth/forgot", { 
-      step: "email", 
+    return res.render("auth/forgot", {
+      step: "email",
       flash: { type: "error", message: "Email not registered." },
-      title: "forgot password" 
+      title: "forgot password"
     });
   }
 
@@ -208,11 +234,11 @@ router.post("/forgot/resend", async (req, res) => {
   // TODO: nodemailer
   console.log("Resent OTP for", email, "is", otp);
 
-  res.render("auth/forgot", { 
-    step: "otp", 
-    email, 
+  res.render("auth/forgot", {
+    step: "otp",
+    email,
     flash: { type: "success", message: "OTP resent successfully." },
-    title: "forgot password" 
+    title: "forgot password"
   });
 });
 

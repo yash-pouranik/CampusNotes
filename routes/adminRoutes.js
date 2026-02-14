@@ -9,9 +9,10 @@ const { isLoggedIn, isModerator } = require("../middlewares");
 
 // Admin Dashboard Data
 router.get("/", isLoggedIn, isModerator, async (req, res) => {
-  
+
   try {
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    console.log("Admin Dashboard Route Hit - Fetching Data...");
 
 
     const [totalUsers, totalNotes, totalDownloadsAgg, fiveLastUsers, topNotes] = await Promise.all([
@@ -34,18 +35,18 @@ router.get("/", isLoggedIn, isModerator, async (req, res) => {
 
 
     const LastDownloads = await DownloadLog.find()
-    .populate("note")
-    .sort({ downloadedAt: -1 })
-    .limit(10);
+      .populate("note")
+      .sort({ downloadedAt: -1 })
+      .limit(10);
 
     // === User Engagement ===
     const newSignups = await User.countDocuments({ createdAt: { $gte: sevenDaysAgo } });
     const verifiedUsers = await User.countDocuments({ "verification.verified": true });
     const unverifiedUsers = totalUsers - verifiedUsers;
     const topContributors = await User.aggregate([
-        { $project: { name: 1, username: 1, avatar: 1, notesCount: { $size: "$notes" } } },
-        { $sort: { notesCount: -1 } },
-        { $limit: 3 }
+      { $project: { name: 1, username: 1, avatar: 1, notesCount: { $size: "$notes" } } },
+      { $sort: { notesCount: -1 } },
+      { $limit: 3 }
     ]);
 
     // === Content & Moderation ===
@@ -53,9 +54,31 @@ router.get("/", isLoggedIn, isModerator, async (req, res) => {
     const newNoteUploads = await Note.countDocuments({ createdAt: { $gte: sevenDaysAgo } });
 
     const courseWise = await Note.aggregate([
-        { $group: { _id: "$course", notes: { $sum: 1 } } },
-        { $sort: { notes: -1 } },
+      { $group: { _id: "$course", notes: { $sum: 1 } } },
+      { $sort: { notes: -1 } },
     ]);
+
+    // === Daily Downloads (Last 7 Days) for Line Chart ===
+    const dailyDownloads = await DownloadLog.aggregate([
+      { $match: { downloadedAt: { $gte: sevenDaysAgo } } },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$downloadedAt" } },
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { _id: 1 } }
+    ]);
+
+    // Fill in missing days with 0
+    const last7DaysData = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().split('T')[0];
+      const record = dailyDownloads.find(r => r._id === dateStr);
+      last7DaysData.push({ date: dateStr, count: record ? record.count : 0 });
+    }
 
     res.render("admin/adminDashboard", {
       // Core Stats
@@ -79,6 +102,7 @@ router.get("/", isLoggedIn, isModerator, async (req, res) => {
       courseWise,
       fiveLastUsers,
       LastDownloads,
+      last7DaysData // Passed for Line Chart
     });
   } catch (err) {
     console.error("Admin Dashboard Error:", err);
