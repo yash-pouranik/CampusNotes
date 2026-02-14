@@ -1,293 +1,451 @@
-
-
-<link rel="stylesheet" href="/css/eachNoteCss.css">
-
-<div class="upload-form-container">
-  <h2>📤 Upload New Note</h2>
-  <form id="uploadForm" enctype="multipart/form-data">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
     
-    <div class="form-group">
-      <label for="title">Title *</label>
-      <input type="text" name="title" id="title" required>
-    </div>
-
-    <div class="form-group">
-      <label for="description">Description</label>
-      <textarea name="description" id="description" rows="3"></textarea>
-    </div>
-
-    <div class="form-group">
-      <label for="subject">Subject *</label>
-      <div class="dropdown" data-name="subject">
-  <div class="dropdown-selected">-- Select Subject --</div>
-
-  <div class="dropdown-menu">
-    <% subjects.forEach(s => { %>
-      <div class="dropdown-item" data-value="<%= s._id %>"><%= s.name %></div>
-    <% }) %>
-
-    <div class="dropdown-item" data-value="other">➕ Add New Subject</div>
-  </div>
-
-  <input type="hidden" name="subject" id="subject">
-</div>
-
-    </div>
-
-    <!-- Hidden input for new subject -->
-    <div class="form-group" id="newSubjectGroup" style="display:none;">
-      <label for="newSubject">New Subject Name *</label>
-      <input type="text" name="newSubject" id="newSubject" placeholder="Enter new subject">
-    </div>
-
-    <div class="form-group">
-      <label for="course">Course *</label>
-      <div class="dropdown" data-name="course">
-  <div class="dropdown-selected">-- Select Course --</div>
-
-  <div class="dropdown-menu">
-    <% courses.forEach(c => { %>
-      <div class="dropdown-item" data-value="<%= c %>"><%= c %></div>
-    <% }) %>
-  </div>
-
-  <!-- hidden input (actual submitted value) -->
-  <input type="hidden" name="course" id="course">
-</div>
-
-    </div>
-
-
-    <div class="form-group">
-      <label for="semester">Semester *</label>
-      <div class="dropdown" data-name="semester">
-  <div class="dropdown-selected">-- Select Semester --</div>
-
-  <div class="dropdown-menu">
-    <% semester.forEach(s => { %>
-      <div class="dropdown-item" data-value="<%= s %>"><%= s %></div>
-    <% }) %>
-  </div>
-
-  <input type="hidden" name="semester" id="semester">
-</div>
-
-    </div>
-
-
-
-    <div class="form-group">
-      <div class="form-group">
-        <label for="file">Upload File *</label>
-
-        <div class="custom-file-input" id="fileInputBox">
-          <i class="fa-solid fa-file-pdf"></i>
-          <span id="fileLabel">Select PDF...</span>
+    <!-- Google Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    
+    <!-- Tailwind CSS & Config -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#FF5722", // Core Orange
+              "primary-hover": "#F4511E",
+              "accent-blue": "#3B82F6",
+              "accent-green": "#22C55E",
+              "accent-purple": "#A855F7",
+              "background-dark": "#050505", // Deep Black
+              "surface-dark": "#0A0A0A",
+              "surface-dark-lighter": "#171717",
+              "border-dark": "#27272A",
+            },
+            fontFamily: {
+              "display": ["Inter", "system-ui", "sans-serif"]
+            },
+            animation: {
+              "fade-in-up": "fadeInUp 0.3s ease-out forwards",
+              "slide-in": "slideIn 0.3s ease-out",
+            },
+            keyframes: {
+              fadeInUp: {
+                "0%": { opacity: "0", transform: "translateY(5px)" },
+                "100%": { opacity: "1", transform: "translateY(0)" },
+              },
+              slideIn: {
+                "0%": { opacity: "0", transform: "translateY(-10px)" },
+                "100%": { opacity: "1", transform: "translateY(0)" },
+              }
+            }
+          },
+        },
+      }
+    </script>
+    <style>
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar { width: 6px; }
+      ::-webkit-scrollbar-track { background: #050505; }
+      ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+      ::-webkit-scrollbar-thumb:hover { background: #555; }
+      
+      body {
+        background-color: #050505 !important;
+        color: #ffffff;
+        font-family: 'Inter', sans-serif;
+      }
+    </style>
+  </head>
+  
+  <div class="min-h-screen bg-background-dark font-display text-gray-300 antialiased py-24 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+    
+    <div class="max-w-xl w-full space-y-8 animate-fade-in-up">
+        
+        <!-- HEADER -->
+        <div class="text-center">
+            <h2 class="mt-6 text-3xl font-bold text-white tracking-tight flex items-center justify-center gap-3">
+                <span class="p-2 rounded-lg bg-surface-dark-lighter border border-border-dark text-primary">
+                    <span class="material-icons-outlined">cloud_upload</span>
+                </span>
+                Upload New Note
+            </h2>
+            <p class="mt-2 text-sm text-gray-500">Share your knowledge with the community.</p>
         </div>
+  
+        <!-- FORM CONTAINER -->
+        <div class="bg-surface-dark border border-border-dark rounded-xl shadow-2xl p-8 relative overflow-hidden">
+            <!-- Background Decoration -->
+            <div class="absolute top-0 right-0 -mr-16 -mt-16 w-32 h-32 rounded-full bg-primary/10 blur-2xl"></div>
+  
+            <form id="uploadForm" class="space-y-6" enctype="multipart/form-data">
+                
+                <!-- TITLE -->
+                <div>
+                    <label for="title" class="block text-sm font-medium text-gray-400 mb-1">Title <span class="text-red-500">*</span></label>
+                    <input type="text" name="title" id="title" required placeholder="e.g. Advanced Data Structures Notes"
+                           class="w-full bg-surface-dark-lighter border border-border-dark rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-colors">
+                </div>
+  
+                <!-- DESCRIPTION -->
+                <div>
+                    <label for="description" class="block text-sm font-medium text-gray-400 mb-1">Description</label>
+                    <textarea name="description" id="description" rows="3" placeholder="Brief summary of what's inside..."
+                              class="w-full bg-surface-dark-lighter border border-border-dark rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-colors"></textarea>
+                </div>
+  
+                <!-- DROPDOWNS GRID -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <!-- SUBJECT CUSTOM DROPDOWN -->
+                    <div class="relative group z-30">
+                        <label class="block text-sm font-medium text-gray-400 mb-1">Subject <span class="text-red-500">*</span></label>
+                        <div class="custom-dropdown relative" id="subjectDropdown">
+                             <!-- Trigger Button -->
+                             <button type="button" class="dropdown-btn w-full bg-surface-dark-lighter border border-border-dark hover:border-gray-600 rounded-lg px-4 py-3 text-left flex justify-between items-center focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all group-hover:bg-white/5">
+                                 <span class="selected-text text-gray-400">Select Subject</span>
+                                 <span class="material-icons-outlined text-gray-500 transition-transform duration-300">expand_more</span>
+                             </button>
+                             
+                             <!-- Dropdown Menu -->
+                             <div class="dropdown-menu hidden absolute top-full left-0 w-full mt-1 bg-surface-dark-lighter border border-border-dark rounded-lg shadow-xl shadow-black/50 max-h-60 overflow-y-auto z-50">
+                                 <% subjects.forEach(s => { %>
+                                     <div class="dropdown-item px-4 py-2.5 hover:bg-primary/20 hover:text-white cursor-pointer text-gray-300 transition-colors border-l-2 border-transparent hover:border-primary" data-value="<%= s._id %>">
+                                         <%= s.name %>
+                                     </div>
+                                 <% }) %>
+                                 <div class="dropdown-item px-4 py-2.5 hover:bg-primary/20 cursor-pointer text-primary font-bold border-t border-border-dark flex items-center gap-2" data-value="other">
+                                     <span class="material-icons-outlined text-sm">add_circle</span> Add New Subject
+                                 </div>
+                             </div>
+                             <input type="hidden" name="subject" id="subjectInput" required>
+                        </div>
+                    </div>
+  
+                    <!-- NEW SUBJECT INPUT (Hidden by default) -->
+                    <div id="newSubjectGroup" class="hidden md:col-span-2 animate-fade-in-up">
+                         <label for="newSubject" class="block text-sm font-medium text-primary mb-1">New Subject Name <span class="text-red-500">*</span></label>
+                         <input type="text" name="newSubject" id="newSubject" placeholder="Enter new subject name"
+                                class="w-full bg-surface-dark-lighter border border-primary/50 text-white placeholder-gray-600 rounded-lg px-4 py-3 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-colors shadow-[0_0_15px_rgba(255,87,34,0.1)]">
+                    </div>
+  
+                    <!-- COURSE CUSTOM DROPDOWN -->
+                    <div class="relative group z-20">
+                        <label class="block text-sm font-medium text-gray-400 mb-1">Course <span class="text-red-500">*</span></label>
+                        <div class="custom-dropdown relative" id="courseDropdown">
+                             <button type="button" class="dropdown-btn w-full bg-surface-dark-lighter border border-border-dark hover:border-gray-600 rounded-lg px-4 py-3 text-left flex justify-between items-center focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all group-hover:bg-white/5">
+                                 <span class="selected-text text-gray-400">Select Course</span>
+                                 <span class="material-icons-outlined text-gray-500 transition-transform duration-300">expand_more</span>
+                             </button>
+                             <div class="dropdown-menu hidden absolute top-full left-0 w-full mt-1 bg-surface-dark-lighter border border-border-dark rounded-lg shadow-xl shadow-black/50 max-h-60 overflow-y-auto z-50">
+                                 <% courses.forEach(c => { %>
+                                     <div class="dropdown-item px-4 py-2.5 hover:bg-primary/20 hover:text-white cursor-pointer text-gray-300 transition-colors border-l-2 border-transparent hover:border-primary" data-value="<%= c %>"><%= c %></div>
+                                 <% }) %>
+                             </div>
+                             <input type="hidden" name="course" id="courseInput" required>
+                        </div>
+                    </div>
+  
+                    <!-- SEMESTER CUSTOM DROPDOWN -->
+                    <div class="relative group z-10">
+                        <label class="block text-sm font-medium text-gray-400 mb-1">Semester <span class="text-red-500">*</span></label>
+                         <div class="custom-dropdown relative" id="semesterDropdown">
+                             <button type="button" class="dropdown-btn w-full bg-surface-dark-lighter border border-border-dark hover:border-gray-600 rounded-lg px-4 py-3 text-left flex justify-between items-center focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all group-hover:bg-white/5">
+                                 <span class="selected-text text-gray-400">Select Semester</span>
+                                 <span class="material-icons-outlined text-gray-500 transition-transform duration-300">expand_more</span>
+                             </button>
+                             <div class="dropdown-menu hidden absolute top-full left-0 w-full mt-1 bg-surface-dark-lighter border border-border-dark rounded-lg shadow-xl shadow-black/50 max-h-60 overflow-y-auto z-50">
+                                 <% semester.forEach(s => { %>
+                                     <div class="dropdown-item px-4 py-2.5 hover:bg-primary/20 hover:text-white cursor-pointer text-gray-300 transition-colors border-l-2 border-transparent hover:border-primary" data-value="<%= s %>"><%= s %></div>
+                                 <% }) %>
+                             </div>
+                             <input type="hidden" name="semester" id="semesterInput" required>
+                        </div>
+                    </div>
+  
+                </div>
+  
+                <!-- FILE UPLOAD AREA -->
+                <div>
+                     <label class="block text-sm font-medium text-gray-400 mb-2">Upload File (PDF) <span class="text-red-500">*</span></label>
+                     <div id="dropZone" class="border-2 border-dashed border-border-dark hover:border-primary rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer transition-all bg-surface-dark-lighter/50 hover:bg-surface-dark-lighter group relative overflow-hidden">
+                         <input type="file" name="file" id="file" accept="application/pdf" required class="hidden">
+                         
+                         <!-- Hover Glow -->
+                         <div class="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
 
-        <input type="file" name="file" id="file" accept="application/pdf" required>
-
-        <p class="error-text" id="fileError">X - File must be a PDF and less than 10MB.</p>
-      </div>
-    </div>
-
-    <button type="submit" class="form-submit-btn">Upload Note</button>
-  </form>
-
-  <!-- Progress bar -->
-
-
-
-</div>
-
-<!-- progress container (place near bottom of upload page) -->
-<div id="progressContainer">
-  <div id="progressInner">
-    <div style="display:flex; align-items:center; gap:14px; width:100%;">
-      <div style="flex:1;">
-        <div style="font-weight:700; font-size:1.05rem;">Uploading file...</div>
-        <div style="color:var(--muted); font-size:0.9rem;">Please do not close this tab.</div>
-      </div>
-      <div style="min-width:140px; text-align:right;">
-        <div id="progressText">0%</div>
-      </div>
-    </div>
-
-    <progress id="progressBar" value="0" max="100"></progress>
-    <div style="display:flex; gap:10px; margin-top:6px;">
-      <button class="btn" id="cancelUploadBtn" type="button">Cancel</button>
+                         <div class="w-14 h-14 rounded-full bg-surface-dark border border-border-dark flex items-center justify-center mb-3 group-hover:scale-110 group-hover:border-primary/50 transition-all duration-300 z-10">
+                             <span class="material-icons-outlined text-3xl text-gray-500 group-hover:text-primary transition-colors">post_add</span>
+                         </div>
+                         
+                         <p id="fileLabel" class="text-sm text-center text-gray-300 font-medium z-10 transition-colors group-hover:text-white">Click to browse or drag PDF here</p>
+                         <p class="text-xs text-center text-gray-600 mt-1 z-10 group-hover:text-primary/70">Max file size: 10MB</p>
+                     </div>
+                     <p id="fileError" class="hidden text-xs text-red-500 mt-2 flex items-center gap-1 animate-pulse">
+                        <span class="material-icons-outlined text-sm">error</span> <span id="fileErrorText">File too large</span>
+                     </p>
+                </div>
+  
+                <!-- ACTION BUTTON -->
+                <button type="submit" class="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-lg shadow-lg text-sm font-bold text-white bg-gradient-to-r from-primary to-orange-600 hover:from-primary-hover hover:to-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all transform hover:-translate-y-0.5 hover:shadow-primary/25">
+                    Upload Note &rarr;
+                </button>
+  
+            </form>
+            
+            <!-- PROGRESS OVERLAY -->
+            <div id="progressContainer" class="hidden absolute inset-0 bg-surface-dark/95 backdrop-blur-sm z-50 flex-col items-center justify-center transition-all duration-300">
+                 <div class="w-3/4 max-w-sm text-center animate-fade-in-up">
+                     <div class="relative w-16 h-16 mx-auto mb-6">
+                        <span class="absolute inset-0 animate-ping inline-flex h-full w-full rounded-full bg-primary/20 opacity-75"></span>
+                        <div class="relative inline-flex rounded-full h-16 w-16 bg-surface-dark-lighter border border-primary/30 items-center justify-center">
+                            <span class="material-icons-outlined text-3xl text-primary">cloud_upload</span>
+                        </div>
+                     </div>
+                     
+                     <h3 class="text-xl font-bold text-white mb-2">Uploading Note...</h3>
+                     <p class="text-sm text-gray-500 mb-8">Please do not close this tab.</p>
+                     
+                     <div class="w-full bg-surface-dark rounded-full h-2 mb-4 overflow-hidden border border-border-dark">
+                         <div id="progressBar" class="bg-gradient-to-r from-primary to-orange-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                     </div>
+                     <p id="progressText" class="text-sm font-bold text-primary font-mono">0%</p>
+                     
+                     <button id="cancelUploadBtn" type="button" class="mt-8 text-xs text-gray-600 hover:text-red-400 transition-colors uppercase tracking-wider font-semibold">Cancel Upload</button>
+                 </div>
+            </div>
+  
+        </div>
     </div>
   </div>
-</div>
-
-
-
-
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-
-<script>
-
-
+  
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  
+  <script>
     const form = document.getElementById("uploadForm");
     const fileInput = document.getElementById("file");
+    const dropZone = document.getElementById("dropZone");
+    const fileLabel = document.getElementById("fileLabel");
     const fileError = document.getElementById("fileError");
+    const fileErrorText = document.getElementById("fileErrorText");
+    const newSubjectGroup = document.getElementById("newSubjectGroup");
+    
+    // --- CUSTOM DROPDOWN LOGIC ---
+    function setupDropdown(id) {
+        const wrapper = document.getElementById(id);
+        const btn = wrapper.querySelector('.dropdown-btn');
+        const menu = wrapper.querySelector('.dropdown-menu');
+        const input = wrapper.querySelector('input[type="hidden"]');
+        const selectedText = wrapper.querySelector('.selected-text');
+        const arrow = wrapper.querySelector('.material-icons-outlined');
+        
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            // Close others
+            document.querySelectorAll('.custom-dropdown').forEach(d => {
+                if (d.id !== id) {
+                    d.querySelector('.dropdown-menu').classList.add('hidden');
+                    d.querySelector('.material-icons-outlined').style.transform = 'rotate(0deg)';
+                }
+            });
+            
+            // Toggle current
+            const isHidden = menu.classList.contains('hidden');
+            if (isHidden) {
+                menu.classList.remove('hidden');
+                // menu.classList.add('animate-slide-in'); // Optional extra animation
+                arrow.style.transform = 'rotate(180deg)';
+            } else {
+                menu.classList.add('hidden');
+                arrow.style.transform = 'rotate(0deg)';
+            }
+        });
+        
+        wrapper.querySelectorAll('.dropdown-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                const val = item.getAttribute('data-value');
+                const txt = item.innerText;
+                
+                input.value = val;
+                selectedText.innerText = txt;
+                selectedText.classList.remove('text-gray-400');
+                selectedText.classList.add('text-white');
+                
+                menu.classList.add('hidden');
+                arrow.style.transform = 'rotate(0deg)';
+                
+                // Subject Logic
+                if (id === 'subjectDropdown') {
+                    if (val === 'other') {
+                        newSubjectGroup.classList.remove('hidden');
+                        const nsInput = document.getElementById('newSubject');
+                        nsInput.required = true;
+                        nsInput.focus();
+                    } else {
+                        newSubjectGroup.classList.add('hidden');
+                         document.getElementById('newSubject').required = false;
+                    }
+                }
+            });
+        });
+    }
+
+    setupDropdown('subjectDropdown');
+    setupDropdown('courseDropdown');
+    setupDropdown('semesterDropdown');
+    
+    // Close dropdowns on outside click
+    document.addEventListener('click', () => {
+         document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.add('hidden'));
+         document.querySelectorAll('.custom-dropdown .material-icons-outlined').forEach(a => a.style.transform = 'rotate(0deg)');
+    });
+
+
+    // --- 1. FILE INPUT LOGIC ---
+    dropZone.addEventListener("click", () => fileInput.click());
   
-  // show/hide helpers
-function showProgress() { 
-  document.getElementById('progressContainer').style.display = 'flex'; 
-}
-function hideProgress() { 
-  document.getElementById('progressContainer').style.display = 'none'; 
-}
-
-const progressBar = document.getElementById('progressBar');
-const progressText = document.getElementById('progressText');
-
-form.addEventListener('submit', async function(e){
-  e.preventDefault();
-  if (fileError.style.display === "block" || !fileInput.files[0]) {
-    alert("Please select a valid PDF file.");
-    return;
-  }
-  showProgress();
-
-  try {
-    // Get signature from backend
-    const sigRes = await axios.get('/api/upload-signature');
-    const { signature, timestamp, cloudName, apiKey } = sigRes.data;
-    const UPLOAD_URL = `https://api.cloudinary.com/v1_1/${cloudName}/raw/upload`;
-
-    const file = fileInput.files[0];
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("api_key", apiKey);
-    formData.append("timestamp", timestamp);
-    formData.append("signature", signature);
-    formData.append("folder", "campusNotes");
-
-    const cloudRes = await axios.post(UPLOAD_URL, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-      onUploadProgress: (ev) => {
-        const percent = Math.round((ev.loaded * 100) / ev.total);
-        progressBar.value = percent;
-        progressText.innerText = percent + '%';
-      }
+    // Drag & Drop
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('border-primary', 'bg-primary/5');
     });
-
-    const uploadedFileUrl = cloudRes.data.secure_url;
-    // send to server
-    const noteDetails = {
-      title: form.title.value,
-      description: form.description.value,
-      subject: form.subject.value,
-      newSubject: form.newSubject.value,
-      course: form.course.value,
-      semester: form.semester.value,
-      fileUrl: uploadedFileUrl
-    };
-
-    const saveNoteResponse = await axios.post('/upload', noteDetails);
-    if (saveNoteResponse.data.success) {
-      hideProgress();
-      alert('✅ Upload successful! Note has been sent for verification.');
-      window.location.href = saveNoteResponse.data.redirectUrl;
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('border-primary', 'bg-primary/5');
+    });
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('border-primary', 'bg-primary/5');
+        if (e.dataTransfer.files.length) {
+            fileInput.files = e.dataTransfer.files;
+            validateFile(fileInput.files[0]);
+        }
+    });
+  
+    fileInput.addEventListener("change", () => {
+        if(fileInput.files.length) validateFile(fileInput.files[0]);
+    });
+  
+    function validateFile(file) {
+        // 10MB limit
+        const maxSize = 10 * 1024 * 1024;
+        
+        if (file.type !== "application/pdf") {
+            showError("Only PDF files are allowed.");
+            resetFile();
+            return;
+        }
+  
+        if (file.size > maxSize) {
+            showError("File is too large! Max limit is 10MB.");
+            resetFile();
+        } else {
+            fileError.classList.add("hidden");
+            fileLabel.innerHTML = `<span class="text-white font-semibold">${file.name}</span> <span class="text-xs text-gray-500">(${(file.size/1024/1024).toFixed(2)} MB)</span>`;
+            dropZone.classList.add("border-primary/50", "bg-primary/5");
+        }
     }
-  } catch(err) {
-    console.error(err);
-    hideProgress();
-    alert('❌ Upload failed: ' + (err.response?.data?.error || err.message));
-  }
-});
-
-// Cancel upload (optional)
-// If you want to actually cancel the axios upload you'd need an AbortController or cancel token.
-document.getElementById('cancelUploadBtn').addEventListener('click', () => {
-  hideProgress();
-});
-
-
-
-
-</script>
-
-<script>
-document.querySelectorAll(".dropdown").forEach(drop => {
-
-  const selected = drop.querySelector(".dropdown-selected");
-  const menu = drop.querySelector(".dropdown-menu");
-  const items = drop.querySelectorAll(".dropdown-item");
-  const hidden = drop.querySelector("input[type='hidden']");
-
-  // open / close
-  selected.addEventListener("click", () => {
-    drop.classList.toggle("open");
-  });
-
-  // choose item
-  items.forEach(item => {
-    item.addEventListener("click", () => {
-      const value = item.dataset.value;
-      const text = item.textContent;
-
-      selected.innerHTML = text;
-      hidden.value = value;
-
-      items.forEach(i => i.classList.remove("active"));
-      item.classList.add("active");
-
-      drop.classList.remove("open");
-
-      // Special case: Add New Subject
-      if(value === "other") {
-        document.getElementById("newSubjectGroup").style.display = "block";
-      } else if (drop.dataset.name === "subject") {
-        document.getElementById("newSubjectGroup").style.display = "none";
-      }
-    });
-  });
-
-});
-
-// click outside to close
-document.addEventListener("click", e => {
-  document.querySelectorAll(".dropdown.open").forEach(dd => {
-    if (!dd.contains(e.target)) dd.classList.remove("open");
-  });
-});
-
-
-const fileBox = document.getElementById("fileInputBox");
-const fileLabel = document.getElementById("fileLabel");
-
-fileBox.addEventListener("click", () => fileInput.click());
-
-fileInput.addEventListener("change", () => {
-  const file = fileInput.files[0];
-
-  if (file) {
-    // 10MB Validation (10 * 1024 * 1024 bytes)
-    const maxSize = 10 * 1024 * 1024; 
-
-    if (file.size > maxSize) {
-      // अगर फाइल बड़ी है तो Error दिखाएं और फाइल हटा दें
-      fileError.style.display = "block";
-      fileError.innerText = "❌ File is too large! Max limit is 10MB.";
+  
+    function showError(msg) {
+        fileError.classList.remove("hidden");
+        fileErrorText.innerText = msg;
+    }
+  
+    function resetFile() {
+        fileInput.value = "";
+        fileLabel.textContent = "Click to browse or drag PDF here";
+        dropZone.classList.remove("border-primary/50", "bg-primary/5");
+    }
+  
+  
+    // --- 3. UPLOAD LOGIC ---
+    const progressContainer = document.getElementById("progressContainer");
+    const progressBar = document.getElementById("progressBar");
+    const progressText = document.getElementById("progressText");
+  
+    function showProgress() { progressContainer.classList.remove("hidden"); progressContainer.classList.add("flex"); }
+    function hideProgress() { progressContainer.classList.add("hidden"); progressContainer.classList.remove("flex"); }
+  
+    form.addEventListener('submit', async function(e){
+      e.preventDefault();
       
-      fileInput.value = ""; // Input reset करें
-      fileLabel.textContent = "Select PDF...";
-      fileLabel.style.color = "var(--muted)";
-    } else {
-      // अगर फाइल सही है
-      fileError.style.display = "none";
-      fileLabel.textContent = file.name;
-      fileLabel.style.color = "#e6eef8";
-    }
-  } else {
-    fileLabel.textContent = "Select PDF...";
-    fileLabel.style.color = "var(--muted)";
-    fileError.style.display = "none";
-  }
-});
-
-
-</script>
+      if (!fileInput.files[0]) {
+        showError("Please select a PDF file.");
+        return;
+      }
+      
+      if (!document.getElementById('subjectInput').value) {
+          alert('Please select a subject.');
+          return;
+      }
+      
+       if (!document.getElementById('courseInput').value) {
+          alert('Please select a course.');
+          return;
+      }
+       if (!document.getElementById('semesterInput').value) {
+          alert('Please select a semester.');
+          return;
+      }
+      
+      showProgress();
+  
+      try {
+        // Get signature
+        const sigRes = await axios.get('/api/upload-signature');
+        const { signature, timestamp, cloudName, apiKey } = sigRes.data;
+        const UPLOAD_URL = `https://api.cloudinary.com/v1_1/${cloudName}/raw/upload`;
+  
+        const file = fileInput.files[0];
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("api_key", apiKey);
+        formData.append("timestamp", timestamp);
+        formData.append("signature", signature);
+        formData.append("folder", "campusNotes");
+  
+        const cloudRes = await axios.post(UPLOAD_URL, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+          onUploadProgress: (ev) => {
+            const percent = Math.round((ev.loaded * 100) / ev.total);
+            progressBar.style.width = percent + "%";
+            progressText.innerText = percent + '%';
+          }
+        });
+  
+        const uploadedFileUrl = cloudRes.data.secure_url;
+        
+        // Prepare backend payload
+        const noteDetails = {
+          title: form.title.value,
+          description: form.description.value,
+          subject: document.getElementById('subjectInput').value,
+          newSubject: form.newSubject ? form.newSubject.value : "",
+          course: document.getElementById('courseInput').value,
+          semester: document.getElementById('semesterInput').value,
+          fileUrl: uploadedFileUrl
+        };
+  
+        const saveNoteResponse = await axios.post('/upload', noteDetails);
+        if (saveNoteResponse.data.success) {
+          progressBar.style.width = "100%";
+          progressText.innerText = "Done!";
+          setTimeout(() => {
+              window.location.href = saveNoteResponse.data.redirectUrl;
+          }, 800);
+        }
+      } catch(err) {
+        console.error(err);
+        hideProgress();
+        alert('Upload failed: ' + (err.response?.data?.error || err.message));
+      }
+    });
+  
+    document.getElementById('cancelUploadBtn').addEventListener('click', () => {
+      // In a real app we would cancel the axios token here (needs abort controller)
+      hideProgress();
+    });
+  
+  </script>

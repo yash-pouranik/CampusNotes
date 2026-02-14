@@ -4,11 +4,13 @@
   top: 0;
   left: 0;
   right: 0;
-  padding: 16px 20px;
-  background: rgba(7, 16, 34, 0.7);
-  backdrop-filter: blur(10px);
+  padding: 12px 24px;
+  background: rgba(5, 5, 5, 0.85);
+  /* Deep Black Glass */
+  backdrop-filter: blur(12px);
   z-index: 999;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
+  border-bottom: 1px solid #27272A;
+  /* Zinc-800 */
 }
 
 .nav-inner {
@@ -21,131 +23,118 @@
 
 /* BRAND */
 .nav-brand {
-  font-size: 1.4rem;
-  padding: 6px 18px;
-  border-radius: 9px;
-  border: 1px solid #00ffd5;
-  color: #00ffd5;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #fff;
   text-decoration: none;
-  font-weight: 600;
-  background: rgba(0,255,213,0.06);
-  box-shadow: 0 0 8px rgba(0,255,213,0.18);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: -0.02em;
 }
+
+
 
 /* TOGGLE BUTTON */
 .nav-toggle {
-  height: 26px;
-  width: 36px;
-  padding: 6px;
+  height: 32px;
+  width: 32px;
+  padding: 4px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  border-radius: 6px;
-  border: 1px solid #00ffd5;
-  background: rgba(0,255,213,0.08);
+  justify-content: space-around;
+  background: transparent;
+  border: none;
   cursor: pointer;
 }
 
 .nav-toggle span {
-  height: 3px;
+  height: 2px;
   width: 100%;
-  background: #00ffd5;
-  border-radius: 4px;
+  background: #fff;
+  border-radius: 2px;
+  transition: all 0.2s;
 }
 
-/* MENU (hidden by default) */
+/* MENU */
 .nav-menu {
   display: none;
   flex-direction: column;
   position: absolute;
-  top: 110%;
+  top: 100%;
   right: 20px;
-  width: 200px;
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(0,255,213,0.3);
-  border-radius: 12px;
-  padding: 12px;
-  backdrop-filter: blur(10px);
+  width: 220px;
+  background: #0A0A0A;
+  border: 1px solid #27272A;
+  border-radius: 8px;
+  padding: 8px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
 }
 
 .nav-menu.active {
   display: flex;
-  animation: fadeIn 0.25s ease;
+  animation: fadeIn 0.2s ease;
 }
 
 .nav-menu a {
-  padding: 10px 12px;
-  color: #00ffd5;
+  padding: 10px 16px;
+  color: #a1a1aa;
+  /* Gray-400 */
   text-decoration: none;
+  font-size: 0.9rem;
   font-weight: 500;
   border-radius: 6px;
+  transition: all 0.2s;
 }
 
 .nav-menu a:hover {
-  background: rgba(0,255,213,0.18);
+  background: #27272A;
+  color: #fff;
 }
 
-/* animation */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-6px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
 
-/* Neon brand hover */
-.nav-brand {
-  transition: all 0.25s ease;
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-
-.nav-brand:hover {
-  color: #00ffd5;
-  border-color: #00ffd5;
-  box-shadow: 0 0 12px rgba(0,255,213,0.35),
-              inset 0 0 8px rgba(0,255,213,0.18);
-  transform: scale(1.05);
-  background: rgba(0,255,213,0.12);
-}
-
 
 /* ============================ */
-/* FOOTER — NEON DARK THEME     */
+/* FOOTER — SAAS DARK THEME     */
 /* ============================ */
-footer{
-  border-top: 1px solid rgba(255, 255, 255, 0.579) !important;
+footer {
+  border-top: 1px solid #27272A !important;
 }
 
 .site-footer {
-  background: rgba(7, 16, 34, 0.8);
-  padding: 50px 20px 30px;
-  margin-top: 70px;
-  backdrop-filter: blur(10px) saturate(140%);
-  border-top: 1px solid rgba(255,255,255,0.05);
-  color: #c9d4e6;
+  background: #050505;
+  padding: 60px 20px 40px;
+  margin-top: 0;
+  /* Index page handles its own spacing */
+  border-top: 1px solid #27272A;
+  color: #9ca3af;
 }
 
 /* Top Brand */
 .footer-top {
-  text-align: center;
-  margin-bottom: 30px;
+  text-align: left;
+  margin-bottom: 40px;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .footer-top .brand {
-  font-size: 1.4rem;
-  padding: 6px 20px;
-  border-radius: 10px;
-  border: 1px solid #00ffd5;
-  color: #00ffd5;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #fff;
   text-decoration: none;
-  font-weight: 600;
-  background: rgba(0,255,213,0.06);
-  box-shadow: 0 0 8px rgba(0,255,213,0.15);
-  transition: all 0.25s ease;
-}
-
-.footer-top .brand:hover {
-  transform: scale(1.06);
-  box-shadow: 0 0 12px rgba(0,255,213,0.35),
-              inset 0 0 8px rgba(0,255,213,0.18);
-  background: rgba(0,255,213,0.12);
+  letter-spacing: -0.02em;
 }
 
 /* Column Layout */
@@ -153,16 +142,18 @@ footer{
   max-width: 1200px;
   margin: auto;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 35px;
-  padding: 20px 0;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 40px;
+  padding-bottom: 40px;
 }
 
 .footer-col h5 {
-  font-size: 1rem;
-  margin-bottom: 12px;
-  color: #00ffd5;
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+  color: #fff;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .footer-col ul {
@@ -172,45 +163,52 @@ footer{
 }
 
 .footer-col ul li {
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .footer-col a {
-  color: #a7b3c9;
+  color: #9ca3af;
+  /* Gray-400 */
   text-decoration: none;
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   transition: color 0.2s ease;
 }
 
 .footer-col a:hover {
-  color: #00ffd5;
-  text-shadow: 0 0 6px rgba(0,255,213,0.3);
+  color: var(--accent);
+  /* Orange */
 }
 
 /* Bottom Bar */
 .footer-bottom {
   text-align: center;
-  margin-top: 35px;
-  padding-top: 20px;
-  border-top: 1px solid rgba(255,255,255,0.04);
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid #27272A;
   font-size: 0.85rem;
-  color: #8fa0b8;
+  color: #52525b;
 }
 
 .footer-version {
-  margin-top: 5px;
-  color: #61738d;
-  font-size: 0.75rem;
+  margin-top: 8px;
+  color: #3f3f46;
 }
 
-/* ============================ */
-/* RESPONSIVE                   */
-/* ============================ */
-@media (max-width: 600px) {
+/* RESPONSIVE */
+@media (max-width: 768px) {
   .footer-columns {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-columns {
+    grid-template-columns: 1fr;
     text-align: center;
   }
-  .footer-col h5 {
-    margin-top: 10px;
+
+  .footer-top {
+    text-align: center;
   }
 }

@@ -1,289 +1,358 @@
-<link rel="stylesheet" href="/css/eachNoteCss.css?v=8">
-
-<div class="note-page-container">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   
-  <div class="note-layout-grid">
+  <!-- Google Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  
+  <!-- Font Awesome (Preserving existing dep if needed, but switching main UI to Material) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+
+  <!-- Tailwind CSS & Config -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#FF5722", // Core Orange
+            "primary-hover": "#F4511E",
+            "accent-blue": "#3B82F6",
+            "accent-green": "#22C55E",
+            "accent-purple": "#A855F7",
+            "background-dark": "#050505", // Deep Black
+            "surface-dark": "#0A0A0A",
+            "surface-dark-lighter": "#171717",
+            "border-dark": "#27272A",
+          },
+          fontFamily: {
+            "display": ["Inter", "system-ui", "sans-serif"]
+          },
+          animation: {
+            "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+          }
+        },
+      },
+    }
+  </script>
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #050505; }
+    ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #555; }
     
-    <!-- LEFT COLUMN: PREVIEWER -->
-    <main class="note-viewer-column">
-      <div class="preview-card">
-        <% if (note.fileUrl.includes('drive.google.com')) { %>
-          <%# Google Drive Link Logic %>
-          <%
-            let fileId = null;
-            try {
-              const url = new URL(note.fileUrl);
-              const pathParts = url.pathname.split('/');
-              const idIndex = pathParts.indexOf('d');
-              if (idIndex !== -1 && pathParts.length > idIndex + 1) {
-                fileId = pathParts[idIndex + 1];
-              }
-            } catch (e) {
-              console.error('Invalid Google Drive URL', e);
-            }
-          %>
+    body {
+      background-color: #050505 !important;
+      color: #ffffff;
+      font-family: 'Inter', sans-serif;
+    }
+    
+    .glass-panel {
+      background: rgba(10, 10, 10, 0.6);
+      backdrop-filter: blur(12px);
+      border: 1px solid #27272A;
+    }
+
+    /* Markdown Styles for AI Output */
+    .prose-invert {
+      color: #d1d5db;
+    }
+    .prose-invert strong { color: #fff; }
+    .prose-invert ul { list-style-type: disc; padding-left: 1.5rem; margin: 1rem 0; }
+    .prose-invert li { margin-bottom: 0.5rem; }
+  </style>
+</head>
+
+<div class="min-h-screen bg-background-dark font-display text-gray-300 antialiased pb-20 pt-24">
+  
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
       
-          <% if (fileId) { %>
-            <iframe 
-              src="https://docs.google.com/gview?url=https://drive.google.com/uc?export=download&id=<%= fileId %>&embedded=true" 
-              class="note-preview-frame" 
-              frameborder="0">
-            </iframe>
-          <% } else { %>
-            <div class="no-preview-box">
-              <i class="fa-solid fa-triangle-exclamation"></i>
-              <p>Invalid Google Drive link format.</p>
+      <!-- LEFT COLUMN: PREVIEWER (Col Span 2) -->
+      <main class="lg:col-span-2 space-y-8">
+        
+        <!-- Preview Card -->
+        <div class="bg-surface-dark border border-border-dark rounded-xl overflow-hidden shadow-2xl relative min-h-[500px] flex flex-col">
+           <!-- Header Bar for Preview -->
+           <div class="px-4 py-3 border-b border-border-dark bg-surface-dark-lighter flex justify-between items-center">
+              <div class="flex items-center gap-2 text-sm text-gray-400">
+                <span class="material-icons-outlined text-base">visibility</span>
+                Preview Mode
+              </div>
+              <!-- 'Open Original' removed to ensure download tracking via main button -->
+           </div>
+
+           <!-- Content -->
+           <div class="flex-1 bg-black/50 relative">
+            <% if (note.fileUrl.includes('drive.google.com')) { %>
+                <%
+                  let fileId = null;
+                  try {
+                    const url = new URL(note.fileUrl);
+                    const pathParts = url.pathname.split('/');
+                    const idIndex = pathParts.indexOf('d');
+                    if (idIndex !== -1 && pathParts.length > idIndex + 1) {
+                      fileId = pathParts[idIndex + 1];
+                    }
+                  } catch (e) {
+                    console.error('Invalid Google Drive URL', e);
+                  }
+                %>
+            
+                <% if (fileId) { %>
+                  <iframe 
+                    src="https://docs.google.com/gview?url=https://drive.google.com/uc?export=download&id=<%= fileId %>&embedded=true" 
+                    class="w-full h-[800px] border-none" 
+                    allow="autoplay">
+                  </iframe>
+                <% } else { %>
+                  <div class="flex flex-col items-center justify-center h-full p-12 text-center text-gray-500">
+                    <span class="material-icons-outlined text-4xl mb-4 text-red-500">broken_image</span>
+                    <p>Invalid Google Drive link format.</p>
+                  </div>
+                <% } %>
+            
+              <% } else if (note.fileUrl.toLowerCase().endsWith('.pdf')) { %>
+                <iframe 
+                  src="<%= note.fileUrl %>#toolbar=0" 
+                  class="w-full h-[800px] border-none">
+                </iframe>
+            
+              <% } else if (/\.(jpg|jpeg|png|gif|webp|avif)$/i.test(note.fileUrl)) { %>
+                <img src="<%= note.fileUrl %>" class="w-full h-auto object-contain" alt="Note Preview">
+                
+              <% } else { %>
+                <div class="flex flex-col items-center justify-center h-full p-12 text-center text-gray-500">
+                  <span class="material-icons-outlined text-4xl mb-4">description</span>
+                  <p class="mb-4">No preview available for this file type.</p>
+                  <a href="/notes/<%= note._id %>/download" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors">Download to View</a>
+                </div>
+              <% } %>
+           </div>
+        </div>
+
+        <!-- AI Assistant / Handwritten Notice -->
+        <div id="ai-assistant-wrapper">
+             <div id="handwritten-notice" class="hidden bg-yellow-900/10 border border-yellow-700/30 rounded-xl p-4 flex items-start gap-3">
+                <span class="material-icons-outlined text-yellow-500 mt-0.5">warning</span>
+                 <div>
+                   <strong class="text-yellow-500 block mb-1">AI Features Unavailable</strong>
+                   <p class="text-sm text-yellow-200/70">This appears to be a handwritten note or image-based document. AI features are currently limited to typed PDF documents.</p>
+                 </div>
+             </div>
+
+             <div class="ai-assistant-card hidden bg-surface-dark border border-border-dark rounded-xl overflow-hidden shadow-lg mt-8">
+                 <div class="bg-gradient-to-r from-purple-900/20 to-blue-900/20 px-6 py-4 border-b border-border-dark flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center text-white shadow-lg shadow-purple-500/20 animate-pulse-slow">
+                            <span class="material-icons-outlined text-sm">auto_awesome</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-white text-base">Volt AI</h4>
+                            <span class="text-[10px] uppercase font-bold tracking-wider text-accent-blue bg-blue-900/30 px-1.5 py-0.5 rounded border border-blue-500/20">Beta</span>
+                        </div>
+                    </div>
+                 </div>
+
+                 <div class="p-6 space-y-6">
+                    <!-- Summary -->
+                    <div>
+                        <button id="summarize-btn" class="w-full py-3 px-4 bg-surface-dark-lighter hover:bg-white/5 border border-border-dark rounded-lg text-left flex items-center justify-between group transition-colors">
+                            <span class="font-medium text-gray-300 group-hover:text-white flex items-center gap-2">
+                                <span class="material-icons-outlined text-primary">summarize</span> Generate Summary
+                            </span>
+                            <span class="material-icons-outlined text-gray-500 group-hover:text-white">chevron_right</span>
+                        </button>
+                        <div id="summary-output" class="mt-4 prose-invert text-sm pl-2 hidden empty:block"></div>
+                    </div>
+
+                    <!-- Chat -->
+                    <div class="border-t border-border-dark pt-6">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-3">Ask about this note</label>
+                        <div class="flex gap-2">
+                           <input type="text" id="ai-question" placeholder="e.g. Explain the main concept..." 
+                                  class="flex-1 bg-black/50 border border-border-dark rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-colors">
+                           <button id="ask-ai-btn" class="px-4 py-2 bg-primary hover:bg-primary-hover text-white rounded-lg transition-colors flex items-center justify-center">
+                               <span class="material-icons-outlined">send</span>
+                           </button>
+                        </div>
+                        <div id="answer-output" class="mt-4 prose-invert text-sm bg-surface-dark-lighter/50 rounded-lg p-3 border border-border-dark/50 hidden empty:hidden"></div>
+                    </div>
+                 </div>
+             </div>
+        </div>
+
+        <!-- Recommended Notes -->
+        <section class="pt-8 border-t border-border-dark">
+            <h3 class="text-xl font-bold text-white mb-6">More Like This</h3>
+            
+            <div class="space-y-8">
+                <!-- Subject Matches -->
+                <% if (subjectNotes.length > 0) { %>
+                    <div>
+                        <h4 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">In <%= note.subject.name %></h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <% subjectNotes.forEach(recNote => { %>
+                                <a href="/notes/<%= recNote._id %>" class="flex items-start gap-4 p-4 rounded-xl bg-surface-dark border border-border-dark hover:border-primary/50 transition-colors group">
+                                    <div class="h-10 w-10 rounded-lg bg-surface-dark-lighter border border-border-dark flex items-center justify-center text-gray-500 group-hover:text-primary transition-colors shrink-0">
+                                        <span class="material-icons-outlined">description</span>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <h5 class="text-white font-medium truncate group-hover:text-primary transition-colors"><%= recNote.title %></h5>
+                                        <p class="text-xs text-gray-500 mt-1 flex items-center gap-2">
+                                            <span><%= recNote.uploadedBy?.name || 'Unknown' %></span>
+                                            <span class="w-1 h-1 bg-gray-700 rounded-full"></span>
+                                            <span class="flex items-center gap-0.5"><span class="material-icons-outlined text-[10px]">download</span> <%= recNote.downloadCount %></span>
+                                        </p>
+                                    </div>
+                                </a>
+                            <% }) %>
+                        </div>
+                    </div>
+                <% } %>
+                
+                <!-- Semester Matches -->
+                <% if (semNotes.length > 0) { %>
+                    <div>
+                        <h4 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">In Semester <%= note.semester %></h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <% semNotes.forEach(recNote => { %>
+                                <a href="/notes/<%= recNote._id %>" class="flex items-start gap-4 p-4 rounded-xl bg-surface-dark border border-border-dark hover:border-primary/50 transition-colors group">
+                                    <div class="h-10 w-10 rounded-lg bg-surface-dark-lighter border border-border-dark flex items-center justify-center text-gray-500 group-hover:text-primary transition-colors shrink-0">
+                                        <span class="material-icons-outlined">description</span>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <h5 class="text-white font-medium truncate group-hover:text-primary transition-colors"><%= recNote.title %></h5>
+                                        <p class="text-xs text-gray-500 mt-1 flex items-center gap-2">
+                                            <span><%= recNote.uploadedBy?.name || 'Unknown' %></span>
+                                            <span class="w-1 h-1 bg-gray-700 rounded-full"></span>
+                                            <span class="flex items-center gap-0.5"><span class="material-icons-outlined text-[10px]">download</span> <%= recNote.downloadCount %></span>
+                                        </p>
+                                    </div>
+                                </a>
+                            <% }) %>
+                        </div>
+                    </div>
+                <% } %>
             </div>
-          <% } %>
-      
-        <% } else if (note.fileUrl.toLowerCase().endsWith('.pdf')) { %>
-          <iframe 
-            src="<%= note.fileUrl %>#toolbar=0" 
-            class="note-preview-frame">
-          </iframe>
-      
-        <% } else if (/\.(jpg|jpeg|png|gif|webp|avif)$/i.test(note.fileUrl)) { %>
-          <img src="<%= note.fileUrl %>" class="note-preview-img" alt="Note Preview">
-          
-        <% } else { %>
-          <div class="no-preview-box">
-            <i class="fa-solid fa-file-circle-question"></i>
-            <p>No preview available for this file type.</p>
-            <a href="/notes/<%= note._id %>/download" class="btn-download-fallback">Download to View</a>
-          </div>
-        <% } %>
-      </div>
-      
+        </section>
 
-    </main>
+      </main>
 
-    <!-- RIGHT COLUMN: SIDEBAR -->
-<!-- RIGHT COLUMN: SIDEBAR -->
-<aside class="note-sidebar-column">
-  <div class="sidebar-sticky-wrapper">
+      <!-- RIGHT COLUMN: SIDEBAR (Sticky) -->
+      <aside class="relative">
+         <div class="sticky top-28 space-y-6">
+            
+            <!-- INFO CARD -->
+            <div class="bg-surface-dark border border-border-dark rounded-xl p-6 shadow-xl">
+                 <h1 class="text-2xl font-bold text-white mb-4 leading-tight"><%= note.title %></h1>
 
-    <!-- MAIN INFO CARD -->
-    <div class="note-info-card">
+                 <!-- Uploader Info -->
+                 <a href="/profile/<%= note.uploadedBy?._id %>" class="flex items-center gap-3 mb-6 pb-6 border-b border-border-dark group">
+                    <div class="h-10 w-10 rounded-full bg-gradient-to-tr from-gray-700 to-gray-600 flex items-center justify-center text-white font-bold ring-2 ring-background-dark group-hover:ring-primary/50 transition-all">
+                        <%= note.uploadedBy?.name?.charAt(0)?.toUpperCase() || 'U' %>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-sm font-semibold text-gray-200 group-hover:text-primary transition-colors"><%= note.uploadedBy?.name || 'Unknown' %></span>
+                            <% if (note.uploadedBy?.roles?.isModerator) { %>
+                                <img src="/images/blueCheckmark.svg" class="w-3.5 h-3.5" title="Moderator">
+                            <% } else if (note.uploadedBy?.roles?.isDev) { %>
+                                <img src="/images/icons8-checkmark.svg" class="w-3.5 h-3.5" title="Dev">
+                            <% } %>
+                        </div>
+                        <div class="text-xs text-gray-500">
+                             <%= note.createdAt?.toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}) %>
+                        </div>
+                    </div>
+                 </a>
 
-      <!-- TITLE -->
-      <h1 class="note-title"><%= note.title %></h1>
+                 <!-- ACTION BUTTONS -->
+                 <div class="space-y-3 mb-8">
+                     <a href="/notes/<%= note._id %>/download" class="flex items-center justify-center gap-2 w-full py-3 bg-primary hover:bg-primary-hover text-white rounded-lg font-bold shadow-lg shadow-primary/20 transition-all transform hover:-translate-y-0.5">
+                         <span class="material-icons-outlined">download</span> Download
+                     </a>
+                     
+                     <form action="/notes/<%= note._id %>/upvote" method="POST" class="w-full">
+                         <button class="flex items-center justify-center gap-2 w-full py-3 bg-surface-dark-lighter hover:bg-white/5 border border-border-dark text-gray-300 hover:text-white rounded-lg font-medium transition-colors">
+                            <span class="material-icons-outlined text-accent-green">thumb_up</span>
+                            <span>Like</span>
+                            <span class="bg-black/30 px-2 py-0.5 rounded text-xs ml-1"><%= note.upvotes.length %></span>
+                         </button>
+                     </form>
+                 </div>
 
-      <!-- META ROW -->
-      <div class="note-meta-row">
-        <a href="/profile/<%= note.uploadedBy?._id %>" class="uploader-badge">
+                 <!-- METADATA LIST -->
+                 <div class="space-y-4">
+                     <div class="flex items-center justify-between py-2 border-b border-border-dark/50">
+                         <span class="text-sm text-gray-500">Subject</span>
+                         <span class="text-sm font-medium text-white"><%= note.subject?.name || 'N/A' %></span>
+                     </div>
+                     <div class="flex items-center justify-between py-2 border-b border-border-dark/50">
+                         <span class="text-sm text-gray-500">Course</span>
+                         <span class="text-sm font-medium text-white"><%= note.course || 'N/A' %></span>
+                     </div>
+                     <div class="flex items-center justify-between py-2 border-b border-border-dark/50">
+                         <span class="text-sm text-gray-500">Semester</span>
+                         <span class="text-sm font-medium text-white"><%= note.semester || 'N/A' %></span>
+                     </div>
+                 </div>
+                 
+                 <div class="mt-6">
+                     <span class="text-xs uppercase font-bold tracking-wider text-gray-500 block mb-2">Description</span>
+                     <p class="text-sm text-gray-400 leading-relaxed"><%= note.description || 'No description provided.' %></p>
+                 </div>
 
-          <div class="uploader-avatar">
-            <%= note.uploadedBy?.name?.charAt(0)?.toUpperCase() || 'U' %>
-          </div>
+                 <!-- OWNER CONTROLS -->
+                 <% if (typeof currUser !== 'undefined' &&
+                   (currUser._id.toString() === note.uploadedBy?._id.toString() ||
+                    currUser.roles?.isModerator ||
+                    currUser.roles?.isDev)) { %>
+                    <div class="mt-8 pt-6 border-t border-border-dark flex gap-3">
+                        <a href="/notes/<%= note._id %>/edit" class="flex-1 py-2 text-sm text-center border border-border-dark rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors">
+                            Edit
+                        </a>
+                        <button onclick="openDeleteModal('/notes/<%= note._id %>?_method=DELETE')" class="flex-1 py-2 text-sm text-center border border-red-900/30 bg-red-900/10 rounded-lg text-red-500 hover:bg-red-900/20 transition-colors">
+                            Delete
+                        </button>
+                    </div>
+                 <% } %>
 
-          <div class="uploader-meta">
-            <span class="uploader-name"><%= note.uploadedBy?.name || 'Unknown' %></span>
+            </div>
+            
+            <div class="text-center text-[10px] text-gray-600 px-4">
+                Disclaimer: Use for reference only. CampusNotes is not responsible for grades.
+            </div>
 
-            <% if (note.uploadedBy?.roles?.isModerator) { %>
-              <img src="/images/blueCheckmark.svg" alt="Mod" class="verified-icon">
-            <% } else if (note.uploadedBy?.roles?.isDev) { %>
-              <img src="/images/icons8-checkmark.svg" alt="Dev" class="verified-icon">
-            <% } %>
-          </div>
-
-        </a>
-
-        <span class="meta-dot">·</span>
-
-        <span class="meta-date">
-          <%= note.createdAt?.toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}) %>
-        </span>
-
-      </div>
-
-      <!-- ACTION BUTTONS -->
-      <div class="action-buttons-grid">
-        <a href="/notes/<%= note._id %>/download" class="btn-block btn-primary-neon">
-          <i class="fa-solid fa-download"></i> Download
-        </a>
-
-        <form action="/notes/<%= note._id %>/upvote" method="POST" style="width: 100%;">
-          <button class="btn-block btn-secondary-neon">
-            <i class="fa-solid fa-thumbs-up"></i>
-            <span><%= note.upvotes.length %></span>
-          </button>
-        </form>
-      </div>
-
-      <!-- DETAILS CARD -->
-      <div class="note-details-card">
-        <h3>Details</h3>
-
-        <ul class="details-list">
-          <li>
-            <span class="label">Subject</span>
-            <span class="value"><%= note.subject?.name || 'N/A' %></span>
-          </li>
-          <li>
-            <span class="label">Course</span>
-            <span class="value"><%= note.course || 'N/A' %></span>
-          </li>
-          <li>
-            <span class="label">Semester</span>
-            <span class="value"><%= note.semester || 'N/A' %></span>
-          </li>
-        </ul>
-
-        <!-- DESCRIPTION -->
-        <div class="description-box">
-          <span class="label">Description</span>
-          <p class="desc-text"><%= note.description || 'No description provided.' %></p>
-        </div>
-
-        <!-- OWNER CONTROLS -->
-        <% if (typeof currUser !== 'undefined' &&
-              (currUser._id.toString() === note.uploadedBy?._id.toString() ||
-               currUser.roles?.isModerator ||
-               currUser.roles?.isDev)) { %>
-          <div class="owner-controls">
-            <a href="/notes/<%= note._id %>/edit" class="btn-icon-text">
-              <i class="fa-solid fa-pen"></i> Edit
-            </a>
-
-            <button type="button"
-                    class="btn-icon-text text-red"
-                    onclick="openDeleteModal('/notes/<%= note._id %>?_method=DELETE')">
-              <i class="fa-solid fa-trash"></i> Delete
-            </button>
-          </div>
-        <% } %>
-
-      </div>
-
-      <!-- DISCLAIMER -->
-      <div class="disclaimer-text">
-        <strong>Disclaimer:</strong> Use for reference only. CampusNotes is not responsible for grades.
-      </div>
+         </div>
+      </aside>
 
     </div>
-
   </div>
-</aside>
-
-
-    
-
-  </div>
-
-        <!-- AI Assistant (Moved here for better width) -->
-      <div class="ai-assistant-card ai-assistant-container" style="display: none; margin-top: 2rem;">
-         <div class="ai-header">
-           <div class="ai-icon-pulse">
-             <i class="fa-solid fa-robot"></i>
-           </div>
-           <div class="ai-title-group">
-              <h4>Volt AI</h4>
-              <span class="ai-badge">BETA</span>
-           </div>
-         </div>
-         
-         <button id="summarize-btn" class="btn-ai-action">
-           <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Summary
-         </button>
-         <div id="summary-output" class="ai-response-box"></div>
-
-         <div class="ai-chat-box">
-           <label for="ai-question">Ask about this note</label>
-           <div class="input-group">
-             <input type="text" id="ai-question" placeholder="e.g. Explain the main concept...">
-             <button id="ask-ai-btn" class="btn-ai-send">
-               <i class="fa-solid fa-paper-plane"></i>
-             </button>
-           </div>
-           <div id="answer-output" class="ai-response-box"></div>
-         </div>
-      </div>
-
-      <div id="handwritten-notice" class="notice-card warning" style="display: none; margin-top: 2rem;">
-         <i class="fa-solid fa-pen-nib"></i>
-         <div>
-           <strong>AI Unavailable</strong>
-           <p>This appears to be a handwritten note. AI features are currently limited to typed documents.</p>
-         </div>
-      </div>
-
-  <!-- Recommended Section -->
-  <section class="recommended-section">
-    <div class="section-divider">
-       <span>More Like This</span>
-    </div>
-
-    <div class="rec-group">
-      <h2>More in <%= note.subject.name %></h2>
-      <% if (subjectNotes.length === 0) { %>
-        <p class="empty-msg">No other notes in this subject yet.</p>
-      <% } else { %>
-        <div class="rec-grid">
-          <% subjectNotes.forEach(note => { %>
-            <a href="/notes/<%= note._id %>" class="rec-card">
-              <div class="rec-icon">
-                <i class="fa-regular fa-file-lines"></i>
-              </div>
-              <div class="rec-info">
-                <h4><%= note.title %></h4>
-                <div class="rec-meta">
-                  <span><%= note.uploadedBy?.name || 'Unknown' %></span>
-                  <span><i class="fa-solid fa-download"></i> <%= note.downloadCount %></span>
-                </div>
-              </div>
-            </a>
-          <% }) %>
-        </div>
-      <% } %>
-    </div>
-    
-    <div class="rec-group" style="margin-top: 2rem;">
-      <h2>More in Semester <%= note.semester %></h2>
-      <% if (semNotes.length === 0) { %>
-        <p class="empty-msg">No other notes in this semester yet.</p>
-      <% } else { %>
-        <div class="rec-grid">
-          <% semNotes.forEach(note => { %>
-            <a href="/notes/<%= note._id %>" class="rec-card">
-              <div class="rec-icon">
-                <i class="fa-regular fa-file-lines"></i>
-              </div>
-              <div class="rec-info">
-                <h4><%= note.title %></h4>
-                <div class="rec-meta">
-                  <span><%= note.uploadedBy?.name || 'Unknown' %></span>
-                  <span><i class="fa-solid fa-download"></i> <%= note.downloadCount %></span>
-                </div>
-              </div>
-            </a>
-          <% }) %>
-        </div>
-      <% } %>
-    </div>
-
-  </section>
-
 </div>
 
 <!-- DELETE CONFIRMATION MODAL -->
-<div id="deleteModal" class="neon-modal-overlay">
-  <div class="neon-modal">
-    <div class="modal-icon warning">
-      <i class="fa-solid fa-trash-can"></i>
+<div id="deleteModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    <div class="bg-surface-dark border border-border-dark rounded-xl w-full max-w-sm p-6 shadow-2xl relative text-center">
+        <div class="w-16 h-16 rounded-full bg-red-900/20 flex items-center justify-center mx-auto mb-4 text-red-500">
+            <span class="material-icons-outlined text-3xl">delete_forever</span>
+        </div>
+        <h3 class="text-xl font-bold text-white mb-2">Delete Note?</h3>
+        <p class="text-gray-400 text-sm mb-6">This action cannot be undone. Are you sure you want to permanently delete this note?</p>
+        
+        <div class="flex gap-3 justify-center">
+             <button id="cancelDelete" class="px-4 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white border border-border-dark hover:bg-white/5 transition-colors">Cancel</button>
+             <form id="deleteForm" method="POST">
+                <button class="px-4 py-2 rounded-lg text-sm font-bold text-white bg-red-600 hover:bg-red-700 shadow-lg shadow-red-600/20 transition-all">Delete</button>
+             </form>
+        </div>
     </div>
-    <h2>Delete Note?</h2>
-    <p>This action cannot be undone. Are you sure?</p>
-
-    <div class="modal-buttons">
-      <button id="cancelDelete" class="btn-modal-cancel">Cancel</button>
-
-      <form id="deleteForm" method="POST">
-        <button class="btn-modal-delete">Delete</button>
-      </form>
-    </div>
-  </div>
 </div>
-
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
@@ -297,7 +366,7 @@
     const noteId = "<%= note._id %>";
 
 
-    const aiContainer = document.querySelector('.ai-assistant-container');
+    const aiContainer = document.querySelector('.ai-assistant-card');
     const handwrittenNotice = document.getElementById('handwritten-notice');
     const converter = new showdown.Converter();
 
@@ -306,66 +375,77 @@
         try {
             const res = await axios.get(`/api/notes/${noteId}/check-pdf`);
             if (res.data.isTyped) {
-                aiContainer.style.display = 'block'; 
+                if(aiContainer) {
+                    aiContainer.classList.remove('hidden');
+                    aiContainer.classList.add('block');
+                }
             } else {
-                handwrittenNotice.style.display = 'flex'; 
-                aiContainer.style.display = 'none'; 
+                if(handwrittenNotice) handwrittenNotice.classList.remove('hidden');
             }
         } catch (error) {
             console.error("Could not check PDF type", error);
-            handwrittenNotice.style.display = 'flex';
-            handwrittenNotice.querySelector('p').textContent = 'Could not determine PDF type. AI Assistant is unavailable.';
-            aiContainer.style.display = 'none';
+            if(handwrittenNotice) {
+                handwrittenNotice.classList.remove('hidden');
+                handwrittenNotice.querySelector('p').textContent = 'Could not determine PDF type. AI Assistant is unavailable.';
+            }
         }
     });
 
 
 
     // --- Summarize Button Logic ---
-    summarizeBtn.addEventListener('click', async () => {
-        summaryOutput.innerHTML = '<div class="ai-loading"><i class="fa-solid fa-circle-notch fa-spin"></i> Thinking...</div>';
-        summarizeBtn.disabled = true;
-        try {
-            const response = await axios.post(`/api/notes/${noteId}/ask`, {
-                question: "Summarize this document in 5 key bullet points."
-            }, { withCredentials: true });
-            summaryOutput.innerHTML = converter.makeHtml(response.data.answer); 
-        } catch (error) {
-            console.error(error);
-            if (error.response && error.response.status === 401) {
-                window.location.href = '/login-n';
-            } else {
-                summaryOutput.textContent = 'Sorry, an error occurred while generating the summary.';
+    if(summarizeBtn) {
+        summarizeBtn.addEventListener('click', async () => {
+            const outputDiv = document.getElementById('summary-output');
+            outputDiv.classList.remove('hidden');
+            outputDiv.innerHTML = '<div class="flex items-center gap-2 text-gray-400 py-2"><span class="animate-spin material-icons-outlined text-sm">autorenew</span> Thinking...</div>';
+            summarizeBtn.disabled = true;
+            try {
+                const response = await axios.post(`/api/notes/${noteId}/ask`, {
+                    question: "Summarize this document in 5 key bullet points."
+                }, { withCredentials: true });
+                outputDiv.innerHTML = converter.makeHtml(response.data.answer); 
+            } catch (error) {
+                console.error(error);
+                if (error.response && error.response.status === 401) {
+                    window.location.href = '/login-n';
+                } else {
+                    outputDiv.textContent = 'Sorry, an error occurred while generating the summary.';
+                }
+            } finally {
+                summarizeBtn.disabled = false;
             }
-        } finally {
-            summarizeBtn.disabled = false;
-        }
-    });
+        });
+    }
 
     // --- Ask Question Button Logic ---
-    askAiBtn.addEventListener('click', async () => {
-        const question = aiQuestionInput.value;
-        if (!question) {
-            alert('Please enter a question.');
-            return;
-        }
-
-        answerOutput.innerHTML = '<div class="ai-loading"><i class="fa-solid fa-circle-notch fa-spin"></i> Finding answer...</div>';
-        askAiBtn.disabled = true;
-        try {
-            const response = await axios.post(`/api/notes/${noteId}/ask`, { question: question }, { withCredentials: true });
-            answerOutput.innerHTML = converter.makeHtml(response.data.answer);
-        } catch (error) {
-             console.error(error);
-            if (error.response && error.response.status === 401) {
-                window.location.href = '/login-n';
-            } else {
-                answerOutput.textContent = 'Sorry, an error occurred while getting the answer.';
+    if(askAiBtn) {
+        askAiBtn.addEventListener('click', async () => {
+            const question = aiQuestionInput.value;
+            if (!question) {
+                alert('Please enter a question.');
+                return;
             }
-        } finally {
-            askAiBtn.disabled = false;
-        }
-    });
+
+            const outputDiv = document.getElementById('answer-output');
+            outputDiv.classList.remove('hidden');
+            outputDiv.innerHTML = '<div class="flex items-center gap-2 text-gray-400 py-2"><span class="animate-spin material-icons-outlined text-sm">autorenew</span> Finding answer...</div>';
+            askAiBtn.disabled = true;
+            try {
+                const response = await axios.post(`/api/notes/${noteId}/ask`, { question: question }, { withCredentials: true });
+                outputDiv.innerHTML = converter.makeHtml(response.data.answer);
+            } catch (error) {
+                 console.error(error);
+                if (error.response && error.response.status === 401) {
+                    window.location.href = '/login-n';
+                } else {
+                    outputDiv.textContent = 'Sorry, an error occurred while getting the answer.';
+                }
+            } finally {
+                askAiBtn.disabled = false;
+            }
+        });
+    }
 </script>
 
 
@@ -376,18 +456,25 @@
 
   function openDeleteModal(actionUrl) {
     deleteForm.action = actionUrl;
-    deleteModal.style.display = "flex";
+    deleteModal.classList.remove("hidden");
+    deleteModal.classList.add("flex");
   }
 
-  cancelDelete.addEventListener("click", () => {
-    deleteModal.style.display = "none";
-  });
+  if(cancelDelete) {
+      cancelDelete.addEventListener("click", () => {
+        deleteModal.classList.add("hidden");
+        deleteModal.classList.remove("flex");
+      });
+  }
 
   // Close modal when clicked outside
-  deleteModal.addEventListener("click", (e) => {
-    if (e.target === deleteModal) {
-      deleteModal.style.display = "none";
-    }
-  });
+  if(deleteModal) {
+      deleteModal.addEventListener("click", (e) => {
+        if (e.target === deleteModal) {
+          deleteModal.classList.add("hidden");
+          deleteModal.classList.remove("flex");
+        }
+      });
+  }
 
 </script>

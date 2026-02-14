@@ -1,112 +1,195 @@
-<link rel="stylesheet" href="/css/requestnotes.css">
-
-<section class="request-notes-section">
-  <div class="container">
-    <h1>📢 Request Notes</h1>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
     
-    <!-- Desktop Form -->
-    <form action="/requestnotes" method="POST" class="request-form">
-      <textarea name="content" placeholder="Request notes from your peers..." maxlength="280" required></textarea>
-      <button type="submit">Post</button>
-    </form>
-
-    <!-- Floating Action Button for Mobile -->
-    <div class="fab" onclick="document.querySelector('.request-form').style.display='flex'">+</div>
-
-    <!-- Feed -->
-    <div class="requests-feed">
-      <% if (requests && requests.length) { %>
-        <% requests.forEach(request => { %>
-          <div class="request-card">
-            <div class="request-user">
-              <img src="<%= request.user.avatar || '/images/dummy_profile.avif' %>" alt="User Avatar">
-              <div>
-                <h4><%= request.user.name || request.user.username %></h4>
-                <span class="timestamp"><%= request.createdAt.toLocaleString() %></span>
-              </div>
-            </div>
-
-            <p class="request-content"><%= request.content %></p>
-
-            <!-- Delete button -->
-            <% if (currUser && (currUser._id.equals(request.user._id) || currUser.role === "moderator")) { %>
-              <form action="/requestnotes/<%= request._id %>/delete" method="POST" onsubmit="return confirm('Delete this request?')">
-                <button type="submit" class="delete-btn">🗑 Delete</button>
-              </form>
-            <% } %>
-
-            <!-- Comments Section -->
-            <div class="comments-section">
-              <% if (request.comments && request.comments.length) { %>
-                <% request.comments.forEach(comment => { %>
-                  <div class="comment">
-                    <a href="/profile/<%= comment.user._id %>" class="comments-username"><strong><%= comment.user.username || comment.user.name %>:</strong></a>
-                    <span><%= comment.content %></span>
-                    <span class="timestamp"><%= comment.createdAt.toLocaleString() %></span>
-                  </div>
+    <!-- Google Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+    
+    <!-- Tailwind CSS & Config -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#FF5722", // Core Orange
+              "primary-hover": "#F4511E",
+              "background-dark": "#050505", // Deep Black
+              "surface-dark": "#0A0A0A",
+              "surface-dark-lighter": "#171717",
+              "border-dark": "#27272A",
+            },
+            fontFamily: {
+              "display": ["Inter", "system-ui", "sans-serif"]
+            },
+            animation: {
+              "fade-in-up": "fadeInUp 0.5s ease-out forwards",
+            },
+            keyframes: {
+              fadeInUp: {
+                "0%": { opacity: "0", transform: "translateY(10px)" },
+                "100%": { opacity: "1", transform: "translateY(0)" },
+              }
+            }
+          },
+        },
+      }
+    </script>
+    <style>
+      ::-webkit-scrollbar { width: 6px; }
+      ::-webkit-scrollbar-track { background: #050505; }
+      ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+      ::-webkit-scrollbar-thumb:hover { background: #555; }
+      
+      body {
+        background-color: #050505 !important;
+        color: #ffffff;
+        font-family: 'Inter', sans-serif;
+      }
+    </style>
+  </head>
+  
+  <div class="min-h-screen bg-background-dark font-display text-gray-300 antialiased py-24 px-4 sm:px-6 lg:px-8">
+    
+    <!-- CENTERED CONTAINER -->
+    <div class="max-w-2xl mx-auto space-y-8 animate-fade-in-up">
+        
+        <!-- HEADER -->
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-bold text-white tracking-tight flex items-center justify-center gap-3">
+                <span class="text-primary material-icons-outlined text-3xl">forum</span>
+                Community Requests
+            </h2>
+            <p class="text-gray-500 mt-2 text-sm">Ask for help, share resources, and collaborate.</p>
+        </div>
+  
+        <!-- CREATE POST (STATUS UPDATE STYLE) -->
+        <div class="bg-surface-dark border border-border-dark rounded-xl p-4 shadow-lg relative overflow-hidden group focus-within:border-primary/50 transition-colors">
+            <form action="/requestnotes" method="POST">
+                <div class="flex gap-4">
+                    <div class="flex-shrink-0">
+                         <div class="w-10 h-10 rounded-full bg-gradient-to-br from-gray-800 to-black border border-border-dark flex items-center justify-center text-white font-bold overflow-hidden shadow-inner">
+                            <% if (currUser && currUser.avatar) { %>
+                                <img src="<%= currUser.avatar %>" alt="avatar" class="w-full h-full object-cover">
+                            <% } else if (currUser) { %>
+                                <%= currUser.username.charAt(0).toUpperCase() %>
+                            <% } else { %>
+                                <span class="material-icons-outlined text-gray-500">person</span>
+                            <% } %>
+                        </div>
+                    </div>
+                    <div class="flex-grow">
+                        <textarea name="content" rows="2" placeholder="What notes are you looking for?" maxlength="280" required
+                                  class="w-full bg-transparent border-none text-white placeholder-gray-500 focus:ring-0 outline-none text-lg resize-none py-2"></textarea>
+                    </div>
+                </div>
+                
+                <div class="flex justify-between items-center mt-3 pt-3 border-t border-border-dark/50">
+                    <div class="text-xs text-gray-600 pl-14">
+                        Max 280 chars
+                    </div>
+                    <button type="submit" class="px-5 py-2 bg-white text-black font-bold rounded-full hover:bg-gray-200 transition-colors text-sm flex items-center gap-2">
+                        Post <span class="material-icons-outlined text-base">send</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+  
+        <!-- FEED -->
+        <div class="space-y-6">
+            <% if (!requests || requests.length === 0) { %>
+                <div class="text-center py-12 opacity-50">
+                    <span class="material-icons-outlined text-4xl mb-2">inbox</span>
+                    <p>No requests yet.</p>
+                </div>
+            <% } else { %>
+                
+                <% requests.forEach(request => { %>
+                    <article class="bg-surface-dark border border-border-dark rounded-xl p-5 shadow-sm hover:border-gray-700 transition-colors">
+                        
+                        <!-- Header -->
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex items-center gap-3">
+                                <a href="/profile/<%= request.user._id %>" class="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden bg-gray-800 border border-border-dark">
+                                    <% if (request.user.avatar) { %>
+                                        <img src="<%= request.user.avatar %>" alt="avatar" class="w-full h-full object-cover">
+                                    <% } else { %>
+                                        <div class="w-full h-full flex items-center justify-center text-white font-bold text-sm">
+                                            <%= request.user.username?.charAt(0).toUpperCase() %>
+                                        </div>
+                                    <% } %>
+                                </a>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <a href="/profile/<%= request.user._id %>" class="font-bold text-white hover:underline text-sm"><%= request.user.name || request.user.username %></a>
+                                        <span class="text-gray-500 text-xs">• <%= new Date(request.createdAt).toLocaleDateString() %></span>
+                                    </div>
+                                    <p class="text-xs text-gray-500">
+                                        <%= request.user.course || 'Student' %>
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <% if (currUser && (currUser._id.equals(request.user._id) || currUser.role === "moderator")) { %>
+                                <form action="/requestnotes/<%= request._id %>/delete" method="POST" onsubmit="return confirm('Delete this request?')">
+                                    <button type="submit" class="text-gray-600 hover:text-red-500 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <span class="material-icons-outlined text-lg">delete</span>
+                                    </button>
+                                </form>
+                            <% } %>
+                        </div>
+  
+                        <!-- Content -->
+                        <p class="text-gray-200 text-base mb-4 leading-relaxed whitespace-pre-wrap"><%= request.content %></p>
+  
+                        <!-- Action Bar (Like/Comment) -->
+                        <div class="flex items-center gap-6 border-t border-border-dark pt-3 text-gray-500 text-sm">
+                            <button class="flex items-center gap-1.5 hover:text-white transition-colors" onclick="document.getElementById('comment-<%= request._id %>').focus()">
+                                <span class="material-icons-outlined text-lg">chat_bubble_outline</span>
+                                <span><%= request.comments ? request.comments.length : 0 %></span>
+                            </button>
+                            <!-- Placeholder for Like functionality if added later -->
+                            <!-- <button class="flex items-center gap-1.5 hover:text-primary transition-colors">
+                                <span class="material-icons-outlined text-lg">favorite_border</span>
+                            </button> -->
+                        </div>
+  
+                        <!-- Comments Section -->
+                        <% if (request.comments && request.comments.length > 0) { %>
+                            <div class="mt-4 pt-4 border-t border-border-dark/50 space-y-3">
+                                <% request.comments.forEach(comment => { %>
+                                    <div class="flex gap-3 text-sm">
+                                        <a href="/profile/<%= comment.user._id %>" class="font-bold text-white whitespace-nowrap"><%= comment.user.username %></a>
+                                        <p class="text-gray-400"><%= comment.content %></p>
+                                    </div>
+                                <% }) %>
+                            </div>
+                        <% } %>
+  
+                        <!-- Add Comment Input -->
+                        <% if (currUser) { %>
+                            <form action="/requestnotes/<%= request._id %>/comment" method="POST" class="mt-4 flex gap-3 items-center">
+                                <div class="w-8 h-8 rounded-full bg-gray-800 flex-shrink-0 overflow-hidden">
+                                     <% if (currUser.avatar) { %>
+                                        <img src="<%= currUser.avatar %>" class="w-full h-full object-cover">
+                                     <% } %>
+                                </div>
+                                <div class="flex-grow relative">
+                                    <input type="text" id="comment-<%= request._id %>" name="content" placeholder="Write a reply..." maxlength="200" required
+                                           class="w-full bg-surface-dark-lighter border-none rounded-full px-4 py-2 text-sm text-white placeholder-gray-600 focus:ring-1 focus:ring-primary outline-none transition-all">
+                                    <button type="submit" class="absolute right-2 top-1.5 text-primary hover:text-white">
+                                        <span class="material-icons-outlined text-sm">send</span>
+                                    </button>
+                                </div>
+                            </form>
+                        <% } %>
+  
+                    </article>
                 <% }) %>
-              <% } else { %>
-                <p class="no-comments">No comments yet.</p>
-              <% } %>
-            </div>
-
-            <!-- Add Comment Form -->
-            <% if (currUser) { %>
-              <form action="/requestnotes/<%= request._id %>/comment" method="POST" class="comment-form">
-                <input type="text" name="content" placeholder="Write a comment..." maxlength="200" required>
-                <button type="submit">reply</button>
-              </form>
             <% } %>
-</div>
-
-
-        <% }) %>
-      <% } else { %>
-        <p class="no-requests">No requests yet. Be the first to ask! 🚀</p>
-      <% } %>
+        </div>
+        
     </div>
   </div>
-</section>
-
-<script>
-  // Request form validation
-  document.querySelector(".request-form").addEventListener("submit", function (e) {
-    const textarea = this.querySelector("textarea");
-    const content = textarea.value.trim();
-
-    if (!content) {
-      alert("Request cannot be empty!");
-      e.preventDefault();
-      return;
-    }
-
-    if (content.length <= 10) {
-      alert("Request must be greater than 10 characters!");
-      e.preventDefault();
-    }
-
-    if (content.length > 280) {
-      alert("Request must be 280 characters or less!");
-      e.preventDefault();
-    }
-  });
-
-  // Comment form validation
-  document.querySelectorAll(".comment-form").forEach(form => {
-    form.addEventListener("submit", function (e) {
-      const input = this.querySelector("input[name='content']");
-      const content = input.value.trim();
-
-      if (!content) {
-        alert("Comment cannot be empty!");
-        e.preventDefault();
-        return;
-      }
-
-      if (content.length > 200) {
-        alert("Comment must be 200 characters or less!");
-        e.preventDefault();
-      }
-    });
-  });
-</script>

@@ -1,346 +1,327 @@
-<!DOCTYPE html>
-<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Signup - CampusNotes</title>
-
-  <!-- FontAwesome (for dropdown arrow icons if needed) -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-  <style>
-
-  /* ==========================
-     AUTH — DARK NEON THEME
-     ========================== */
-
-  .auth-section {
-    max-width: 460px;
-    margin: 40px auto;
-    padding: 32px;
-    border-radius: 16px;
-
-    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
-    border: 1px solid rgba(255,255,255,0.05);
-    box-shadow: 0 8px 30px rgba(0,0,0,0.45);
-    backdrop-filter: blur(14px) saturate(140%);
-
-    text-align: center;
-    color: var(--text);
-  }
-
-  h2 {
-    font-size: 1.6rem;
-    margin-bottom: 22px;
-    font-weight: 700;
-    color: var(--accent);
-  }
-
-  p {
-    color: var(--muted);
-    margin: 18px 0;
-    font-size: 0.95rem;
-  }
-
-  /* ---------- INPUTS ---------- */
-  .auth-section input {
-    width: 100%;
-    padding: 12px 14px;
-    border-radius: 10px;
-    border: 1px solid rgba(255,255,255,0.08);
-    background: rgba(255,255,255,0.02);
-    color: var(--text);
-    font-size: 1rem;
-    transition: 0.2s;
-    margin-bottom: 15px;
-  }
-
-  .auth-section input:focus {
-    border-color: rgba(0,255,213,0.35);
-    box-shadow: 0 0 12px rgba(0,255,213,0.25);
-    outline: none;
-  }
-
-  /* ---------- BUTTON ---------- */
-  .auth-section button {
-    margin-top: 10px;
-    padding: 12px;
-    background: #0d182a;
-    border: 1px solid var(--accent);
-    color: var(--accent);
-    font-size: 1rem;
-    border-radius: 10px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: 0.25s;
-  }
-
-  .auth-section button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0 20px rgba(0,255,213,0.25);
-  }
-
-  /* ----------------------------
-     CUSTOM DROPDOWN (NEON)
-     ---------------------------- */
-  .dropdown {
-    width: 100%;
-    position: relative;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 12px;
-    padding: 12px 14px;
-    cursor: pointer;
-    color: var(--text);
-    margin-bottom: 12px;
-    transition: 0.2s;
-  }
-
-  .dropdown:hover {
-    border-color: rgba(0,255,213,0.4);
-    box-shadow: 0 0 14px rgba(0,255,213,0.15);
-  }
-
-  .dropdown-selected {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .dropdown-selected::after {
-    content: "▾";
-    color: var(--accent);
-    font-size: 0.9rem;
-  }
-
-  .dropdown-menu {
-    position: absolute;
-    top: 105%;
-    left: 0;
-    width: 100%;
-    max-height: 230px;
-    overflow-y: auto;
-    background: rgba(9, 16, 33, 0.92);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 12px;
-    box-shadow: 0 12px 30px rgba(0,0,0,0.5);
-    backdrop-filter: blur(10px);
-    z-index: 100;
-    display: none;
-    animation: fadeIn 0.15s ease-out;
-  }
-
-  .dropdown.open .dropdown-menu {
-    display: block;
-  }
-
-  .dropdown-item {
-    padding: 10px 14px;
-    cursor: pointer;
-    transition: 0.1s;
-    color: #dce7ff;
-  }
-
-  .dropdown-item:hover {
-    background: rgba(0,255,213,0.12);
-    color: var(--accent);
-  }
-
-  .dropdown-item.active {
-    background: rgba(138,47,255,0.18);
-    color: #d8b8ff;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-4px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  </style>
-</head>
-
-<body>
-
-<section class="auth-section">
-
-  <!-- Google Sign-In -->
-  <div id="g_id_onload"
-       data-client_id="466885260272-86cp1p5tkpsspvrdp8n79h0gbfob48qq.apps.googleusercontent.com"
-       data-context="signin"
-       data-auto_select="true"
-       data-itp_support="true"
-       data-theme="filled_blue"
-       data-text="signup_with">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    
+    <!-- Google Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+    
+    <!-- Tailwind CSS & Config -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#FF5722", // Core Orange
+              "primary-hover": "#F4511E",
+              "background-dark": "#050505", // Deep Black
+              "surface-dark": "#0A0A0A",
+              "surface-dark-lighter": "#171717",
+              "border-dark": "#27272A",
+            },
+            fontFamily: {
+              "display": ["Inter", "system-ui", "sans-serif"]
+            },
+            animation: {
+              "fade-in-up": "fadeInUp 0.5s ease-out forwards",
+            },
+            keyframes: {
+              fadeInUp: {
+                "0%": { opacity: "0", transform: "translateY(10px)" },
+                "100%": { opacity: "1", transform: "translateY(0)" },
+              }
+            }
+          },
+        },
+      }
+    </script>
+    <style>
+      ::-webkit-scrollbar { width: 6px; }
+      ::-webkit-scrollbar-track { background: #050505; }
+      ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+      ::-webkit-scrollbar-thumb:hover { background: #555; }
+      
+      body {
+        background-color: #050505 !important;
+        color: #ffffff;
+        font-family: 'Inter', sans-serif;
+      }
+    </style>
+  </head>
+  
+  <div class="min-h-screen bg-background-dark font-display text-gray-300 antialiased py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center relative overflow-hidden">
+      
+      <!-- Background Blobs -->
+      <div class="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full blur-[100px] translate-x-1/2 -translate-y-1/2"></div>
+      <div class="absolute bottom-0 left-0 w-96 h-96 bg-purple-500/10 rounded-full blur-[100px] -translate-x-1/2 translate-y-1/2"></div>
+  
+      <div class="max-w-md w-full space-y-8 animate-fade-in-up relative z-10">
+          
+          <!-- BRAND HEADER -->
+          <div class="text-center">
+              <a href="/" class="inline-block mb-4">
+                  <h1 class="text-3xl font-bold text-white tracking-tighter">
+                      Campus<span class="text-primary">Notes</span><span class="text-primary">.</span>
+                  </h1>
+              </a>
+              <h2 class="text-2xl font-bold text-white tracking-tight">Create your account</h2>
+              <p class="mt-2 text-sm text-gray-500">Join the community of students and learners.</p>
+          </div>
+  
+          <!-- AUTH CARD -->
+          <div class="bg-surface-dark border border-border-dark rounded-xl shadow-2xl p-8">
+              
+              <!-- GOOGLE LOGIN -->
+              <div class="mb-6">
+                  <div id="g_id_onload"
+                       data-client_id="466885260272-86cp1p5tkpsspvrdp8n79h0gbfob48qq.apps.googleusercontent.com"
+                       data-context="signin"
+                       data-auto_select="false"
+                       data-itp_support="true">
+                  </div>
+                  
+                  <!-- Custom wrapper for centering -->
+                  <div class="flex justify-center">
+                      <div class="g_id_signin" 
+                           data-type="standard" 
+                           data-size="large" 
+                           data-theme="filled_black" 
+                           data-text="signup_with" 
+                           data-shape="rectangular"
+                           data-logo_alignment="left"
+                           data-width="340">
+                      </div>
+                  </div>
+              </div>
+  
+              <div class="relative mb-6">
+                  <div class="absolute inset-0 flex items-center">
+                      <div class="w-full border-t border-border-dark"></div>
+                  </div>
+                  <div class="relative flex justify-center text-sm">
+                      <span class="px-2 bg-surface-dark text-gray-500">Or sign up with email</span>
+                  </div>
+              </div>
+  
+              <!-- SIGNUP FORM -->
+              <form id="signupForm" action="/register" method="POST" class="space-y-4">
+                  
+                  <!-- Username & Name -->
+                  <div>
+                      <input type="text" name="username" placeholder="Username" required 
+                             class="w-full bg-surface-dark-lighter border border-border-dark rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-colors">
+                  </div>
+                  <div>
+                      <input type="text" name="name" placeholder="Full Name" 
+                             class="w-full bg-surface-dark-lighter border border-border-dark rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-colors">
+                  </div>
+  
+                  <!-- Email -->
+                  <div>
+                      <input type="email" name="email" id="emailInput" placeholder="Email address" required 
+                             class="w-full bg-surface-dark-lighter border border-border-dark rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-colors">
+                  </div>
+  
+                  <!-- COURSE & GENDER DROPDOWNS -->
+                  <div class="grid grid-cols-2 gap-4">
+                      
+                      <!-- Course Dropdown -->
+                      <div class="relative">
+                          <div class="custom-dropdown relative" id="courseDropdown">
+                               <button type="button" class="dropdown-btn w-full bg-surface-dark-lighter border border-border-dark hover:border-gray-600 rounded-lg px-4 py-3 text-left flex justify-between items-center focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all text-sm h-[46px]">
+                                   <span class="selected-text text-gray-500">Course</span>
+                                   <span class="material-icons-outlined text-gray-500 text-sm transition-transform duration-300">expand_more</span>
+                               </button>
+                               <div class="dropdown-menu hidden absolute top-full left-0 w-full mt-1 bg-surface-dark-lighter border border-border-dark rounded-lg shadow-xl shadow-black/50 max-h-48 overflow-y-auto z-50">
+                                   <% const courses = ["B.Tech CSE", "B.Tech IT", "B.Tech ECE", "B.Tech ME", "MBA", "BBA", "MCA", "BCA"]; %>
+                                   <% courses.forEach(c => { %>
+                                       <div class="dropdown-item px-4 py-2 hover:bg-primary/20 hover:text-white cursor-pointer text-gray-300 text-sm transition-colors" data-value="<%= c %>"><%= c %></div>
+                                   <% }) %>
+                               </div>
+                               <input type="hidden" name="course" id="course" required>
+                          </div>
+                      </div>
+  
+                      <!-- Gender Dropdown -->
+                      <div class="relative">
+                          <div class="custom-dropdown relative" id="genderDropdown">
+                               <button type="button" class="dropdown-btn w-full bg-surface-dark-lighter border border-border-dark hover:border-gray-600 rounded-lg px-4 py-3 text-left flex justify-between items-center focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all text-sm h-[46px]">
+                                   <span class="selected-text text-gray-500">Gender</span>
+                                   <span class="material-icons-outlined text-gray-500 text-sm transition-transform duration-300">expand_more</span>
+                               </button>
+                               <div class="dropdown-menu hidden absolute top-full left-0 w-full mt-1 bg-surface-dark-lighter border border-border-dark rounded-lg shadow-xl shadow-black/50 max-h-48 overflow-y-auto z-50">
+                                   <% const genders = ["He/Him", "She/Her", "They/Them", "Other"]; %>
+                                   <% genders.forEach(g => { %>
+                                       <div class="dropdown-item px-4 py-2 hover:bg-primary/20 hover:text-white cursor-pointer text-gray-300 text-sm transition-colors" data-value="<%= g %>"><%= g %></div>
+                                   <% }) %>
+                               </div>
+                               <input type="hidden" name="gender" id="gender" required>
+                          </div>
+                      </div>
+  
+                  </div>
+  
+                  <!-- Password -->
+                  <div>
+                      <input type="password" name="password" placeholder="Password (Min 6 chars, 1 Upper, 1 Number)" required 
+                             class="w-full bg-surface-dark-lighter border border-border-dark rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-colors">
+                  </div>
+  
+                  <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-lg text-sm font-bold text-white bg-gradient-to-r from-primary to-orange-600 hover:from-primary-hover hover:to-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all transform hover:-translate-y-0.5">
+                      Create Account
+                  </button>
+              </form>
+          </div>
+  
+          <!-- FOOTER -->
+          <p class="text-center text-sm text-gray-500">
+              Already have an account? 
+              <a href="/login-n" class="font-medium text-primary hover:text-primary-hover transition-colors">Log in</a>
+          </p>
+      </div>
   </div>
-
-  <div class="g_id_signin"
-       data-type="standard"
-       data-theme="filled_blue"
-       data-text="signup_with"></div>
-
-  <p>or</p>
-
-  <h2>Sign Up with CampusNotes</h2>
-
-  <form id="loginForm" action="/register" method="POST">
-
-    <input type="text" name="username" placeholder="Username" required />
-    <input type="text" name="name" placeholder="Full Name" />
-    <input type="email" name="email" placeholder="Email" id="emailInput" required />
-
-    <!-- COURSE -->
-    <div class="dropdown" data-name="course">
-      <div class="dropdown-selected">Select Course</div>
-      <div class="dropdown-menu">
-        <div class="dropdown-item" data-value="B.Tech CSE">B.Tech CSE</div>
-        <div class="dropdown-item" data-value="B.Tech IT">B.Tech IT</div>
-        <div class="dropdown-item" data-value="B.Tech ECE">B.Tech ECE</div>
-        <div class="dropdown-item" data-value="B.Tech ME">B.Tech ME</div>
-        <div class="dropdown-item" data-value="MBA">MBA</div>
-        <div class="dropdown-item" data-value="BBA">BBA</div>
-        <div class="dropdown-item" data-value="MCA">MCA</div>
-        <div class="dropdown-item" data-value="BCA">BCA</div>
-      </div>
-      <input type="hidden" name="course" id="course">
-    </div>
-
-    <!-- GENDER -->
-    <div class="dropdown" data-name="gender">
-      <div class="dropdown-selected">Select Gender</div>
-      <div class="dropdown-menu">
-        <div class="dropdown-item" data-value="He/Him">He/Him</div>
-        <div class="dropdown-item" data-value="She/Her">She/Her</div>
-        <div class="dropdown-item" data-value="They/Them">They/Them</div>
-        <div class="dropdown-item" data-value="Other">Other</div>
-      </div>
-      <input type="hidden" name="gender" id="gender">
-    </div>
-
-    <input type="password" name="password" placeholder="Password" required />
-
-    <button type="submit">Sign Up</button>
-  </form>
-
-</section>
-
-<!-- Google Script -->
-<script src="https://accounts.google.com/gsi/client" async></script>
-
-<script>
-  /* ---------- GOOGLE LOGIN ---------- */
-  function decodeJWT(token) {
-    let base64Url = token.split(".")[1];
-    let base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-    let jsonPayload = decodeURIComponent(
-      atob(base64)
-      .split("")
-      .map(c => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-      .join("")
-    );
-    return JSON.parse(jsonPayload);
-  }
-
-  function handleCredentialResponse(response) {
-    fetch("/oauth2callback", {
-      method: "POST",
-      body: JSON.stringify({ credential: response.credential }),
-      headers: { "Content-Type": "application/json" }
-    }).then(res => res.json())
-      .then(data => {
-        if (data.success) window.location.href = "/explore";
+  
+  <!-- Google Script -->
+  <script src="https://accounts.google.com/gsi/client" async></script>
+  
+  <script>
+    // --- GOOGLE AUTH ---
+    function decodeJWT(token) {
+      let base64Url = token.split(".")[1];
+      let base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      let jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split("")
+          .map(c => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+          .join("")
+      );
+      return JSON.parse(jsonPayload);
+    }
+  
+    function handleCredentialResponse(response) {
+      fetch("/oauth2callback", {
+        method: "POST",
+        body: JSON.stringify({ credential: response.credential }),
+        headers: { "Content-Type": "application/json" }
+      }).then(res => res.json())
+        .then(data => {
+          if (data.success) window.location.href = "/explore";
+        });
+    }
+  
+    window.onload = function () {
+      google.accounts.id.initialize({
+        client_id: "466885260272-86cp1p5tkpsspvrdp8n79h0gbfob48qq.apps.googleusercontent.com",
+        callback: handleCredentialResponse
       });
-  }
-
-  window.onload = function () {
-    google.accounts.id.initialize({
-      client_id: "466885260272-86cp1p5tkpsspvrdp8n79h0gbfob48qq.apps.googleusercontent.com",
-      callback: handleCredentialResponse
+    };
+  
+  
+    // --- DROPDOWN LOGIC ---
+    function setupDropdown(id) {
+        const wrapper = document.getElementById(id);
+        const btn = wrapper.querySelector('.dropdown-btn');
+        const menu = wrapper.querySelector('.dropdown-menu');
+        const input = wrapper.querySelector('input[type="hidden"]');
+        const selectedText = wrapper.querySelector('.selected-text');
+        const arrow = wrapper.querySelector('.material-icons-outlined');
+        
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            // Close others
+            document.querySelectorAll('.custom-dropdown').forEach(d => {
+                if (d.id !== id) {
+                    d.querySelector('.dropdown-menu').classList.add('hidden');
+                    d.querySelector('.material-icons-outlined').style.transform = 'rotate(0deg)';
+                }
+            });
+            
+            // Toggle
+            const isHidden = menu.classList.contains('hidden');
+            if (isHidden) {
+                menu.classList.remove('hidden');
+                arrow.style.transform = 'rotate(180deg)';
+                arrow.classList.add('text-primary');
+            } else {
+                menu.classList.add('hidden');
+                arrow.style.transform = 'rotate(0deg)';
+                arrow.classList.remove('text-primary');
+            }
+        });
+        
+        wrapper.querySelectorAll('.dropdown-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                const val = item.getAttribute('data-value');
+                const txt = item.innerText;
+                
+                input.value = val;
+                selectedText.innerText = txt;
+                selectedText.classList.remove('text-gray-500');
+                selectedText.classList.add('text-white');
+                
+                menu.classList.add('hidden');
+                arrow.style.transform = 'rotate(0deg)';
+                arrow.classList.remove('text-primary');
+            });
+        });
+    }
+  
+    setupDropdown('courseDropdown');
+    setupDropdown('genderDropdown');
+  
+    document.addEventListener('click', () => {
+         document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.add('hidden'));
+         document.querySelectorAll('.custom-dropdown .material-icons-outlined').forEach(a => {
+             a.style.transform = 'rotate(0deg)';
+             a.classList.remove('text-primary');
+         });
     });
-    google.accounts.id.renderButton(
-      document.querySelector(".g_id_signin"),
-      { theme: "outline", size: "large" }
-    );
-  };
-</script>
-
-<script>
-  /* ---------- FORM VALIDATIONS ---------- */
-  document.getElementById("loginForm").addEventListener("submit", function (e) {
-    let emailField = document.getElementById("emailInput");
-    let username = this.username.value.trim();
-    let name = this.name.value.trim();
-    let password = this.password.value;
-    let course = this.course.value;
-    let gender = this.gender.value;
-
-    emailField.value = emailField.value.toLowerCase().trim();
-
-    if (username.length < 3) {
-      alert("⚠️ Username must be at least 3 characters.");
-      e.preventDefault(); return;
-    }
-
-    if (name && !/^[a-zA-Z\s]+$/.test(name)) {
-      alert("⚠️ Name can only contain letters and spaces.");
-      e.preventDefault(); return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(emailField.value)) {
-      alert("⚠️ Invalid email address.");
-      e.preventDefault(); return;
-    }
-
-    const passRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{6,}$/;
-    if (!passRegex.test(password)) {
-      alert("⚠️ Password must have 1 uppercase, 1 lowercase & 1 number.");
-      e.preventDefault(); return;
-    }
-
-    if (!course) {
-      alert("⚠️ Please select your course.");
-      e.preventDefault(); return;
-    }
-
-    if (!gender) {
-      alert("⚠️ Please select your gender.");
-      e.preventDefault(); return;
-    }
-  });
-</script>
-
-<script>
-  /* ---------- CUSTOM DROPDOWN JS ---------- */
-  document.querySelectorAll(".dropdown").forEach(drop => {
-
-    const selected = drop.querySelector(".dropdown-selected");
-    const menu = drop.querySelector(".dropdown-menu");
-    const items = drop.querySelectorAll(".dropdown-item");
-    const hidden = drop.querySelector("input[type='hidden']");
-
-    selected.addEventListener("click", () => {
-      drop.classList.toggle("open");
+  
+  
+    // --- VALIDATION LOGIC ---
+    document.getElementById("signupForm").addEventListener("submit", function (e) {
+      let emailField = document.getElementById("emailInput");
+      let username = this.username.value.trim();
+      let name = this.name.value.trim();
+      let password = this.password.value;
+      let course = this.course.value;
+      let gender = this.gender.value;
+  
+      emailField.value = emailField.value.toLowerCase().trim();
+  
+      if (username.length < 3) {
+        alert("⚠️ Username must be at least 3 characters.");
+        e.preventDefault(); return;
+      }
+  
+      if (name && !/^[a-zA-Z\s]+$/.test(name)) {
+        alert("⚠️ Name can only contain letters and spaces.");
+        e.preventDefault(); return;
+      }
+  
+      // Simple format check (browser handles most of it due to type="email")
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(emailField.value)) {
+        alert("⚠️ Invalid email address.");
+        e.preventDefault(); return;
+      }
+  
+      const passRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{6,}$/;
+      if (!passRegex.test(password)) {
+        alert("⚠️ Password must have 1 uppercase, 1 lowercase & 1 number.");
+        e.preventDefault(); return;
+      }
+  
+      if (!course) {
+        alert("⚠️ Please select your course.");
+        e.preventDefault(); return;
+      }
+  
+      if (!gender) {
+        alert("⚠️ Please select your gender.");
+        e.preventDefault(); return;
+      }
     });
-
-    items.forEach(item => {
-      item.addEventListener("click", () => {
-        selected.innerHTML = item.textContent;
-        hidden.value = item.dataset.value;
-
-        items.forEach(i => i.classList.remove("active"));
-        item.classList.add("active");
-
-        drop.classList.remove("open");
-      });
-    });
-
-  });
-
-  document.addEventListener("click", e => {
-    document.querySelectorAll(".dropdown.open").forEach(dd => {
-      if (!dd.contains(e.target)) dd.classList.remove("open");
-    });
-  });
-</script>
-
-</body>
-</html>
+  </script>

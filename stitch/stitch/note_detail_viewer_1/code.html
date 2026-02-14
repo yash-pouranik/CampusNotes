@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Note Detail Viewer - CampusNotes</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f59f0a",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#221c10",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<!-- Google Fonts & Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        /* Custom scrollbar for dark mode professional feel */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #2d261a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4b4132; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #f59f0a;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200 antialiased min-h-screen flex flex-col">
+<!-- Navbar -->
+<nav class="sticky top-0 z-50 w-full border-b border-gray-200 dark:border-white/10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex items-center justify-between h-16">
+<!-- Logo & Breadcrumb -->
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white font-bold text-xl">C</div>
+<span class="font-bold text-lg tracking-tight dark:text-white">CampusNotes</span>
+</div>
+<div class="hidden md:flex items-center text-sm text-gray-500 dark:text-gray-400">
+<span class="material-icons text-base mx-2">chevron_right</span>
+<a class="hover:text-primary transition-colors" href="#">Mathematics</a>
+<span class="material-icons text-base mx-2">chevron_right</span>
+<a class="hover:text-primary transition-colors" href="#">MATH 202</a>
+<span class="material-icons text-base mx-2">chevron_right</span>
+<span class="text-gray-900 dark:text-white font-medium">Midterm Review</span>
+</div>
+</div>
+<!-- Search & Actions -->
+<div class="flex items-center gap-4">
+<div class="hidden md:block relative">
+<span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
+<span class="material-icons text-lg">search</span>
+</span>
+<input class="w-64 pl-10 pr-4 py-2 rounded-lg border-none bg-gray-100 dark:bg-white/5 text-sm focus:ring-2 focus:ring-primary placeholder-gray-500 dark:placeholder-gray-400 transition-all" placeholder="Search notes..." type="text"/>
+</div>
+<button class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 text-gray-500 dark:text-gray-400 transition-colors relative">
+<span class="material-icons">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-primary border-2 border-background-light dark:border-background-dark"></span>
+</button>
+<div class="h-8 w-8 rounded-full overflow-hidden border border-gray-200 dark:border-white/10">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="User profile picture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZBEgRwQyVfVH3ZJRw7iA6mTndaemiF-Je4i2MSVOP0y7jJr7Zwq-_DWYmpLdDDJt_y69Q6M6S25gOChpUTIpMUP3_BmOvUjOB0wvc7waI0mg3M6_BY-WRvsPZzQRNXUhwGAMXUrK97PFsRQTuMYSpi1AjrQ_Cc8Xt6L2-ududw--jj_8D6xv8rYqMnudLWwaeZQgdW8hR0jMWXhK3CJkGhuh16yKwVaWCBFtyZNoXitzhtzoFi48k4x_wYnyeaGD24unuVZR1hX8"/>
+</div>
+</div>
+</div>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- LEFT COLUMN: Document Viewer (8 cols) -->
+<div class="lg:col-span-8 space-y-4">
+<!-- Viewer Controls -->
+<div class="flex items-center justify-between bg-white dark:bg-white/5 p-3 rounded-lg border border-gray-200 dark:border-white/5">
+<div class="flex items-center gap-2">
+<button class="p-2 rounded hover:bg-gray-100 dark:hover:bg-white/10 text-gray-500 dark:text-gray-300">
+<span class="material-icons text-sm">menu</span>
+</button>
+<span class="text-xs font-medium text-gray-500 dark:text-gray-400 border-l border-gray-200 dark:border-white/10 pl-3">Page 1 of 14</span>
+</div>
+<div class="flex items-center gap-1">
+<button class="p-2 rounded hover:bg-gray-100 dark:hover:bg-white/10 text-gray-500 dark:text-gray-300">
+<span class="material-icons text-sm">remove</span>
+</button>
+<span class="text-xs font-medium w-12 text-center text-gray-700 dark:text-gray-200">100%</span>
+<button class="p-2 rounded hover:bg-gray-100 dark:hover:bg-white/10 text-gray-500 dark:text-gray-300">
+<span class="material-icons text-sm">add</span>
+</button>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 rounded hover:bg-gray-100 dark:hover:bg-white/10 text-gray-500 dark:text-gray-300">
+<span class="material-icons text-sm">fullscreen</span>
+</button>
+</div>
+</div>
+<!-- Document Surface -->
+<div class="relative w-full aspect-[8.5/11] bg-white dark:bg-[#1a160e] rounded-lg shadow-sm overflow-hidden border border-gray-200 dark:border-white/5 flex flex-col">
+<!-- Fake Content for Preview -->
+<div class="flex-grow p-12 lg:p-16 overflow-y-auto">
+<div class="max-w-2xl mx-auto space-y-8">
+<!-- Title -->
+<div class="space-y-4 border-b border-gray-200 dark:border-white/10 pb-8">
+<h1 class="text-4xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">Linear Algebra: Midterm Review</h1>
+<p class="text-lg text-gray-600 dark:text-gray-400">MATH 202 - Fall Semester 2023</p>
+</div>
+<!-- Content Blocks -->
+<div class="space-y-6">
+<h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">1. Vector Spaces</h2>
+<p class="text-gray-600 dark:text-gray-400 leading-relaxed">
+                                    A vector space is a set V on which two operations, vector addition and scalar multiplication, are defined. 
+                                    Let <span class="font-mono bg-gray-100 dark:bg-white/10 px-1 rounded">u, v, w</span> be vectors in V and <span class="font-mono bg-gray-100 dark:bg-white/10 px-1 rounded">c, d</span> be scalars.
+                                </p>
+<div class="p-6 bg-gray-50 dark:bg-white/5 rounded border border-gray-200 dark:border-white/10">
+<h3 class="text-sm font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-3">Key Axioms</h3>
+<ul class="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300 text-sm">
+<li>Commutativity of addition: u + v = v + u</li>
+<li>Associativity of addition: u + (v + w) = (u + v) + w</li>
+<li>Identity element of addition: There exists an element 0 in V.</li>
+</ul>
+</div>
+<p class="text-gray-600 dark:text-gray-400 leading-relaxed">
+                                    Understanding the subspace topology is critical for the exam. Ensure you can prove whether a subset is a subspace by checking closure under addition and scalar multiplication.
+                                </p>
+<!-- Diagram Placeholder -->
+<div class="w-full h-48 rounded bg-gradient-to-br from-gray-100 to-gray-200 dark:from-white/5 dark:to-white/10 flex items-center justify-center border border-dashed border-gray-300 dark:border-white/20">
+<span class="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
+<span class="material-icons">image</span> Figure 1.1: Vector Projection
+                                    </span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- RIGHT COLUMN: Sticky Sidebar (4 cols) -->
+<div class="lg:col-span-4 space-y-6">
+<!-- Main Details Card -->
+<div class="sticky top-24 bg-white dark:bg-white/5 rounded-xl border border-gray-200 dark:border-white/5 p-6 shadow-sm">
+<!-- Header Info -->
+<div class="mb-6">
+<div class="flex justify-between items-start mb-2">
+<span class="px-2 py-1 rounded text-xs font-semibold bg-primary/10 text-primary uppercase tracking-wider">Note</span>
+<div class="flex text-yellow-500 text-sm">
+<span class="material-icons text-base">star</span>
+<span class="material-icons text-base">star</span>
+<span class="material-icons text-base">star</span>
+<span class="material-icons text-base">star</span>
+<span class="material-icons text-base text-gray-300 dark:text-gray-600">star</span>
+<span class="ml-1 text-gray-500 dark:text-gray-400 text-xs">(4.2)</span>
+</div>
+</div>
+<h1 class="text-2xl font-bold text-gray-900 dark:text-white leading-tight mb-2">Linear Algebra - Midterm Review</h1>
+<p class="text-sm text-gray-500 dark:text-gray-400">MATH 202 • Advanced Mathematics</p>
+</div>
+<!-- Author -->
+<div class="flex items-center gap-3 mb-6 pb-6 border-b border-gray-100 dark:border-white/5">
+<img alt="Author Avatar" class="w-10 h-10 rounded-full object-cover ring-2 ring-primary/20" data-alt="Female student portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC46Rk3xMk1LZ6bbgzAZPg-h6Q6d28C5JlvGidjeV1hhQqI4_IF_E0XkJoxhXqE9lpol8-Lj9vNh4-dyHZBi6M4WWyUbRue-oPb10hj-lVQnVCQFWPSihz7RUHVEkDv9bsdYA4Q1vqMvZ_ZzzcRbbByw92-AMwAHC77nrYsvA4u4QR52-0usLuHTygcxsMbmvUwSFO9HCKyB0ZnAOcevfUY-kKZgBItJLk5yziEIaxLgBn_Wsp85sNTiiIWoYUeIrsFhmWfuAtW4dM"/>
+<div>
+<p class="text-sm font-medium text-gray-900 dark:text-white">Sarah Jenkins</p>
+<p class="text-xs text-gray-500 dark:text-gray-500">Computer Science • Class of '24</p>
+</div>
+</div>
+<!-- Stats Grid -->
+<div class="grid grid-cols-2 gap-4 mb-6">
+<div>
+<span class="block text-xs text-gray-400 uppercase tracking-wide">Uploaded</span>
+<span class="text-sm font-medium text-gray-900 dark:text-white">Oct 12, 2023</span>
+</div>
+<div>
+<span class="block text-xs text-gray-400 uppercase tracking-wide">Pages</span>
+<span class="text-sm font-medium text-gray-900 dark:text-white">14 Pages</span>
+</div>
+<div>
+<span class="block text-xs text-gray-400 uppercase tracking-wide">Views</span>
+<span class="text-sm font-medium text-gray-900 dark:text-white">1,240</span>
+</div>
+<div>
+<span class="block text-xs text-gray-400 uppercase tracking-wide">File Size</span>
+<span class="text-sm font-medium text-gray-900 dark:text-white">4.2 MB</span>
+</div>
+</div>
+<!-- Tags -->
+<div class="flex flex-wrap gap-2 mb-8">
+<span class="px-3 py-1 bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-300 text-xs rounded-full hover:bg-gray-200 dark:hover:bg-white/10 cursor-pointer transition-colors">Vectors</span>
+<span class="px-3 py-1 bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-300 text-xs rounded-full hover:bg-gray-200 dark:hover:bg-white/10 cursor-pointer transition-colors">Matrices</span>
+<span class="px-3 py-1 bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-300 text-xs rounded-full hover:bg-gray-200 dark:hover:bg-white/10 cursor-pointer transition-colors">Eigenvalues</span>
+</div>
+<!-- Primary Action -->
+<button class="w-full bg-primary hover:bg-yellow-600 text-white font-semibold py-3 px-4 rounded-lg shadow-lg shadow-primary/20 flex items-center justify-center gap-2 transition-all transform hover:-translate-y-0.5 mb-3">
+<span class="material-icons">download</span>
+                        Download PDF
+                    </button>
+<!-- Secondary Actions -->
+<div class="grid grid-cols-2 gap-3">
+<button class="flex items-center justify-center gap-2 py-2 px-3 rounded-lg border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 text-gray-600 dark:text-gray-300 text-sm transition-colors">
+<span class="material-icons text-sm">bookmark_border</span>
+                            Save
+                        </button>
+<button class="flex items-center justify-center gap-2 py-2 px-3 rounded-lg border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 text-gray-600 dark:text-gray-300 text-sm transition-colors">
+<span class="material-icons text-sm">share</span>
+                            Share
+                        </button>
+</div>
+<!-- Report Link -->
+<div class="mt-4 text-center">
+<a class="text-xs text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 underline decoration-gray-400/50" href="#">Report an issue</a>
+</div>
+</div>
+<!-- Ad Placeholder (Optional Context) -->
+<div class="rounded-xl border border-dashed border-gray-300 dark:border-white/10 p-4 text-center">
+<p class="text-xs text-gray-400">Sponsored Content</p>
+<div class="mt-2 h-32 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-white/5 dark:to-white/10 rounded flex items-center justify-center">
+<span class="text-xs text-gray-400">Ad Space</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Related Notes Section -->
+<div class="mt-16 border-t border-gray-200 dark:border-white/5 pt-12">
+<div class="flex items-center justify-between mb-8">
+<h2 class="text-xl font-bold text-gray-900 dark:text-white">Related Notes</h2>
+<a class="text-sm font-medium text-primary hover:text-primary/80 flex items-center gap-1" href="#">
+                    View all <span class="material-icons text-sm">arrow_forward</span>
+</a>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- Card 1 -->
+<div class="group bg-white dark:bg-white/5 rounded-xl border border-gray-200 dark:border-white/5 overflow-hidden hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5">
+<div class="relative h-40 bg-gray-100 dark:bg-black/20 overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+<img alt="Thumbnail of math notes" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500" data-alt="Abstract math formulas on dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC13nIgYDYtXxtf0xECkFGSqWGIwfrdzeWHQhfBf-JpAp8h2HMnKIO-4JlcQy2MbH6IdqO-0OEJ72sVH0cQGG3Qqb6Fpoy_oU5OtlHaU5HyQSVTbGr1Z2ViWBU7pft0h_Le7VIdERt7nl5enDPxkjQGnEFtwgeUci6bmzXVqUzpcIFDFNomxah4v-zAxN4lisRsnS9diegjrAMe2BvhoyufuuMtvTuz_fE1-eed4QL9aMj3sJtrcL1cr9ikXiFCzrMNOmJp0Va8Kik"/>
+<span class="absolute bottom-3 left-3 bg-primary text-white text-xs font-bold px-2 py-1 rounded">PDF</span>
+</div>
+<div class="p-4">
+<div class="flex justify-between items-start mb-2">
+<span class="text-xs text-primary font-medium">Calculus I</span>
+<div class="flex items-center gap-1 text-xs text-gray-400">
+<span class="material-icons text-[10px]">visibility</span> 450
+                            </div>
+</div>
+<h3 class="font-bold text-gray-900 dark:text-gray-100 mb-1 line-clamp-1 group-hover:text-primary transition-colors">Complete Cheat Sheet</h3>
+<p class="text-xs text-gray-500 dark:text-gray-400 mb-4 line-clamp-2">A summary of all derivatives and integrals for Calc 1 final exam.</p>
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-gray-200 dark:bg-white/10 overflow-hidden">
+<img alt="User" class="w-full h-full object-cover" data-alt="Male student portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAvtNKOelFBuuHVBOsbag5aORoIZzjtELMTYq6hz0Ls9LonbYbRb2F0L0WIfez5oMvaCJqjxPdRJ4pDbMr47Jk_k1p1ymuh2FJXGmItYOxqhRRI3BqKeIUmCWaZ8KlxWvJxWSeNvWKe9Tdl5c0EukQBgPg43y1RybgpuBl2n5yWUlp1vtxQNuwriWnytMOCogO24UjMrcRYAgUYhXNJg_wKPMMwJflCM50BshRC2fMTiof5Rqo4VBQSU6YVmqN9Zl1t51xMjJQN8E4"/>
+</div>
+<span class="text-xs text-gray-600 dark:text-gray-300">Mark T.</span>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="group bg-white dark:bg-white/5 rounded-xl border border-gray-200 dark:border-white/5 overflow-hidden hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5">
+<div class="relative h-40 bg-gray-100 dark:bg-black/20 overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+<img alt="Thumbnail of physics notes" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500" data-alt="Physics notebook open on desk" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDh_gLSyLkYYbrFQprCeSqq-LZ8Ytgh6zqGCJ4kDX5FJVJVygrrxQ7ATHvfY8U9x2F9Dk73s3_AUhaDHTbCV4JpTNcZW_caaL3YK7JXbJdZCVWGkWHW3e1SqR_PY3Cq3PihCvDLrnVVoUldfemYjQzk2CJIUWhnIYjWdNmdTfknmxXkFaglDmc1NRcq4OZl963yJuS9hVKsbiVHhYJOEn3d3M38tI3apOJul3PycBX0ooaf013d8huna8T0JCAm1eRZPB5VLrt5vVQ"/>
+<span class="absolute bottom-3 left-3 bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded">DOCX</span>
+</div>
+<div class="p-4">
+<div class="flex justify-between items-start mb-2">
+<span class="text-xs text-primary font-medium">Physics 101</span>
+<div class="flex items-center gap-1 text-xs text-gray-400">
+<span class="material-icons text-[10px]">visibility</span> 892
+                            </div>
+</div>
+<h3 class="font-bold text-gray-900 dark:text-gray-100 mb-1 line-clamp-1 group-hover:text-primary transition-colors">Newtonian Mechanics</h3>
+<p class="text-xs text-gray-500 dark:text-gray-400 mb-4 line-clamp-2">Detailed lecture notes from weeks 1-4 covering motion and force.</p>
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-gray-200 dark:bg-white/10 overflow-hidden">
+<img alt="User" class="w-full h-full object-cover" data-alt="Female student portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgBFHEesWRHHxroay1ku_5D_uy8b1znSj2vXQ7I8ZRoS-j5uefWpiE1O8lMpTg2A91vvgMRqP060yOgIwHARvI5Z9DngN11og9bT3zFWh6H66RUdW4FTGy0X4x-y4bQFMJqbguSypP_9oa00s0VGSmRi7cDL1ieuivUzuVpUtYN0HyW055jCbLLHOB4DNqF2kd-qgTRU3YUVPR6vbCPuRU_pd63q3VBTNr1EABwy0bQXukByyroIcfkOr7U6OxFvyMlkeC20Y4EUY"/>
+</div>
+<span class="text-xs text-gray-600 dark:text-gray-300">Emily R.</span>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="group bg-white dark:bg-white/5 rounded-xl border border-gray-200 dark:border-white/5 overflow-hidden hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5">
+<div class="relative h-40 bg-gray-100 dark:bg-black/20 overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+<img alt="Thumbnail of algebra notes" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500" data-alt="Abstract geometric shapes" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD4RObXcFsENdmXMbwdei4wtMBsUt2HoM_Te6TBFneuUEJMewVdLRW1M9JnHRaushXqC2KgnkX4QUDjvx8S98376cHn-7l4lIdaLBEebyz3JjDLo3mePlHGoG1XDT00TMmygTt4plIwOCkB0B0852fLitOsFpv3l6T2Aj1xpD_2wwBc4qYbf8EtW1EoDCqc5OmtlP90ZFdlIZiyhRuKmoGD4dgjvaokDat8q_eHIfUIxugLyHj5dpP7tJZj3CPZEdvKv8TzRUO-Vx8"/>
+<span class="absolute bottom-3 left-3 bg-primary text-white text-xs font-bold px-2 py-1 rounded">PDF</span>
+</div>
+<div class="p-4">
+<div class="flex justify-between items-start mb-2">
+<span class="text-xs text-primary font-medium">MATH 202</span>
+<div class="flex items-center gap-1 text-xs text-gray-400">
+<span class="material-icons text-[10px]">visibility</span> 2.1k
+                            </div>
+</div>
+<h3 class="font-bold text-gray-900 dark:text-gray-100 mb-1 line-clamp-1 group-hover:text-primary transition-colors">Eigenvectors Practice</h3>
+<p class="text-xs text-gray-500 dark:text-gray-400 mb-4 line-clamp-2">50 practice problems with solutions focused on Eigenvectors.</p>
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-gray-200 dark:bg-white/10 overflow-hidden">
+<img alt="User" class="w-full h-full object-cover" data-alt="Male student portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQq_az2i1fHDxY9leMOSiHyqQsr4X6b_6IkBXVkUXucVXJiDE2hJ9PWD9WqBwvJQbZCo1Z7DS0LtgQJ9Lp5WaqG5fF4w7W-ktjU5p2-Q42bYxFkkvR4AYU6BQIi01_s7K9PG44DB5jM2t5uNr-p3r2XNED_evyJ3of4gTGpx4ucERLELqmVd0s8toKPDxnNAX6eNgd5UMexfWUtxlps_fZc3L4ziBf6p1P9jS0isNNbc0_ceTu4KNDVGocAWW1ZzvGlHy4C9k7GMI"/>
+</div>
+<span class="text-xs text-gray-600 dark:text-gray-300">David K.</span>
+</div>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="group bg-white dark:bg-white/5 rounded-xl border border-gray-200 dark:border-white/5 overflow-hidden hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5">
+<div class="relative h-40 bg-gray-100 dark:bg-black/20 overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+<img alt="Thumbnail of coding notes" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500" data-alt="Computer code on screen" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCkEAJXAimVzqPPTEnquNAoCsvgz5punAlQRv_0YQma8Mc3n5nh-wM_CGlaOWZtCrOjJwSxVf7xEFfuflEvyuY2tiqPAcCQDFSQkz71yoVDWpAmRTauhJCca2f6yZOP3RrYOWSGOP5yHyaNi_4a5zaIlDzjlVoKW34VkWtfYApOhQky_W3ZvVSxTl2FsL4Zyl3RuQNWK0HtYapMsxfIDmD1AGZUNANOOyH7PC99Sm9C79dMUbMDqulZdfpikWMyhI8vw340lQSDSz0"/>
+<span class="absolute bottom-3 left-3 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">TXT</span>
+</div>
+<div class="p-4">
+<div class="flex justify-between items-start mb-2">
+<span class="text-xs text-primary font-medium">CS 101</span>
+<div class="flex items-center gap-1 text-xs text-gray-400">
+<span class="material-icons text-[10px]">visibility</span> 120
+                            </div>
+</div>
+<h3 class="font-bold text-gray-900 dark:text-gray-100 mb-1 line-clamp-1 group-hover:text-primary transition-colors">Python Basics</h3>
+<p class="text-xs text-gray-500 dark:text-gray-400 mb-4 line-clamp-2">Variables, loops, and functions explained simply.</p>
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-gray-200 dark:bg-white/10 overflow-hidden">
+<img alt="User" class="w-full h-full object-cover" data-alt="Female student portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDnrGVDcuZ4Ndq_3OvPHaa6COIpvSJCgSxKKSQkQmbrIDNDvKNzuxga9WWz6H2th67qULkqlz__f0l6Wmw0Pa3UKnN9-aauXbdFdr1l6txkYJSqivj6yXTUSELu49HrCplx5w_kDovr_U0u5rCKTkSv59DLLw2zcunm2HYQKBzQM-cgp-J4nzdXETEKli3sMQL_2L70ZezD_7WIDKFRowjrjUtmLmfojRr1ZMqCyf1ExJav9Yo636jrRmIH9GC7sG3vWgl0pYYPyvI"/>
+</div>
+<span class="text-xs text-gray-600 dark:text-gray-300">Anna L.</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

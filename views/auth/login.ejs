@@ -1,81 +1,180 @@
-<link rel="stylesheet" href="/css/auth.css">
-
-<section class="auth-section">
-
-  <!-- Google Sign-In -->
-  <div id="g_id_onload"
-       data-client_id="466885260272-86cp1p5tkpsspvrdp8n79h0gbfob48qq.apps.googleusercontent.com"
-       data-context="signin"
-       data-auto_select="true"
-       data-itp_support="true">
-  </div>
-
-  <div class="g_id_signin" data-type="standard"></div>
-
-  <p>or</p>
-
-  <h2>Login to CampusNotes</h2>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    
+    <!-- Google Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+    
+    <!-- Tailwind CSS & Config -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#FF5722", // Core Orange
+              "primary-hover": "#F4511E",
+              "background-dark": "#050505", // Deep Black
+              "surface-dark": "#0A0A0A",
+              "surface-dark-lighter": "#171717",
+              "border-dark": "#27272A",
+            },
+            fontFamily: {
+              "display": ["Inter", "system-ui", "sans-serif"]
+            },
+            animation: {
+              "fade-in-up": "fadeInUp 0.5s ease-out forwards",
+            },
+            keyframes: {
+              fadeInUp: {
+                "0%": { opacity: "0", transform: "translateY(10px)" },
+                "100%": { opacity: "1", transform: "translateY(0)" },
+              }
+            }
+          },
+        },
+      }
+    </script>
+    <style>
+      body {
+        background-color: #050505 !important;
+        color: #ffffff;
+        font-family: 'Inter', sans-serif;
+      }
+    </style>
+  </head>
   
-  <form id="loginForm" action="/login" method="POST">
-    <input type="email" id="emailInput" name="email" placeholder="Email" required />
-    <input type="password" name="password" placeholder="Password" required />
-    <button type="submit">Login</button>
-  </form>
-
-  <p class="muted">
-    <a href="/forgot">Forgot your password?</a>
-  </p>
-
-  <p class="muted">
-    Not a member yet? <a href="/register-n">Register here</a>
-  </p>
-</section>
-
-<!-- Google Script -->
-<script src="https://accounts.google.com/gsi/client" async></script>
-
-<script>
-  function decodeJWT(token) {
-    let base64Url = token.split(".")[1];
-    let base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-    let jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split("")
-        .map(c => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-        .join("")
-    );
-    return JSON.parse(jsonPayload);
-  }
-
-  function handleCredentialResponse(response) {
-    const body = { credential: response.credential };
-
-    fetch("/oauth2callback", {
-      method: "POST",
-      body: JSON.stringify(body),
-      headers: { "Content-Type": "application/json" }
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          window.location.href = `/profile/${data.userId}`;
-        }
+  <div class="min-h-screen bg-background-dark font-display text-gray-300 antialiased py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center relative overflow-hidden">
+      
+      <!-- Background Blobs -->
+      <div class="absolute top-0 left-0 w-96 h-96 bg-primary/10 rounded-full blur-[100px] -translate-x-1/2 -translate-y-1/2"></div>
+      <div class="absolute bottom-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-[100px] translate-x-1/2 translate-y-1/2"></div>
+  
+      <div class="max-w-md w-full space-y-8 animate-fade-in-up relative z-10">
+          
+          <!-- BRAND HEADER -->
+          <div class="text-center">
+              <a href="/" class="inline-block mb-4">
+                  <h1 class="text-3xl font-bold text-white tracking-tighter">
+                      Campus<span class="text-primary">Notes</span><span class="text-primary">.</span>
+                  </h1>
+              </a>
+              <h2 class="text-2xl font-bold text-white tracking-tight">Welcome back</h2>
+              <p class="mt-2 text-sm text-gray-500">Sign in to access your notes and dashboard.</p>
+          </div>
+  
+          <!-- AUTH CARD -->
+          <div class="bg-surface-dark border border-border-dark rounded-xl shadow-2xl p-8">
+              
+              <!-- GOOGLE LOGIN -->
+              <div class="mb-6">
+                  <div id="g_id_onload"
+                       data-client_id="466885260272-86cp1p5tkpsspvrdp8n79h0gbfob48qq.apps.googleusercontent.com"
+                       data-context="signin"
+                       data-auto_select="false"
+                       data-itp_support="true">
+                  </div>
+                  
+                  <!-- Custom wrapper for centering -->
+                  <div class="flex justify-center">
+                      <div class="g_id_signin" 
+                           data-type="standard" 
+                           data-size="large" 
+                           data-theme="filled_black" 
+                           data-text="sign_in_with" 
+                           data-shape="rectangular" 
+                           data-logo_alignment="left"
+                           data-width="340">
+                      </div>
+                  </div>
+              </div>
+  
+              <div class="relative mb-6">
+                  <div class="absolute inset-0 flex items-center">
+                      <div class="w-full border-t border-border-dark"></div>
+                  </div>
+                  <div class="relative flex justify-center text-sm">
+                      <span class="px-2 bg-surface-dark text-gray-500">Or continue with email</span>
+                  </div>
+              </div>
+  
+              <!-- LOGIN FORM -->
+              <form id="loginForm" action="/login" method="POST" class="space-y-6">
+                  <div>
+                      <label for="emailInput" class="block text-sm font-medium text-gray-400 mb-1">Email address</label>
+                      <input type="email" name="email" id="emailInput" required placeholder="you@university.edu"
+                             class="w-full bg-surface-dark-lighter border border-border-dark rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-colors">
+                  </div>
+  
+                  <div>
+                      <div class="flex justify-between items-center mb-1">
+                          <label for="password" class="block text-sm font-medium text-gray-400">Password</label>
+                          <a href="/forgot" class="text-xs font-medium text-primary hover:text-primary-hover transition-colors">Forgot password?</a>
+                      </div>
+                      <input type="password" name="password" id="password" required placeholder="••••••••"
+                             class="w-full bg-surface-dark-lighter border border-border-dark rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-colors">
+                  </div>
+  
+                  <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-lg text-sm font-bold text-white bg-gradient-to-r from-primary to-orange-600 hover:from-primary-hover hover:to-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all transform hover:-translate-y-0.5">
+                      Sign In
+                  </button>
+              </form>
+          </div>
+  
+          <!-- FOOTER -->
+          <p class="text-center text-sm text-gray-500">
+              Don't have an account? 
+              <a href="/register-n" class="font-medium text-primary hover:text-primary-hover transition-colors">Sign up for free</a>
+          </p>
+      </div>
+  </div>
+  
+  <!-- Google Script -->
+  <script src="https://accounts.google.com/gsi/client" async></script>
+  
+  <script>
+    function decodeJWT(token) {
+      let base64Url = token.split(".")[1];
+      let base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      let jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split("")
+          .map(c => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+          .join("")
+      );
+      return JSON.parse(jsonPayload);
+    }
+  
+    function handleCredentialResponse(response) {
+      const body = { credential: response.credential };
+  
+      fetch("/oauth2callback", {
+        method: "POST",
+        body: JSON.stringify(body),
+        headers: { "Content-Type": "application/json" }
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            window.location.href = `/profile/${data.userId}`;
+          }
+        });
+    }
+  
+    window.onload = function () {
+      google.accounts.id.initialize({
+        client_id: "466885260272-86cp1p5tkpsspvrdp8n79h0gbfob48qq.apps.googleusercontent.com",
+        callback: handleCredentialResponse
       });
-  }
-
-  window.onload = function () {
-    google.accounts.id.initialize({
-      client_id: "466885260272-86cp1p5tkpsspvrdp8n79h0gbfob48qq.apps.googleusercontent.com",
-      callback: handleCredentialResponse
+      // The button is already rendered via HTML API in the div above, 
+      // but if we need a programmatic render, we can do it here. 
+      // The existing HTML data attributes should handle it.
+    };
+  
+    document.getElementById("loginForm").addEventListener("submit", e => {
+      let emailField = document.getElementById("emailInput");
+      emailField.value = emailField.value.toLowerCase().trim();
     });
-    google.accounts.id.renderButton(
-      document.querySelector(".g_id_signin"),
-      { theme: "outline", size: "large" }
-    );
-  };
-
-  document.getElementById("loginForm").addEventListener("submit", e => {
-    let emailField = document.getElementById("emailInput");
-    emailField.value = emailField.value.toLowerCase().trim();
-  });
-</script>
+  </script>
