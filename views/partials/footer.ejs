@@ -1,68 +1,103 @@
 <footer class="site-footer">
+  <div class="footer-container">
+    
+    <!-- Left Column: Brand & Newsletter -->
+    <div class="footer-brand-column">
+      <a href="/" class="brand-logo">
+        <span class="brand-text">CampusNotes</span>
+      </a>
+      <p class="brand-tagline">
+        The best place to share and find college notes. Join our community of students helping students.
+      </p>
 
-  <!-- Top / Branding -->
-  <div class="footer-top">
-    <a href="/" class="brand">CampusNotes</a>
+      <div class="newsletter-widget">
+        <p class="newsletter-title">Stay up to date</p>
+        <form class="newsletter-form" action="#" onsubmit="event.preventDefault();">
+          <input type="email" placeholder="Enter your email" aria-label="Email for newsletter" required />
+          <button type="submit" aria-label="Subscribe">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+          </button>
+        </form>
+      </div>
+
+      <div class="social-links">
+        <a href="https://twitter.com/bitbros_in" target="_blank" rel="noopener" aria-label="Twitter">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path></svg>
+        </a>
+        <a href="https://github.com/BitBros-in" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+        </a>
+        <a href="https://discord.gg/CXJjvJkNWn" target="_blank" rel="noopener" aria-label="Discord">
+           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 21.5a2 2 0 0 1-2 2H4.5a2 2 0 0 1-2-2V4.5a2 2 0 0 1 2-2h15a2 2 0 0 1 2 2z"></path><path d="M8.5 13.5c2.5 1.5 5 1.5 7.5 0"></path><path d="M9 9h.01"></path><path d="M15 9h.01"></path></svg> <!-- Placeholder for Discord icon simplicity using a smiley-ish shape or generic square -->
+        </a>
+        <a href="https://linkedin.com/company/campusnotes" target="_blank" rel="noopener" aria-label="LinkedIn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- Navigation Columns -->
+    <div class="footer-links-group">
+      <div class="footer-col">
+        <h5>Product</h5>
+        <ul>
+          <li><a href="/explore">Explore Notes</a></li>
+          <li><a href="/upload">Upload</a></li>
+          <li><a href="/rankings">Leaderboard</a></li>
+          <li><a href="/requestnotes">Requests</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h5>Resources</h5>
+        <ul>
+          <li><a href="/bitbros/aboutus">How it Works</a></li>
+          <li><a href="/blog">Blog</a></li>
+          <li><a href="/help">Help Center</a></li>
+          <li><a href="/community">Community</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h5>Company</h5>
+        <ul>
+          <li><a href="/bitbros/aboutus">About Us</a></li>
+          <li><a href="/bitbros/our-team">Our Team</a></li>
+          <li><a href="/careers">Careers</a></li> <!-- Placeholder if not exists -->
+          <li><a href="mailto:campusnotes@bitbros.in">Contact</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h5>Legal</h5>
+        <ul>
+          <li><a href="/privacy-policy">Privacy</a></li>
+          <li><a href="/terms-of-service">Terms</a></li>
+          <li><a href="/cookie-policy">Cookies</a></li>
+        </ul>
+      </div>
+    </div>
   </div>
 
-  <!-- Columns -->
-  <div class="footer-columns">
-
-    <!-- Products -->
-    <div class="footer-col">
-      <h5>Products</h5>
-      <ul>
-        <li><a href="/explore">Explore</a></li>
-        <li><a href="/upload">Upload Notes</a></li>
-        <li><a href="/rankings">Contributor Leaderboard</a></li>
-        <li><a href="/requestnotes">Request Notes</a></li>
-      </ul>
-    </div>
-
-    <!-- Get Started -->
-    <div class="footer-col">
-      <h5>Get Started</h5>
-      <ul>
-        <li><a href="/login-n">Login</a></li>
-        <li><a href="/register-n">Sign Up</a></li>
-        <li><a href="/bitbros/aboutus">How it Works</a></li>
-        <li><a href="/faq">FAQ</a></li>
-      </ul>
-    </div>
-
-
-        <!-- Connect -->
-    <div class="footer-col">
-      <h5>Connect</h5>
-      <ul>
-        <li><a href="mailto:campusnotes@bitbros.in">Contact: campusnotes@bitbros.in</a></li>
-        <li><a href="https://linkedin.com/company/campusnotes" target="_blank" rel="noopener">LinkedIn</a></li>
-        <li><a href="https://discord.gg/CXJjvJkNWn" target="_blank" rel="noopener">Discord</a></li>
-        <li><a href="https://www.instagram.com/bitbros_campusnotes/" target="_blank" rel="noopener">Instagram</a></li>
-      </ul>
-    </div>
-
-
-    <!-- Company -->
-    <div class="footer-col">
-      <h5>Company</h5>
-      <ul>
-        <li><a href="/bitbros/aboutus">About Us</a></li>
-        <li><a href="/bitbros/our-team">Our Team</a></li>
-        <li><a href="/feedback">Give Feedback</a></li>
-        <li><a href="/privacy-policy">Privacy Policy</a></li>
-        <li><a href="/terms-of-service">Terms of Service</a></li>
-      </ul>
-    </div>
-
-
-
   </div>
 
-  <!-- Bottom -->
+  <!-- Big Text Element - Correctly placed outside container for full width -->
+  <div class="footer-big-text">
+    CAMPUSNOTES
+  </div>
+
   <div class="footer-bottom">
-    <p>© 2025 <strong>CampusNotes</strong> by BitBros. All rights reserved.</p>
-    <p class="footer-version">Version 0.2.0</p>
+    <div class="footer-bottom-content">
+      <p class="copyright">© 2025 CampusNotes Inc. All rights reserved.</p>
+      
+      <div class="footer-status">
+        <span class="status-dot"></span>
+        <span>All systems normal</span>
+      </div>
+
+      <div class="footer-version-tag">
+        v0.2.0-beta
+      </div>
+    </div>
   </div>
-  
 </footer>

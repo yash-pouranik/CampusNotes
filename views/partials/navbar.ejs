@@ -45,16 +45,21 @@
 
 
 <script>
-  const btn = document.getElementById("navToggle");
-  const menu = document.getElementById("navMenu");
+  (function() {
+    const navToggleBtn = document.getElementById("navToggle");
+    const navMenu = document.getElementById("navMenu");
 
-  btn.addEventListener("click", () => {
-    menu.classList.toggle("active");
-  });
+    if (navToggleBtn && navMenu) {
+      navToggleBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        navMenu.classList.toggle("active");
+      });
 
-  document.addEventListener("click", (e) => {
-    if (!btn.contains(e.target) && !menu.contains(e.target)) {
-      menu.classList.remove("active");
+      document.addEventListener("click", (e) => {
+        if (!navToggleBtn.contains(e.target) && !navMenu.contains(e.target)) {
+          navMenu.classList.remove("active");
+        }
+      });
     }
-  });
+  })();
 </script>
