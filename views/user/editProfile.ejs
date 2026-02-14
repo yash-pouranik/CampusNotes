@@ -1,46 +1,196 @@
-<link rel="stylesheet" href="/css/login.css">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile - CampusNotes</title>
+    
+    <!-- Google Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#FF5722",
+              "primary-hover": "#F4511E",
+              "background-dark": "#050505",
+              "surface-dark": "#0A0A0A",
+              "surface-dark-lighter": "#171717",
+              "border-dark": "#27272A",
+            },
+            fontFamily: {
+              "display": ["Inter", "sans-serif"]
+            },
+            animation: {
+              "fade-in-up": "fadeInUp 0.3s ease-out forwards",
+            },
+            keyframes: {
+              fadeInUp: {
+                "0%": { opacity: "0", transform: "translateY(10px)" },
+                "100%": { opacity: "1", transform: "translateY(0)" },
+              }
+            }
+          },
+        },
+      }
+    </script>
+    <style>
+      body {
+        background-color: #050505 !important;
+        color: #ffffff;
+        font-family: 'Inter', sans-serif;
+      }
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar { width: 6px; }
+      ::-webkit-scrollbar-track { background: #050505; }
+      ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+    </style>
+    <!-- Add Navbar CSS (if needed for shared styles) -->
+    <link rel="stylesheet" href="/css/footer_nav.css" />
+</head>
+<body class="bg-background-dark min-h-screen flex flex-col">
 
-<% if (currUser && (currUser._id.toString() === user._id.toString() || currUser.roles.isModerator)) { %>
-<section class="auth-section">
-  <h2>Edit Profile</h2>
+    <%- include('../partials/navbar') %>
 
-  <form action="/profile/<%= user._id %>/edit?_method=PUT" method="POST" onsubmit="return validateForm()">
-    <input type="text" name="username" placeholder="Username" required value="<%= user.username %>" />
-    <input type="text" name="name" placeholder="Full Name" value="<%= user.name %>" />
-    <input type="text" name="course" placeholder="Course" value="<%= user.course %>" />
+    <% if (currUser && (currUser._id.toString() === user._id.toString() || currUser.roles.isModerator)) { %>
+    
+    <div class="flex-grow flex items-center justify-center py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+        <!-- Background Decoration -->
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-primary/5 blur-[120px] rounded-full pointer-events-none"></div>
 
-    <h3>Social Links</h3>
-    <input type="url" name="socialLinks[linkedin]" placeholder="LinkedIn Profile URL"
-           pattern="https?://.+" value="<%= user.socialLinks?.linkedin || '' %>" />
-    <input type="url" name="socialLinks[github]" placeholder="GitHub Profile URL"
-           pattern="https?://.+" value="<%= user.socialLinks?.github || '' %>" />
+        <div class="max-w-md w-full space-y-8 relative z-10 animate-fade-in-up">
+            
+            <div class="text-center">
+                <h2 class="mt-6 text-3xl font-extrabold text-white tracking-tight">
+                    Edit Profile
+                </h2>
+                <p class="mt-2 text-sm text-gray-400">
+                    Update your personal details and social links.
+                </p>
+            </div>
 
-    <button type="submit">Update</button>
-  </form>
-</section>
-<% } %>
+            <div class="bg-surface-dark border border-border-dark rounded-xl shadow-2xl p-8">
+                <form class="space-y-6" action="/profile/<%= user._id %>/edit?_method=PUT" method="POST" onsubmit="return validateForm()">
+                    
+                    <!-- Basic Info -->
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Username</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span class="material-icons-outlined text-gray-500 text-lg">person</span>
+                                </span>
+                                <input type="text" name="username" required value="<%= user.username %>" placeholder="Username"
+                                    class="w-full bg-surface-dark-lighter border border-border-dark rounded-lg pl-10 pr-4 py-3 text-white placeholder-gray-600 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-colors">
+                            </div>
+                        </div>
 
-<script>
-  function validateForm() {
-    const username = document.querySelector("[name='username']").value.trim();
-    const linkedin = document.querySelector("[name='socialLinks[linkedin]']").value.trim();
-    const github = document.querySelector("[name='socialLinks[github]']").value.trim();
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Full Name</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span class="material-icons-outlined text-gray-500 text-lg">badge</span>
+                                </span>
+                                <input type="text" name="name" value="<%= user.name %>" placeholder="Full Name"
+                                    class="w-full bg-surface-dark-lighter border border-border-dark rounded-lg pl-10 pr-4 py-3 text-white placeholder-gray-600 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-colors">
+                            </div>
+                        </div>
 
-    if (username.length < 6) {
-      alert("Username must be at least 6 characters long");
-      return false;
-    }
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Course / Major</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span class="material-icons-outlined text-gray-500 text-lg">school</span>
+                                </span>
+                                <input type="text" name="course" value="<%= user.course %>" placeholder="e.g. Computer Science"
+                                    class="w-full bg-surface-dark-lighter border border-border-dark rounded-lg pl-10 pr-4 py-3 text-white placeholder-gray-600 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-colors">
+                            </div>
+                        </div>
+                    </div>
 
-    const urlRegex = /^https?:\/\/.+/;
-    if (linkedin && !urlRegex.test(linkedin)) {
-      alert("Enter a valid LinkedIn URL (must start with http:// or https://)");
-      return false;
-    }
-    if (github && !urlRegex.test(github)) {
-      alert("Enter a valid GitHub URL (must start with http:// or https://)");
-      return false;
-    }
+                    <div class="border-t border-border-dark my-6"></div>
 
-    return true;
-  }
-</script>
+                    <!-- Social Links -->
+                    <div class="space-y-4">
+                        <h3 class="text-sm font-bold text-gray-300 uppercase tracking-wide">Social Links</h3>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">LinkedIn URL</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span class="material-icons-outlined text-gray-500 text-lg">link</span>
+                                </span>
+                                <input type="url" name="socialLinks[linkedin]" placeholder="https://linkedin.com/in/..." pattern="https?://.+" value="<%= user.socialLinks?.linkedin || '' %>"
+                                    class="w-full bg-surface-dark-lighter border border-border-dark rounded-lg pl-10 pr-4 py-3 text-white placeholder-gray-600 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-colors">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">GitHub URL</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span class="material-icons-outlined text-gray-500 text-lg">code</span>
+                                </span>
+                                <input type="url" name="socialLinks[github]" placeholder="https://github.com/..." pattern="https?://.+" value="<%= user.socialLinks?.github || '' %>"
+                                    class="w-full bg-surface-dark-lighter border border-border-dark rounded-lg pl-10 pr-4 py-3 text-white placeholder-gray-600 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-colors">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-4">
+                        <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-lg text-sm font-bold text-white bg-gradient-to-r from-primary to-orange-600 hover:from-primary-hover hover:to-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all transform hover:-translate-y-0.5">
+                            Save Changes
+                        </button>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <a href="/profile/<%= user._id %>" class="text-sm text-gray-500 hover:text-white transition-colors">Cancel</a>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <% } else { %>
+        <div class="flex-grow flex items-center justify-center">
+            <div class="text-center">
+                <h2 class="text-2xl font-bold text-white mb-2">Access Denied</h2>
+                <p class="text-gray-400">You do not have permission to edit this profile.</p>
+                <a href="/" class="inline-block mt-4 text-primary hover:text-white">Go Home</a>
+            </div>
+        </div>
+    <% } %>
+
+    <script>
+      function validateForm() {
+        const username = document.querySelector("[name='username']").value.trim();
+        const linkedin = document.querySelector("[name='socialLinks[linkedin]']").value.trim();
+        const github = document.querySelector("[name='socialLinks[github]']").value.trim();
+    
+        if (username.length < 6) {
+          alert("Username must be at least 6 characters long");
+          return false;
+        }
+    
+        const urlRegex = /^https?:\/\/.+/;
+        if (linkedin && !urlRegex.test(linkedin)) {
+          alert("Enter a valid LinkedIn URL (must start with http:// or https://)");
+          return false;
+        }
+        if (github && !urlRegex.test(github)) {
+          alert("Enter a valid GitHub URL (must start with http:// or https://)");
+          return false;
+        }
+    
+        return true;
+      }
+    </script>
+</body>
+</html>
