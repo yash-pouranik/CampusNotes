@@ -263,43 +263,44 @@ router.get("/notes/:nid/download", async (req, res) => {
 // /explore
 router.get("/explore", async (req, res) => {
   try {
+    console.time("/explore")
     const { q, course, semester, visibility } = req.query;
 
     let filter = { isVerified: true };
 
-    // Search by query
     if (q) {
       filter.$text = { $search: q };
     }
-
-    // Filter by course (dropdown filter in frontend)
     if (course && course !== "all") {
       filter.course = course;
     }
-
-    // Filter by semester
     if (semester && semester !== "all") {
       filter.semester = semester;
     }
-
-    // Filter by visibility
     if (visibility && visibility !== "all") {
       filter.visibility = visibility;
     }
 
-    // Pagination (for better performance)
     const page = parseInt(req.query.page) || 1;
     const limit = 20;
     const skip = (page - 1) * limit;
 
-    const notes = await Note.find(filter, q ? { score: { $meta: "textScore" } } : {})
-      .populate("subject", "name")
-      .populate("uploadedBy", "username name roles verification")
-      .sort(q ? { score: { $meta: "textScore" } } : { createdAt: -1 }) // sort by relevance if searching, else newest
-      .skip(skip)
-      .limit(limit);
-
-    const totalNotes = await Note.countDocuments(filter);
+    // optimization: Use Promise.all to run find and count in parallel
+    // optimization: Use .lean() to get plain JS objects (faster than Mongoose Documents)
+    // optimization: Use .select() to only fetch fields needed for the UI
+    console.time("Explore-db");
+    const [notes, totalNotes] = await Promise.all([
+      Note.find(filter, q ? { score: { $meta: "textScore" } } : {})
+        .select("title description subject uploadedBy course semester createdAt fileUrl") // Only required fields
+        .populate("subject", "name")
+        .populate("uploadedBy", "username name avatar roles verification")
+        .sort(q ? { score: { $meta: "textScore" } } : { createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(), // 👈 Huge performance boost
+      Note.countDocuments(filter)
+    ]);
+    console.timeEnd("Explore-db");
     const totalPages = Math.ceil(totalNotes / limit);
 
     if (req.xhr || req.headers.accept.indexOf('json') > -1) {
@@ -310,8 +311,8 @@ router.get("/explore", async (req, res) => {
       });
     }
 
-
-
+    console.timeEnd("/explore");
+    console.time("ejs-render")
     res.render("notes/explore", {
       notes,
       query: q,
@@ -321,8 +322,9 @@ router.get("/explore", async (req, res) => {
       currentPage: page,
       totalPages,
       title: "Explore Notes at SVVV | CampusNotes",
-      description: "Browse and download free notes for B.Tech CSE, BBA, and other courses at Shri Vaishnav Vidyapeeth Vishwavidyalaya (SVVV). Search and filter by subject, course, and semester.",
+      description: "Browse and download free notes for B.Tech CSE, BBA, and other courses at Shri Vaishnav Vidyapeeth Vishwavidyalaya (SVVV).",
     });
+    console.timeEnd("ejs-render");
   } catch (err) {
     console.error("❌ Explore Error:", err);
     res.status(500).send("Server error while fetching notes.");
