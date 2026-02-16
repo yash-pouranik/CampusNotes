@@ -13,6 +13,11 @@ require('dotenv').config();
 require('./config/passport'); // path to the passport file
 app.use(methodOverride('_method'));
 
+// worker
+const otp_worker = require("./worker/otp.worker");
+const email_worker = require("./worker/bulkEmail.worker");
+const bg_process = require("./worker/bg.worker");
+
 //requiring middleware
 const { isModerator } = require("./middlewares")
 

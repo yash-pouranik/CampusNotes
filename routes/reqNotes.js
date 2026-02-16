@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const router = express.Router();
 const { isLoggedIn } = require("../middlewares");
 const RequestNote = require("../models/reqNotes");
-
+const {addBgJob} = require("../queues/bg.queue")
 const { sendNewRequestMail } = require("../config/mailer");
 
 
@@ -16,7 +16,7 @@ router.get('/requestnotes', async (req, res) => {
     .sort({ createdAt: -1 });
 
     for(r of requests) {
-      console.log(r.comments)
+      console.log(r)
     }
 
   res.render('request/requestnotes', { 
@@ -50,14 +50,17 @@ router.post('/requestnotes', isLoggedIn, async (req, res) => {
     // ✅ populate user data for email
     await newRequest.populate("user", "username name email");
 
-    // 📩 send email to all users
-    sendNewRequestMail({
+    // send email to all users
+    console.log(newRequest.user)
+    const requestData = {
       _id: newRequest.user._id,
       user: newRequest.user,
       content: newRequest.content,
       postedBy: newRequest.user.username || newRequest.user.name,
-    });
+    };
 
+    addBgJob({requestData});
+    
     req.flash("success", "Request posted successfully!");
     res.redirect("/requestnotes");
   } catch (err) {
