@@ -5,7 +5,7 @@ const User = require("../models/user")
 const { notLoggedIn } = require("../middlewares");
 const { OAuth2Client } = require("google-auth-library");
 
-const { sendOTP } = require("../config/mailer");
+const {addEmailJob} = require("../queues/otp.queue")
 
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -147,7 +147,11 @@ router.post("/forgot/send-otp", async (req, res) => {
 
   // TODO: nodemailer
   console.log("OTP for", email, "is", otp);
-  sendOTP(email, otp);
+  const data = {
+    user: user,
+    otp: otp
+  };
+  addEmailJob(data, 5000)
 
   res.render("auth/forgot", {
     step: "otp",
