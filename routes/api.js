@@ -9,6 +9,7 @@ const triviaQuestions = require("../config/trivia");
 const axios = require('axios');
 const pdf = require('pdf-parse');
 const aiService = require("../services/ai");
+const Subscriber = require("../models/Subscriber");
 
 
 // Route to get list of all notes for the AI Chat dropdown
@@ -139,5 +140,29 @@ router.get("/notes/:sec", async (req, res) => {
 
 // ok
 
+
+// Newsletter Subscription
+router.post("/subscribe", async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email) {
+            return res.status(400).json({ error: "Email is required" });
+        }
+
+        // Check if already subscribed
+        const existing = await Subscriber.findOne({ email });
+        if (existing) {
+            return res.status(400).json({ error: "You are already subscribed." });
+        }
+
+        const newSubscriber = new Subscriber({ email });
+        await newSubscriber.save();
+
+        res.json({ success: true, message: "Successfully subscribed!" });
+    } catch (error) {
+        console.error("Subscription Error:", error);
+        res.status(500).json({ error: "Failed to subscribe. Please try again." });
+    }
+});
 
 module.exports = router;

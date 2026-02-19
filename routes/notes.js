@@ -291,7 +291,7 @@ router.get("/explore", async (req, res) => {
     console.time("Explore-db");
     const [notes, totalNotes] = await Promise.all([
       Note.find(filter, q ? { score: { $meta: "textScore" } } : {})
-        .select("title description subject uploadedBy course semester createdAt fileUrl") // Only required fields
+        .select("title description subject uploadedBy course semester createdAt fileUrl downloadCount") // Only required fields
         .populate("subject", "name")
         .populate("uploadedBy", "username name avatar roles verification")
         .sort(q ? { score: { $meta: "textScore" } } : { createdAt: -1 })

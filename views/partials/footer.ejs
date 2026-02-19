@@ -12,13 +12,42 @@
 
       <div class="newsletter-widget">
         <p class="newsletter-title">Stay up to date</p>
-        <form class="newsletter-form" action="#" onsubmit="event.preventDefault();">
-          <input type="email" placeholder="Enter your email" aria-label="Email for newsletter" required />
-          <button type="submit" aria-label="Subscribe">
+        <form id="newsletterForm" class="newsletter-form" onsubmit="handleSubscribe(event)">
+          <input type="email" id="newsletterEmail" placeholder="Enter your email" aria-label="Email for newsletter" required />
+          <button type="submit" id="newsletterBtn" aria-label="Subscribe">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
           </button>
         </form>
+        <p id="newsletterMessage" style="display: none; font-size: 0.75rem; margin-top: 0.5rem;"></p>
       </div>
+
+      <script>
+        async function handleSubscribe(e) {
+          e.preventDefault();
+          const emailInput = document.getElementById('newsletterEmail');
+          const btn = document.getElementById('newsletterBtn');
+          const msg = document.getElementById('newsletterMessage');
+          const email = emailInput.value;
+
+          btn.disabled = true;
+          msg.style.display = 'none'; // reset
+          msg.style.color = 'inherit';
+
+          try {
+            const res = await axios.post('/api/subscribe', { email });
+            msg.textContent = res.data.message;
+            msg.style.color = '#4ade80'; // green-400
+            msg.style.display = 'block';
+            emailInput.value = '';
+          } catch (err) {
+            msg.textContent = err.response?.data?.error || "Something went wrong.";
+            msg.style.color = '#f87171'; // red-400
+            msg.style.display = 'block';
+          } finally {
+            btn.disabled = false;
+          }
+        }
+      </script>
 
       <div class="social-links">
         <a href="https://github.com/yash-pouranik/campusnotes" target="_blank" rel="noopener" aria-label="GitHub">
@@ -90,7 +119,7 @@
       </div>
 
       <div class="footer-version-tag">
-        v0.2.0-beta
+        v0.2.0
       </div>
     </div>
   </div>
