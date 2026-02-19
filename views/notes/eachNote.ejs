@@ -187,60 +187,7 @@
              </div>
         </div>
 
-        <!-- Recommended Notes -->
-        <section class="pt-8 border-t border-border-dark">
-            <h3 class="text-xl font-bold text-white mb-6">More Like This</h3>
-            
-            <div class="space-y-8">
-                <!-- Subject Matches -->
-                <% if (subjectNotes.length > 0) { %>
-                    <div>
-                        <h4 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">In <%= note.subject.name %></h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <% subjectNotes.forEach(recNote => { %>
-                                <a href="/notes/<%= recNote._id %>" class="flex items-start gap-4 p-4 rounded-xl bg-surface-dark border border-border-dark hover:border-primary/50 transition-colors group">
-                                    <div class="h-10 w-10 rounded-lg bg-surface-dark-lighter border border-border-dark flex items-center justify-center text-gray-500 group-hover:text-primary transition-colors shrink-0">
-                                        <span class="material-icons-outlined">description</span>
-                                    </div>
-                                    <div class="min-w-0">
-                                        <h5 class="text-white font-medium truncate group-hover:text-primary transition-colors"><%= recNote.title %></h5>
-                                        <p class="text-xs text-gray-500 mt-1 flex items-center gap-2">
-                                            <span><%= recNote.uploadedBy?.name || 'Unknown' %></span>
-                                            <span class="w-1 h-1 bg-gray-700 rounded-full"></span>
-                                            <span class="flex items-center gap-0.5"><span class="material-icons-outlined text-[10px]">download</span> <%= recNote.downloadCount %></span>
-                                        </p>
-                                    </div>
-                                </a>
-                            <% }) %>
-                        </div>
-                    </div>
-                <% } %>
-                
-                <!-- Semester Matches -->
-                <% if (semNotes.length > 0) { %>
-                    <div>
-                        <h4 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">In Semester <%= note.semester %></h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <% semNotes.forEach(recNote => { %>
-                                <a href="/notes/<%= recNote._id %>" class="flex items-start gap-4 p-4 rounded-xl bg-surface-dark border border-border-dark hover:border-primary/50 transition-colors group">
-                                    <div class="h-10 w-10 rounded-lg bg-surface-dark-lighter border border-border-dark flex items-center justify-center text-gray-500 group-hover:text-primary transition-colors shrink-0">
-                                        <span class="material-icons-outlined">description</span>
-                                    </div>
-                                    <div class="min-w-0">
-                                        <h5 class="text-white font-medium truncate group-hover:text-primary transition-colors"><%= recNote.title %></h5>
-                                        <p class="text-xs text-gray-500 mt-1 flex items-center gap-2">
-                                            <span><%= recNote.uploadedBy?.name || 'Unknown' %></span>
-                                            <span class="w-1 h-1 bg-gray-700 rounded-full"></span>
-                                            <span class="flex items-center gap-0.5"><span class="material-icons-outlined text-[10px]">download</span> <%= recNote.downloadCount %></span>
-                                        </p>
-                                    </div>
-                                </a>
-                            <% }) %>
-                        </div>
-                    </div>
-                <% } %>
-            </div>
-        </section>
+
 
       </main>
 
@@ -335,6 +282,61 @@
 
          </div>
       </aside>
+
+      <!-- Recommended Notes (Full Width) -->
+      <section class="col-span-1 lg:col-span-3 pt-8 border-t border-border-dark">
+          <h3 class="text-xl font-bold text-white mb-6">More Like This</h3>
+          
+          <div class="space-y-8">
+              <!-- Subject Matches -->
+              <% if (subjectNotes.length > 0) { %>
+                  <div>
+                      <h4 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">In <%= note.subject.name %></h4>
+                      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          <% subjectNotes.forEach(recNote => { %>
+                              <a href="/notes/<%= recNote._id %>" class="flex items-start gap-4 p-4 rounded-xl bg-surface-dark border border-border-dark hover:border-primary/50 transition-colors group">
+                                  <div class="h-10 w-10 rounded-lg bg-surface-dark-lighter border border-border-dark flex items-center justify-center text-gray-500 group-hover:text-primary transition-colors shrink-0">
+                                      <span class="material-icons-outlined">description</span>
+                                  </div>
+                                  <div class="min-w-0">
+                                      <h5 class="text-white font-medium truncate group-hover:text-primary transition-colors"><%= recNote.title %></h5>
+                                      <p class="text-xs text-gray-500 mt-1 flex items-center gap-2">
+                                          <span><%= recNote.uploadedBy?.name || 'Unknown' %></span>
+                                          <span class="w-1 h-1 bg-gray-700 rounded-full"></span>
+                                          <span class="flex items-center gap-0.5"><span class="material-icons-outlined text-[10px]">download</span> <%= recNote.downloadCount %></span>
+                                      </p>
+                                  </div>
+                              </a>
+                          <% }) %>
+                      </div>
+                  </div>
+              <% } %>
+              
+              <!-- Semester Matches -->
+              <% if (semNotes.length > 0) { %>
+                  <div>
+                      <h4 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">In Semester <%= note.semester %></h4>
+                      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          <% semNotes.forEach(recNote => { %>
+                              <a href="/notes/<%= recNote._id %>" class="flex items-start gap-4 p-4 rounded-xl bg-surface-dark border border-border-dark hover:border-primary/50 transition-colors group">
+                                  <div class="h-10 w-10 rounded-lg bg-surface-dark-lighter border border-border-dark flex items-center justify-center text-gray-500 group-hover:text-primary transition-colors shrink-0">
+                                      <span class="material-icons-outlined">description</span>
+                                  </div>
+                                  <div class="min-w-0">
+                                      <h5 class="text-white font-medium truncate group-hover:text-primary transition-colors"><%= recNote.title %></h5>
+                                      <p class="text-xs text-gray-500 mt-1 flex items-center gap-2">
+                                          <span><%= recNote.uploadedBy?.name || 'Unknown' %></span>
+                                          <span class="w-1 h-1 bg-gray-700 rounded-full"></span>
+                                          <span class="flex items-center gap-0.5"><span class="material-icons-outlined text-[10px]">download</span> <%= recNote.downloadCount %></span>
+                                      </p>
+                                  </div>
+                              </a>
+                          <% }) %>
+                      </div>
+                  </div>
+              <% } %>
+          </div>
+      </section>
 
     </div>
   </div>
