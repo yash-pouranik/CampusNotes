@@ -104,7 +104,7 @@ module.exports.sendNewRequestMailOnce = async (email, requestData) => {
     // );
       const { data, error } = await resend.emails.send({
         from: fromEmail,
-        to: email,
+        to: [email],
         subject: "New Notes Request Posted!",
         html: `
         <div style="font-family: 'Inter', system-ui, -apple-system, sans-serif; background-color: #050505; color: #ffffff; margin: 0; padding: 40px 20px;">

@@ -1,5 +1,5 @@
 const express = require("express");
-const path = require("path");
+const path = require('path');
 const expressLayouts = require("express-ejs-layouts");
 const flash = require("connect-flash");
 const methodOverride = require('method-override');
@@ -13,10 +13,9 @@ require('dotenv').config();
 require('./config/passport'); // path to the passport file
 app.use(methodOverride('_method'));
 
-// worker
+// workers
 const otp_worker = require("./worker/otp.worker");
 const email_worker = require("./worker/bulkEmail.worker");
-const bg_process = require("./worker/bg.worker");
 
 //requiring middleware
 const { isModerator } = require("./middlewares")

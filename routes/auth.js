@@ -145,7 +145,6 @@ router.post("/forgot/send-otp", async (req, res) => {
   user.otpExpiry = Date.now() + 10 * 60 * 1000; // 10min
   await user.save();
 
-  // TODO: nodemailer
   console.log("OTP for", email, "is", otp);
   const data = {
     user: user,
@@ -235,7 +234,6 @@ router.post("/forgot/resend", async (req, res) => {
   user.otpExpiry = Date.now() + 10 * 60 * 1000;
   await user.save();
 
-  // TODO: nodemailer
   console.log("Resent OTP for", email, "is", otp);
 
   res.render("auth/forgot", {
