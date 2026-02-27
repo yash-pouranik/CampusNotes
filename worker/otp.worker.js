@@ -1,12 +1,11 @@
 require('dotenv').config();
 const { Worker } = require('bullmq');
-const nodemailer = require('nodemailer');
 const { sendOTP } = require("../config/mailer");
 const redisConnection = require("../config/redis")
 
-// // Your email sending utility (e.g., using nodemailer)
+// // Your email sending utility (e.g., using )
 // const sendEmail = async (to, subject, body) => {
-//     // Nodemailer transport setup goes here
+//     //  transport setup goes here
 //     // ...
 //     console.log(`Sending email to ${to} with subject: ${subject}`);
 //     // Example: await transporter.sendMail(...)

@@ -3,10 +3,7 @@ const mongoose = require("mongoose");
 const router = express.Router();
 const { isLoggedIn } = require("../middlewares");
 const RequestNote = require("../models/reqNotes");
-const {addBgJob} = require("../queues/bg.queue")
-const { sendNewRequestMail } = require("../config/mailer");
-
-
+const { queueBulkEmails } = require("../queues/bulkEmail.queue");
 
 // GET /requestnotes
 router.get('/requestnotes', async (req, res) => {
@@ -14,10 +11,6 @@ router.get('/requestnotes', async (req, res) => {
     .populate('user', 'username name avatar') 
     .populate('comments.user', 'username name avatar') 
     .sort({ createdAt: -1 });
-
-    for(r of requests) {
-      console.log(r)
-    }
 
   res.render('request/requestnotes', { 
     requests, 
@@ -27,7 +20,6 @@ router.get('/requestnotes', async (req, res) => {
 });
 
 
-// POST /requestnotes (Create new request)
 // POST /requestnotes (Create new request)
 router.post('/requestnotes', isLoggedIn, async (req, res) => {
   try {
@@ -47,11 +39,8 @@ router.post('/requestnotes', isLoggedIn, async (req, res) => {
       content: content.trim() 
     });
 
-    // ✅ populate user data for email
     await newRequest.populate("user", "username name email");
 
-    // send email to all users
-    console.log(newRequest.user)
     const requestData = {
       _id: newRequest.user._id,
       user: newRequest.user,
@@ -59,7 +48,10 @@ router.post('/requestnotes', isLoggedIn, async (req, res) => {
       postedBy: newRequest.user.username || newRequest.user.name,
     };
 
-    addBgJob({requestData});
+    // Fire-and-forget: queue all email jobs without blocking the response
+    queueBulkEmails(requestData).catch(err => {
+      console.error("❌ Failed to queue bulk emails:", err.message);
+    });
     
     req.flash("success", "Request posted successfully!");
     res.redirect("/requestnotes");
