@@ -4,7 +4,7 @@ const multer = require("multer");
 const { storage } = require("../config/cloud");
 const upload = multer({ storage });
 const User = require("../models/user");
-const { isModerator, isLoggedIn } = require("../middlewares");
+const { isModerator, isLoggedIn, checkAccess } = require("../middlewares");
 const { json } = require("body-parser");
 const { sendAccountVerificationMail } = require("../config/mailer")
 const triviaQuestions = require("../config/trivia");
@@ -21,7 +21,8 @@ router.get("/verify", isLoggedIn, (req, res) => {
   res.redirect("/explore");
 });
 
-router.post("/verify", isLoggedIn, upload.single("idProof"), async (req, res) => {
+// POST FOR - Submit Verification
+router.post("/verify", isLoggedIn, checkAccess, upload.single("idProof"), async (req, res) => {
   if (req.user.verification?.verified) {
     req.flash("success", "You are already verified!");
     res.redirect("/explore");
@@ -50,7 +51,8 @@ router.get("/verify/question", isLoggedIn, (req, res) => {
   res.json({ question: randomQuestion.question, id: randomQuestion.id });
 });
 
-router.post("/verify/check-answer", isLoggedIn, async (req, res) => {
+// POST FOR - Check Trivia Answer
+router.post("/verify/check-answer", isLoggedIn, checkAccess, async (req, res) => {
   const { answer, questionId } = req.body;
   const sessionQuestionId = req.session.triviaQuestionId;
 

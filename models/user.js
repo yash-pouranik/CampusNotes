@@ -68,7 +68,8 @@ const userSchema = new mongoose.Schema({
   socialLinks: {
     linkedin: { type: String, default: null },
     github: { type: String, default: null }
-  }
+  },
+  isBlocked: { type: Boolean, default: false }
 }, {
   timestamps: true
 });

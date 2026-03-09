@@ -7,7 +7,7 @@ const DownloadLog = require("../models/downloadLog");
 const RequestNote = require("../models/reqNotes");
 const { isLoggedIn, isModerator } = require("../middlewares");
 
-// Admin Dashboard Data
+// GET FOR - Dashboard Stats
 router.get("/", isLoggedIn, isModerator, async (req, res) => {
 
   try {
@@ -107,6 +107,79 @@ router.get("/", isLoggedIn, isModerator, async (req, res) => {
   } catch (err) {
     console.error("Admin Dashboard Error:", err);
     res.status(500).send("Server Error");
+  }
+});
+
+// GET FOR - User Management Page
+router.get("/users", isLoggedIn, isModerator, async (req, res) => {
+  try {
+    const { q } = req.query;
+    const page = parseInt(req.query.page) || 1;
+    const limit = 20;
+    const skip = (page - 1) * limit;
+
+    let filter = {};
+    if (q) {
+      filter = {
+        $or: [
+          { username: { $regex: q, $options: 'i' } },
+          { name: { $regex: q, $options: 'i' } },
+          { email: { $regex: q, $options: 'i' } }
+        ]
+      };
+    }
+
+    const [users, totalUsers] = await Promise.all([
+      User.find(filter)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      User.countDocuments(filter)
+    ]);
+
+    const totalPages = Math.ceil(totalUsers / limit);
+
+    res.render("admin/manageUsers", {
+      title: "Manage Users | CampusNotes",
+      users,
+      currentPage: page,
+      totalPages,
+      query: q || ""
+    });
+  } catch (err) {
+    console.error(err);
+    req.flash("error", "Error loading users");
+    res.redirect("/dashboard");
+  }
+});
+
+// POST FOR - Toggle Block User
+router.post("/users/:id/toggle-block", isLoggedIn, isModerator, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findById(id);
+    
+    if (!user) {
+      req.flash("error", "User not found");
+      return res.redirect("back");
+    }
+
+    // Don't block self
+    if (user._id.toString() === req.user._id.toString()) {
+      req.flash("error", "You cannot block yourself.");
+      return res.redirect("back");
+    }
+
+    user.isBlocked = !user.isBlocked;
+    await user.save();
+
+    req.flash("success", `User ${user.isBlocked ? 'blocked' : 'unblocked'} successfully.`);
+    res.redirect("back");
+  } catch (err) {
+    console.error(err);
+    req.flash("error", "Something went wrong.");
+    res.redirect("back");
   }
 });
 

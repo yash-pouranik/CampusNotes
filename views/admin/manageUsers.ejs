@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title><%= title %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #050505; color: #e5e7eb; font-family: 'Inter', sans-serif; }
+        .glass-card {
+            background: rgba(10, 10, 10, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 mt-14">
+    <div class="max-w-6xl mx-auto space-y-6">
+        
+        <!-- Header & Search -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-white">Manage Users</h1>
+                <p class="text-gray-500 text-sm">Search and moderate platform accounts</p>
+            </div>
+            
+            <form action="/dashboard/users" method="GET" class="w-full md:w-auto flex gap-2">
+                <input type="text" name="q" value="<%= query %>" placeholder="Search by name, email..." 
+                    class="bg-surface-dark-lighter border border-border-dark rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-primary w-full md:w-64">
+                <button type="submit" class="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-lg text-sm transition-colors">
+                    Search
+                </button>
+            </form>
+        </div>
+
+        <!-- Users Table -->
+        <div class="glass-card rounded-xl overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-gray-400">
+                    <thead class="bg-white/5 text-xs uppercase text-gray-500">
+                        <tr>
+                            <th class="px-6 py-4 font-medium">User Details</th>
+                            <th class="px-6 py-4 font-medium">Verification</th>
+                            <th class="px-6 py-4 font-medium">Joined</th>
+                            <th class="px-6 py-4 font-medium text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5">
+                        <% if (users.length === 0) { %>
+                            <tr>
+                                <td colspan="4" class="px-6 py-10 text-center text-gray-500">No users found.</td>
+                            </tr>
+                        <% } %>
+                        <% users.forEach(u => { %>
+                            <tr class="hover:bg-white/[0.02] transition-colors">
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img src="<%= u.avatar || '/images/dummy_profile.avif' %>" class="w-10 h-10 rounded-full object-cover">
+                                        <div>
+                                            <div class="font-medium text-white"><%= u.name %></div>
+                                            <div class="text-xs text-gray-500"><%= u.email %></div>
+                                            <div class="text-[10px] text-primary/80">@<%= u.username %></div>
+                                        </div>
+                                        <% if (u.isBlocked) { %>
+                                            <span class="px-2 py-0.5 bg-red-500/10 text-red-500 text-[10px] font-bold rounded uppercase tracking-wider">Blocked</span>
+                                        <% } %>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <% if (u.verification && u.verification.verified) { %>
+                                        <span class="text-green-500 flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> Verified</span>
+                                    <% } else { %>
+                                        <span class="text-gray-600">Unverified</span>
+                                    <% } %>
+                                </td>
+                                <td class="px-6 py-4 text-xs">
+                                    <%= new Date(u.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) %>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <form action="/dashboard/users/<%= u._id %>/toggle-block" method="POST">
+                                        <button type="submit" class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all border <%= u.isBlocked ? 'border-green-500/50 text-green-500 hover:bg-green-500 hover:text-white' : 'border-red-500/50 text-red-500 hover:bg-red-500 hover:text-white' %>">
+                                            <%= u.isBlocked ? 'UNBLOCK' : 'BLOCK USER' %>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <% if (totalPages > 1) { %>
+            <div class="flex justify-center items-center gap-2 py-4">
+                <% if (currentPage > 1) { %>
+                    <a href="?page=<%= currentPage - 1 %>&q=<%= query %>" class="p-2 glass-card rounded hover:bg-white/5"><i class="fa-solid fa-chevron-left"></i></a>
+                <% } %>
+                <span class="text-sm text-gray-400">Page <%= currentPage %> of <%= totalPages %></span>
+                <% if (currentPage < totalPages) { %>
+                    <a href="?page=<%= currentPage + 1 %>&q=<%= query %>" class="p-2 glass-card rounded hover:bg-white/5"><i class="fa-solid fa-chevron-right"></i></a>
+                <% } %>
+            </div>
+        <% } %>
+
+        <div class="mt-4">
+            <a href="/dashboard" class="text-sm text-gray-500 hover:text-primary transition-colors flex items-center gap-2">
+                <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+</body>
+</html>

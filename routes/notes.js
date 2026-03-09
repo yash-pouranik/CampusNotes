@@ -4,7 +4,7 @@ const router = express.Router();
 const Note = require("../models/note");
 const Subject = require("../models/subject")
 const DownloadLog = require("../models/downloadLog");
-const { isLoggedIn, isModerator } = require("../middlewares");
+const { isLoggedIn, isModerator, checkAccess } = require("../middlewares");
 const { sendVerificationMail } = require("../config/mailer");
 // const multer = require("multer");
 const { cloudinary, getNextAccount } = require("../config/cloud");
@@ -15,7 +15,7 @@ const { cloudinary, getNextAccount } = require("../config/cloud");
 //   limits: { fileSize: 30 * 1024 * 1024 } // max 15MB
 // });
 
-// ===== to generate signature
+// GET FOR - Upload signature
 router.get("/api/upload-signature", isLoggedIn, (req, res) => {
   const account = getNextAccount();
 
@@ -38,6 +38,7 @@ router.get("/api/upload-signature", isLoggedIn, (req, res) => {
 
 
 
+// GET FOR - Upload Page
 router.get("/upload", isLoggedIn, async (req, res) => {
   if (!req.user.verification?.verified && !req.user.roles?.isModerator) {
     req.flash("error", 'You are not verified! Verify <a href="/verify">here</a>');
@@ -91,7 +92,7 @@ router.get("/upload", isLoggedIn, async (req, res) => {
 
 
 
-router.post("/upload", isLoggedIn, async (req, res) => {
+router.post("/upload", isLoggedIn, checkAccess, async (req, res) => {
   try {
     const { title, description, subject, course, visibility, newSubject, semester, fileUrl } = req.body;
 
@@ -166,6 +167,7 @@ router.get("/most-downloaded", async (req, res) => {
 
 
 
+// GET FOR - Note Details
 router.get("/notes/:nid", async (req, res) => {
   try {
     const file = await Note.findById(req.params.nid)
@@ -210,8 +212,7 @@ router.get("/notes/:nid", async (req, res) => {
   }
 });
 
-//download
-
+// GET FOR - Download Note
 router.get("/notes/:nid/download", async (req, res) => {
   try {
     const note = await Note.findById(req.params.nid);
@@ -333,7 +334,7 @@ router.get("/explore", async (req, res) => {
 
 
 
-router.get("/notes/:nid/edit", isLoggedIn, async (req, res) => {
+router.get("/notes/:nid/edit", isLoggedIn, checkAccess, async (req, res) => {
   try {
     const file = await Note.findById(req.params.nid)
       .populate("uploadedBy")
@@ -399,7 +400,7 @@ router.get("/notes/:nid/edit", isLoggedIn, async (req, res) => {
 
 
 
-router.put('/notes/:id', isLoggedIn, async (req, res) => {
+router.put('/notes/:id', isLoggedIn, checkAccess, async (req, res) => {
   try {
     const note = await Note.findById(req.params.id).populate("uploadedBy");
 
@@ -444,7 +445,7 @@ router.put('/notes/:id', isLoggedIn, async (req, res) => {
 });
 
 
-router.delete("/notes/:id", isLoggedIn, async (req, res) => {
+router.delete("/notes/:id", isLoggedIn, checkAccess, async (req, res) => {
   try {
     const note = await Note.findById(req.params.id);
 
@@ -581,7 +582,7 @@ router.post('/admin/verify-notes', isModerator, async (req, res) => {
 
 
 
-router.post("/notes/:nid/upvote", isLoggedIn, async (req, res) => {
+router.post("/notes/:nid/upvote", isLoggedIn, checkAccess, async (req, res) => {
   try {
     const note = await Note.findById(req.params.nid);
     if (!note) return res.status(404).send("Note not found");
