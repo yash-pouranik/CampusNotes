@@ -3,7 +3,7 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const Chat = require("../models/chat");
 const Note = require("../models/note");
-const { isLoggedIn } = require("../middlewares");
+const { isLoggedIn, checkAccess } = require("../middlewares");
 const axios = require('axios');
 const pdf = require('pdf-parse');
 const aiService = require("../services/ai");
@@ -11,7 +11,7 @@ const aiService = require("../services/ai");
 // MAX CHATS LIMIT
 const MAX_CHATS = 10;
 
-// 1. GET Full Chat Page (The "Maximized" View)
+// GET FOR - Chat Page 
 router.get("/chat", isLoggedIn, async (req, res) => {
     try {
         // Fetch user's chat history info (not full messages to save bandwidth)
@@ -39,8 +39,8 @@ router.get("/chat", isLoggedIn, async (req, res) => {
     }
 });
 
-// 2. API: Create New Chat
-router.post("/api/chat/new", isLoggedIn, async (req, res) => {
+// POST FOR - Create Chat
+router.post("/api/chat/new", isLoggedIn, checkAccess, async (req, res) => {
     try {
         // Check limit
         const count = await Chat.countDocuments({ user: req.user._id });
@@ -89,8 +89,8 @@ router.post("/api/chat/new", isLoggedIn, async (req, res) => {
     }
 });
 
-// 3. API: Send Message & Get Response
-router.post("/api/chat/:id/message", isLoggedIn, async (req, res) => {
+// POST FOR - Send Message
+router.post("/api/chat/:id/message", isLoggedIn, checkAccess, async (req, res) => {
     try {
         const chatId = req.params.id;
         const { message } = req.body;
@@ -143,8 +143,8 @@ router.post("/api/chat/:id/message", isLoggedIn, async (req, res) => {
     }
 });
 
-// 3b. API: Send Message & Get Streaming Response (NEW)
-router.post("/api/chat/:id/message/stream", isLoggedIn, async (req, res) => {
+// POST FOR - Send Message Stream
+router.post("/api/chat/:id/message/stream", isLoggedIn, checkAccess, async (req, res) => {
     try {
         const chatId = req.params.id;
         const { message } = req.body;
@@ -208,8 +208,8 @@ router.post("/api/chat/:id/message/stream", isLoggedIn, async (req, res) => {
     }
 });
 
-// 4. API: Delete Chat
-router.delete("/api/chat/:id", isLoggedIn, async (req, res) => {
+// DELETE FOR - Delete Chat
+router.delete("/api/chat/:id", isLoggedIn, checkAccess, async (req, res) => {
     try {
         await Chat.findOneAndDelete({ _id: req.params.id, user: req.user._id });
         res.json({ success: true });

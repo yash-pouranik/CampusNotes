@@ -32,3 +32,29 @@ module.exports.isModerator = (req, res, next) => {
     title: "Page Not Found | CampusNotes",
   });
 };
+
+module.exports.checkAccess = (req, res, next) => {
+  if (!req.user) return next();
+
+  if (req.user.isBlocked && req.method !== 'GET') {
+    const msg = "This account is blocked. You cannot perform this action.";
+    if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+      return res.status(403).json({ error: msg });
+    }
+    req.flash("error", msg);
+    return res.redirect("back");
+  }
+
+  const isVerificationRoute = req.path.startsWith('/verify');
+  
+  if (!req.user.verification?.verified && req.method === 'POST' && !isVerificationRoute) {
+    const msg = 'Verification required to post. Verify <a href="/verify">here</a>';
+    if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+      return res.status(403).json({ error: "Verification required." });
+    }
+    req.flash("error", msg);
+    return res.redirect("/verify");
+  }
+
+  next();
+};

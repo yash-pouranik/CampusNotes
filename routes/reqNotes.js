@@ -1,11 +1,11 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const router = express.Router();
-const { isLoggedIn } = require("../middlewares");
+const { isLoggedIn, checkAccess } = require("../middlewares");
 const RequestNote = require("../models/reqNotes");
 const { queueBulkEmails } = require("../queues/bulkEmail.queue");
 
-// GET /requestnotes
+// GET FOR - Request Notes List
 router.get('/requestnotes', async (req, res) => {
   const requests = await RequestNote.find({})
     .populate('user', 'username name avatar') 
@@ -20,8 +20,8 @@ router.get('/requestnotes', async (req, res) => {
 });
 
 
-// POST /requestnotes (Create new request)
-router.post('/requestnotes', isLoggedIn, async (req, res) => {
+// POST FOR - Create new request
+router.post('/requestnotes', isLoggedIn, checkAccess, async (req, res) => {
   try {
     const { content } = req.body;
 
@@ -64,8 +64,8 @@ router.post('/requestnotes', isLoggedIn, async (req, res) => {
 
 
 
-// POST /requestnotes/:id/delete
-router.post('/requestnotes/:id/delete', isLoggedIn, async (req, res) => {
+// POST FOR - Delete request
+router.post('/requestnotes/:id/delete', isLoggedIn, checkAccess, async (req, res) => {
   const { id } = req.params;
   const requestNote = await RequestNote.findById(id);
 
@@ -86,8 +86,8 @@ router.post('/requestnotes/:id/delete', isLoggedIn, async (req, res) => {
 });
 
 
-// POST /requestnotes/:id/comment
-router.post('/requestnotes/:id/comment', isLoggedIn, async (req, res) => {
+// POST FOR - Add comment
+router.post('/requestnotes/:id/comment', isLoggedIn, checkAccess, async (req, res) => {
   try {
     const { id } = req.params;
     const { content } = req.body;

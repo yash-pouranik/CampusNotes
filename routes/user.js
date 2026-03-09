@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require("../models/user")
 const Note = require("../models/note")
-const {isLoggedIn} = require("../middlewares")
+const {isLoggedIn, checkAccess} = require("../middlewares")
 const multer = require("multer");
 const { storage, cloudinary, deleteFromAllAccounts  } = require("../config/cloud");
 const upload = multer({ 
@@ -62,7 +62,8 @@ router.get("/rankings", async (req, res) => {
 });
 
 
-router.get("/profile/:id/edit", isLoggedIn,  async (req, res) => {
+// GET FOR - Edit Profile Page
+router.get("/profile/:id/edit", isLoggedIn, checkAccess, async (req, res) => {
   try {
     if (req.user._id.toString() !== req.params.id && !req.user.roles.isModerator) {
       console.log("YOU R NOT AUTHORIZED");
@@ -88,7 +89,8 @@ router.get("/profile/:id/edit", isLoggedIn,  async (req, res) => {
 });
 
 
-router.put("/profile/:id/edit", isLoggedIn, async (req, res) => {
+// PUT FOR - Update Profile
+router.put("/profile/:id/edit", isLoggedIn, checkAccess, async (req, res) => {
   try {
     if (req.user._id.toString() !== req.params.id && !req.user.roles.isModerator) {
       req.flash("error", "Not authorized to edit this profile");
@@ -121,7 +123,8 @@ router.put("/profile/:id/edit", isLoggedIn, async (req, res) => {
 
 // ...existing code...
 // ...existing code...
-router.put("/profile/avatar", isLoggedIn, upload.single("avatar"), async (req, res) => {
+// PUT FOR - Update Avatar
+router.put("/profile/avatar", isLoggedIn, checkAccess, upload.single("avatar"), async (req, res) => {
   try {
     if (!req.file) {
       req.flash("error", "Please upload an image file");

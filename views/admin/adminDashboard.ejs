@@ -277,8 +277,10 @@
         <div class="space-y-8">
             
             <!-- Recent Users -->
-            <div>
-                <h2 class="text-lg font-semibold text-white mb-4">Recent Users</h2>
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold text-white">Recent Users</h2>
+                <a href="/dashboard/users" class="text-xs text-primary hover:underline">See All Users</a>
+            </div>
                 <div class="glass-card rounded-xl overflow-hidden">
                     <table class="w-full text-left text-sm text-gray-400">
                         <thead class="bg-surface-dark-lighter text-xs uppercase text-gray-500">
@@ -291,10 +293,26 @@
                             <% fiveLastUsers.forEach(u => { %>
                                 <tr class="hover:bg-white/5 transition-colors">
                                     <td class="px-4 py-3">
-                                        <div class="font-medium text-white"><%= u.name %></div>
-                                        <div class="text-xs text-gray-500">@<%= u.username %></div>
+                                        <div class="flex items-center gap-3">
+                                            <div>
+                                                <div class="font-medium text-white"><%= u.name %></div>
+                                                <div class="text-xs text-gray-500">@<%= u.username %></div>
+                                            </div>
+                                            <% if (u.isBlocked) { %>
+                                                <span class="px-2 py-0.5 bg-red-500/10 text-red-500 text-[10px] font-bold rounded uppercase tracking-wider">Blocked</span>
+                                            <% } %>
+                                        </div>
                                     </td>
-                                    <td class="px-4 py-3 text-right text-xs"><%= new Date(u.createdAt).toLocaleDateString() %></td>
+                                    <td class="px-4 py-3 text-right">
+                                        <div class="flex flex-col items-end gap-1">
+                                            <div class="text-xs text-gray-500"><%= new Date(u.createdAt).toLocaleDateString() %></div>
+                                            <form action="/dashboard/users/<%= u._id %>/toggle-block" method="POST">
+                                                <button type="submit" class="text-[10px] font-bold uppercase transition-colors <%= u.isBlocked ? 'text-green-500 hover:text-green-400' : 'text-red-500 hover:text-red-400' %>">
+                                                    <%= u.isBlocked ? 'Unblock' : 'Block' %>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
                                 </tr>
                             <% }) %>
                         </tbody>
