@@ -96,7 +96,6 @@ router.post("/upload", isLoggedIn, checkAccess, async (req, res) => {
   try {
     const { title, description, subject, course, visibility, newSubject, semester, fileUrl } = req.body;
 
-    // fileUrl aana zaroori hai
     if (!fileUrl) {
       return res.status(400).json({ success: false, error: "File URL is missing." });
     }

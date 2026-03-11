@@ -220,6 +220,9 @@ module.exports.sendVerificationMail = async (mail, status) => {
       console.log("⚠️ No user found with this email.");
       return;
     }
+    if(user.roles.isModerator || user.roles.isDev){
+      return;
+    }
 
     const isApproved = status === "Approved";
     const statusColor = isApproved ? "#22c55e" : "#ef4444"; // Green or Red (Keeping these as success/error indicators, but styled w/ theme context)
