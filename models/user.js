@@ -53,7 +53,7 @@ const userSchema = new mongoose.Schema({
     }
   ],
   verification: {
-    docUrl: { type: String }, // URL/path of verification document
+    docUrl: { type: String }, 
     verified: { type: Boolean, default: false },
     verifiedAt: { type: Date }
   },
