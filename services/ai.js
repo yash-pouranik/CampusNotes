@@ -163,6 +163,23 @@ class AIService {
         const response = await result.response;
         return response.text();
     }
+
+    async generateDescriptionFromText(extractedText, noteMetadata) {
+        const prompt = `Write a highly detailed, 250 to 300-word SEO-friendly summary of this study material.
+Metadata:
+- Title: ${noteMetadata.title}
+- Subject: ${noteMetadata.subject}
+- Course: ${noteMetadata.course}
+
+Use the following extracted text from the PDF as your primary source of information. 
+EXTRACTED TEXT:
+${extractedText.substring(0, 10000)}
+
+Outline the core concepts, topics, and chapters covered. Use bullet points for readability. Make it highly descriptive for search engines (SEO). Do not include greetings or fluff. Focus on what's inside.`;
+
+        const messages = [{ role: 'user', content: prompt }];
+        return await this.generateResponse(messages);
+    }
 }
 
 module.exports = new AIService();

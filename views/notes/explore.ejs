@@ -217,9 +217,9 @@
     
         <div class="mt-12 text-center load-more-wrap">
           <% if (currentPage < totalPages) { %>
-            <button id="loadMoreBtn" class="px-6 py-3 bg-surface-dark border border-border-dark text-white rounded-lg hover:bg-surface-dark-lighter hover:border-gray-600 transition-colors font-medium">
+            <a href="/explore?page=<%= currentPage + 1 %><%= query ? '&q=' + query : '' %><%= course ? '&course=' + course : '' %><%= semester ? '&semester=' + semester : '' %>" id="loadMoreBtn" class="inline-block px-6 py-3 bg-surface-dark border border-border-dark text-white rounded-lg hover:bg-surface-dark-lighter hover:border-gray-600 transition-colors font-medium">
                 Load More Notes
-            </button>
+            </a>
           <% } %>
         </div>
       </main>
@@ -280,7 +280,10 @@
         semesterSelect?.addEventListener('change', () => appendNotes(true));
     
         // Load More
-        loadMoreBtn?.addEventListener("click", () => appendNotes(false));
+        loadMoreBtn?.addEventListener("click", (e) => {
+            e.preventDefault();
+            appendNotes(false);
+        });
     
     
         // --- 3. AJAX CORE ---

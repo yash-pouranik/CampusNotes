@@ -15,6 +15,7 @@ app.use(methodOverride('_method'));
 
 const otp_worker = require("./worker/otp.worker");
 const email_worker = require("./worker/bulkEmail.worker");
+const description_worker = require("./worker/description.worker");
 
 const { isModerator } = require("./middlewares")
 
@@ -189,7 +190,7 @@ app.get("/sitemap.xml", async (req, res) => {
       xml += `
         <url>
           <loc>${baseUrl}/notes/${note._id}</loc>
-          <lastmod>${new Date(note.updatedAt).toISOString()}</lastmod>
+          <lastmod>${note.updatedAt ? new Date(note.updatedAt).toISOString() : new Date().toISOString()}</lastmod>
           <changefreq>weekly</changefreq>
           <priority>0.9</priority>
         </url>`;

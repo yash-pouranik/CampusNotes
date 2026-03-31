@@ -77,7 +77,7 @@ router.get("/upload", isLoggedIn, async (req, res) => {
 
 router.post("/upload", isLoggedIn, checkAccess, async (req, res) => {
   try {
-    const { title, description, subject, course, visibility, newSubject, semester, fileUrl } = req.body;
+    const { title, subject, course, visibility, newSubject, semester, fileUrl } = req.body;
 
     if (!fileUrl) {
       return res.status(400).json({ success: false, error: "File URL is missing." });
@@ -102,7 +102,7 @@ router.post("/upload", isLoggedIn, checkAccess, async (req, res) => {
     if (copied.length < 1) {
       const note = new Note({
         title,
-        description,
+        description: "AI is analyzing this document to generate a high-quality description... Please check back shortly.",
         subject: subjectId,
         course,
         semester,
@@ -110,6 +110,13 @@ router.post("/upload", isLoggedIn, checkAccess, async (req, res) => {
         uploadedBy: req.user._id,
       });
       await note.save();
+
+      try {
+          const { addDescriptionJob } = require('../queues/description.queue');
+          await addDescriptionJob(note._id);
+      } catch (qErr) {
+          console.error("Queue dispatch error:", qErr);
+      }
 
       res.json({ success: true, redirectUrl: "/explore" });
     } else {
