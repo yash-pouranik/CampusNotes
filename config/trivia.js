@@ -1,10 +1,9 @@
-// config/trivia.js
 
 const questions = [
   {
     id: 1,
     question: "Account Section is in which Block?",
-    answer: "mahatmagandhiblock" // Answers should be in lowercase
+    answer: "mahatmagandhiblock"
   },
   {
     id: 2,

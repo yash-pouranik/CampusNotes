@@ -6,16 +6,9 @@ const Subject = require("../models/subject")
 const DownloadLog = require("../models/downloadLog");
 const { isLoggedIn, isModerator, checkAccess } = require("../middlewares");
 const { sendVerificationMail } = require("../config/mailer");
-// const multer = require("multer");
 const { cloudinary, getNextAccount } = require("../config/cloud");
 
 
-// const upload = multer({ 
-//   storage,
-//   limits: { fileSize: 30 * 1024 * 1024 } // max 15MB
-// });
-
-// GET FOR - Upload signature
 router.get("/api/upload-signature", isLoggedIn, (req, res) => {
   const account = getNextAccount();
 
@@ -34,11 +27,6 @@ router.get("/api/upload-signature", isLoggedIn, (req, res) => {
 });
 
 
-
-
-
-
-// GET FOR - Upload Page
 router.get("/upload", isLoggedIn, async (req, res) => {
   if (!req.user.verification?.verified && !req.user.roles?.isModerator) {
     req.flash("error", 'You are not verified! Verify <a href="/verify">here</a>');
@@ -46,7 +34,7 @@ router.get("/upload", isLoggedIn, async (req, res) => {
   }
 
   try {
-    const subjects = await Subject.find().sort({ name: 1 }); // sorted A-Z
+    const subjects = await Subject.find().sort({ name: 1 });
     const courses = [
       "B.Tech CSE",
       "B.Tech IT",
@@ -76,7 +64,6 @@ router.get("/upload", isLoggedIn, async (req, res) => {
       subjects,
       courses,
       semester,
-      // Ye do lines add karein
       "process.env.CLOUD_NAME": process.env.CLOUD_NAME,
       "process.env.CLOUD_API_KEY": process.env.CLOUD_API_KEY
     });
@@ -86,10 +73,6 @@ router.get("/upload", isLoggedIn, async (req, res) => {
     res.redirect("/explore");
   }
 });
-
-
-
-
 
 
 router.post("/upload", isLoggedIn, checkAccess, async (req, res) => {
@@ -116,7 +99,6 @@ router.post("/upload", isLoggedIn, checkAccess, async (req, res) => {
     const copied = await Note.find({ title: title });
 
 
-
     if (copied.length < 1) {
       const note = new Note({
         title,
@@ -124,7 +106,7 @@ router.post("/upload", isLoggedIn, checkAccess, async (req, res) => {
         subject: subjectId,
         course,
         semester,
-        fileUrl: fileUrl, // Yahan Cloudinary se mila URL save hoga
+        fileUrl: fileUrl,
         uploadedBy: req.user._id,
       });
       await note.save();
@@ -135,7 +117,6 @@ router.post("/upload", isLoggedIn, checkAccess, async (req, res) => {
     }
 
 
-
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, error: "Something went wrong while saving the note." });
@@ -143,9 +124,6 @@ router.post("/upload", isLoggedIn, checkAccess, async (req, res) => {
 });
 
 
-
-// most voted notes
-// most downloaded notes
 router.get("/most-downloaded", async (req, res) => {
   try {
     const notes = await Note.find({ downloadCount: { $gt: 0 } })
@@ -163,10 +141,6 @@ router.get("/most-downloaded", async (req, res) => {
 });
 
 
-
-
-
-// GET FOR - Note Details
 router.get("/notes/:nid", async (req, res) => {
   try {
     const file = await Note.findById(req.params.nid)
@@ -189,12 +163,12 @@ router.get("/notes/:nid", async (req, res) => {
     const subjectNotes = await Note.find({ subject: subId })
       .populate("subject", "name")
       .populate("uploadedBy", "username name roles verification")
-      .sort({ createdAt: -1 }) // newest first
+      .sort({ createdAt: -1 })
 
     const semNotes = await Note.find({ semester: fileSemester })
       .populate("subject", "name")
       .populate("uploadedBy", "username name roles verification")
-      .sort({ createdAt: -1 }) // newest first
+      .sort({ createdAt: -1 })
 
 
     res.render("notes/eachNote", {
@@ -211,7 +185,6 @@ router.get("/notes/:nid", async (req, res) => {
   }
 });
 
-// GET FOR - Download Note
 router.get("/notes/:nid/download", async (req, res) => {
   try {
     const note = await Note.findById(req.params.nid);
@@ -219,11 +192,9 @@ router.get("/notes/:nid/download", async (req, res) => {
       return res.status(404).send("Note not found");
     }
 
-    // Total download count hamesha badhayein
     note.downloadCount = (note.downloadCount || 0) + 1;
     await note.save();
 
-    // Unique download tracking (cookie)
     let downloaderId = req.cookies.downloaderId;
     if (!downloaderId) {
       downloaderId = new mongoose.Types.ObjectId().toString();
@@ -233,10 +204,8 @@ router.get("/notes/:nid/download", async (req, res) => {
       });
     }
 
-    // IP address
     const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
 
-    // Check karein ki is user ne pehle download kiya ya nahi
     const existingLog = await DownloadLog.findOne({
       note: note._id,
       downloaderId: downloaderId,
@@ -258,9 +227,6 @@ router.get("/notes/:nid/download", async (req, res) => {
 });
 
 
-
-
-// /explore
 router.get("/explore", async (req, res) => {
   try {
     console.time("/explore")
@@ -285,19 +251,16 @@ router.get("/explore", async (req, res) => {
     const limit = 20;
     const skip = (page - 1) * limit;
 
-    // optimization: Use Promise.all to run find and count in parallel
-    // optimization: Use .lean() to get plain JS objects (faster than Mongoose Documents)
-    // optimization: Use .select() to only fetch fields needed for the UI
     console.time("Explore-db");
     const [notes, totalNotes] = await Promise.all([
       Note.find(filter, q ? { score: { $meta: "textScore" } } : {})
-        .select("title description subject uploadedBy course semester createdAt fileUrl downloadCount") // Only required fields
+        .select("title description subject uploadedBy course semester createdAt fileUrl downloadCount")
         .populate("subject", "name")
         .populate("uploadedBy", "username name avatar roles verification")
         .sort(q ? { score: { $meta: "textScore" } } : { createdAt: -1 })
         .skip(skip)
         .limit(limit)
-        .lean(), // 👈 Huge performance boost
+        .lean(),
       Note.countDocuments(filter)
     ]);
     console.timeEnd("Explore-db");
@@ -332,12 +295,11 @@ router.get("/explore", async (req, res) => {
 });
 
 
-
 router.get("/notes/:nid/edit", isLoggedIn, checkAccess, async (req, res) => {
   try {
     const file = await Note.findById(req.params.nid)
       .populate("uploadedBy")
-      .populate("subject"); // so note.subject.name works
+      .populate("subject");
 
     const noteId = req.params.nid;
 
@@ -355,7 +317,6 @@ router.get("/notes/:nid/edit", isLoggedIn, checkAccess, async (req, res) => {
       return res.redirect(`/notes/${noteId}`);
     }
 
-    // ✅ Fetch subjects & courses for form dropdowns
     const subjects = await Subject.find().sort({ name: 1 });
     const courses = [
       "B.Tech CSE",
@@ -396,9 +357,6 @@ router.get("/notes/:nid/edit", isLoggedIn, checkAccess, async (req, res) => {
 });
 
 
-
-
-
 router.put('/notes/:id', isLoggedIn, checkAccess, async (req, res) => {
   try {
     const note = await Note.findById(req.params.id).populate("uploadedBy");
@@ -408,7 +366,6 @@ router.put('/notes/:id', isLoggedIn, checkAccess, async (req, res) => {
       return res.redirect("/explore");
     }
 
-    // Authorization: Only owner or moderator/dev can edit
     const isOwner = note.uploadedBy._id.toString() === req.user._id.toString();
     const isModerator = req.user.roles?.isModerator;
     const isDev = req.user.roles?.isDev;
@@ -418,20 +375,18 @@ router.put('/notes/:id', isLoggedIn, checkAccess, async (req, res) => {
       return res.redirect(`/notes/${req.params.id}`);
     }
 
-    // Validate subject ID
     if (!mongoose.Types.ObjectId.isValid(req.body.subject)) {
       req.flash("error", "Invalid subject selected");
       return res.redirect(`/notes/${req.params.id}/edit`);
     }
 
-    // Update fields
     await Note.findByIdAndUpdate(req.params.id, {
       title: req.body.title,
       description: req.body.description,
       tags: req.body.tags ? req.body.tags.split(',').map(t => t.trim()) : [],
       subject: req.body.subject,
       course: req.body.course,
-      fileUrl: note.fileUrl // keep old file
+      fileUrl: note.fileUrl
     });
 
     req.flash("success", "Note updated successfully");
@@ -453,7 +408,6 @@ router.delete("/notes/:id", isLoggedIn, checkAccess, async (req, res) => {
       return res.redirect("/explore");
     }
 
-    // permission check
     if (
       note.uploadedBy.toString() !== req.user._id.toString() &&
       !req.user.roles?.isModerator
@@ -462,13 +416,12 @@ router.delete("/notes/:id", isLoggedIn, checkAccess, async (req, res) => {
       return res.redirect(`/notes/${note._id}`);
     }
 
-    // Corrected Cloudinary delete logic
     if (note.fileUrl) {
       try {
         const urlParts = note.fileUrl.split('/');
         const uploadIndex = urlParts.indexOf('upload');
         if (uploadIndex > -1 && urlParts.length > uploadIndex + 2) {
-          const resourceType = urlParts[uploadIndex - 1]; // This will be 'image', 'raw', etc.
+          const resourceType = urlParts[uploadIndex - 1];
           const publicIdWithFolder = urlParts.slice(uploadIndex + 2).join('/').split('.')[0];
 
           if (resourceType && publicIdWithFolder) {
@@ -477,17 +430,14 @@ router.delete("/notes/:id", isLoggedIn, checkAccess, async (req, res) => {
         }
       } catch (cloudErr) {
         console.warn("Cloudinary delete error:", cloudErr.message);
-        // It's a good practice to log the error but not block the note deletion from the DB.
       }
     }
 
-    // user.notes array se bhi remove karo
     await mongoose.model("User").updateOne(
       { _id: note.uploadedBy },
       { $pull: { notes: note._id } }
     );
 
-    // finally note delete
     await note.deleteOne();
 
     req.flash("success", "Note deleted successfully!");
@@ -498,11 +448,6 @@ router.delete("/notes/:id", isLoggedIn, checkAccess, async (req, res) => {
     res.redirect("/explore");
   }
 });
-
-
-
-
-
 
 
 router.get('/admin/verify-notes', isModerator, async (req, res) => {
@@ -523,9 +468,6 @@ router.get('/admin/verify-notes', isModerator, async (req, res) => {
 });
 
 
-
-
-// POST - Accept or reject a note
 router.post('/admin/verify-notes', isModerator, async (req, res) => {
   const { noteId, action } = req.body;
 
@@ -543,7 +485,6 @@ router.post('/admin/verify-notes', isModerator, async (req, res) => {
 
     if (action === 'accept') {
       if (note.uploadedBy) {
-        // Add note id if not already in user's notes
         const alreadyExists = note.uploadedBy.notes.some(
           nId => nId.toString() === note._id.toString()
         );
@@ -580,7 +521,6 @@ router.post('/admin/verify-notes', isModerator, async (req, res) => {
 });
 
 
-
 router.post("/notes/:nid/upvote", isLoggedIn, checkAccess, async (req, res) => {
   try {
     const note = await Note.findById(req.params.nid);
@@ -589,7 +529,6 @@ router.post("/notes/:nid/upvote", isLoggedIn, checkAccess, async (req, res) => {
     const userId = req.user._id;
 
     if (note.upvotes.includes(userId)) {
-      // Already voted → remove vote
       note.upvotes.pull(userId);
     } else {
       note.upvotes.push(userId);
@@ -602,13 +541,6 @@ router.post("/notes/:nid/upvote", isLoggedIn, checkAccess, async (req, res) => {
     res.status(500).send("Server error");
   }
 });
-
-
-
-
-
-
-
 
 
 module.exports = router;

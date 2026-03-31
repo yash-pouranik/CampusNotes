@@ -1,0 +1,30 @@
+{
+  "baseUrl": "bas",
+  "createdAt": "2026-03-16T10:03:25.550Z",
+  "projectName": "iwf",
+  "settings": {
+    "analysis": {
+      "failOnSeverity": "none",
+      "maxCompletionTokens": 900,
+      "modelPriority": [
+        "qwen/qwen3-32b",
+        "moonshotai/kimi-k2-instruct-0905",
+        "openai/gpt-oss-20b"
+      ],
+      "provider": "groq"
+    },
+    "ci": {
+      "failOnSeverity": "high"
+    },
+    "determinism": {
+      "sortKeys": true
+    },
+    "export": {
+      "defaultFormat": "postman"
+    },
+    "redaction": {
+      "enabled": true,
+      "redactedValue": "bas"
+    }
+  }
+}

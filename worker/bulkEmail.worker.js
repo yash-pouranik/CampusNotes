@@ -3,7 +3,6 @@ const { Worker } = require('bullmq');
 const { sendNewRequestMailOnce } = require("../config/mailer");
 const redisConnection = require("../config/redis");
 
-// Rate limiter: 1 email per 60 seconds to avoid domain blocks
 const worker = new Worker('bulkEmailQueue', async job => {
     const { email, requestData } = job.data;
     console.log(`📧 Sending mail to: ${email}`);
@@ -11,8 +10,8 @@ const worker = new Worker('bulkEmailQueue', async job => {
 }, {
     connection: redisConnection,
     limiter: {
-        max: 1,        // 1 email
-        duration: 60000 // per 60 seconds
+        max: 1,       
+        duration: 60000
     }
 });
 

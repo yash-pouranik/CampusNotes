@@ -5,7 +5,6 @@ const User = require("../models/user");
 passport.use(
   new LocalStrategy({ usernameField: "email" }, async (email, password, done) => {
     try {
-      // ✅ password explicitly select karna
       const user = await User.findOne({ email }).select("+password");
       if (!user) {
         return done(null, false, { message: "No user found" });

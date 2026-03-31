@@ -33,7 +33,6 @@ async function run() {
 
         await queueBulkEmails(requestData);
 
-        // Give the queue a moment to confirm jobs are added
         setTimeout(async () => {
             console.log('🎉 Done. Jobs queued — worker will send at 1 mail/min.');
             console.log('   Leave server running. Check logs for "✅ Job completed" entries.');

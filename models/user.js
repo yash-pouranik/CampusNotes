@@ -39,7 +39,7 @@ const userSchema = new mongoose.Schema({
   password: { 
     type: String, 
     required: true, 
-    select: false // will not be returned by default in queries
+    select: false
   },
   gender: {
     type: String,
@@ -74,19 +74,16 @@ const userSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Hash password before saving
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 12);
   next();
 });
 
-// Compare passwords
 userSchema.methods.comparePassword = function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
 
-// Remove sensitive data when converting to JSON
 userSchema.methods.toJSON = function () {
   const obj = this.toObject();
   delete obj.password;

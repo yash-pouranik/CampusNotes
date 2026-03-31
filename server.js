@@ -3,55 +3,44 @@ const path = require('path');
 const expressLayouts = require("express-ejs-layouts");
 const flash = require("connect-flash");
 const methodOverride = require('method-override');
-const cookieParser = require('cookie-parser'); // Require cookie-parser
+const cookieParser = require('cookie-parser');
 
 const app = express();
 const session = require('express-session');
-const MongoStore = require('connect-mongo'); // <-- YEH LINE ADD KAREIN
+const MongoStore = require('connect-mongo');
 const passport = require('passport');
 require('dotenv').config();
-require('./config/passport'); // path to the passport file
+require('./config/passport');
 app.use(methodOverride('_method'));
 
-// workers
 const otp_worker = require("./worker/otp.worker");
 const email_worker = require("./worker/bulkEmail.worker");
 
-//requiring middleware
 const { isModerator } = require("./middlewares")
-
 
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(cookieParser()); // Use cookie-parser middleware
+app.use(cookieParser());
 
 
-// **Important: Use express-ejs-layouts middleware before routes**
 app.use(expressLayouts);
 
 app.use(express.static(path.join(__dirname, "public")));
-// caching for 1 day in user browser
 app.use(express.static(path.join(__dirname, "public"), {
   maxAge: '1d', 
   etag: false
 }));
 
-//db
 const connectDB = require('./config/db');
 connectDB();
 
-//dbs
-const User = require("./models/user");  // or correct path
+const User = require("./models/user"); 
 const Note = require('./models/note');
 
 
-
-
-
-//auth
 app.use(session({
   secret: process.env.SECRET,
   resave: false,
@@ -62,7 +51,6 @@ app.use(session({
     collectionName: 'sessions', 
     ttl: 14 * 24 * 60 * 60  
   }),
-  // =======================================
 
   cookie: {
     maxAge: 7 * 24 * 60 * 60 * 1000  
@@ -84,8 +72,6 @@ app.use((req, res, next) => {
 });
 
 
-
-
 app.get('/health/campnotes', (req, res) => {
   res.status(200).send('OK');
 });
@@ -102,7 +88,6 @@ const dash = require("./routes/adminRoutes");
 const chatRoutes = require("./routes/chat");
 
 
-// Corrected code for server.js
 app.use('/', notesRoutes); 
 app.use('/dashboard', dash);
 app.use('/api', apiR);
@@ -114,10 +99,9 @@ app.use("/", companyRoutes)
 app.use("/", chatRoutes); 
 
 
-
 let cachedContributors = null;
 let lastCacheTime = 0;
-const CACHE_TTL = 1000 * 60 * 60 * 24; // Cache for 12 Hour
+const CACHE_TTL = 1000 * 60 * 60 * 24;
 
 app.get("/", async (req, res) => {
   try {
@@ -211,7 +195,6 @@ app.get("/sitemap.xml", async (req, res) => {
         </url>`;
     });
 
-    // Add Profiles
     users.forEach(user => {
       xml += `
         <url>
@@ -233,11 +216,6 @@ app.get("/sitemap.xml", async (req, res) => {
 });
 
 
-
-
-
-//404
-// 404 Page Not Found handler
 app.use((req, res) => {
   res.status(404).render("errors/404", {
     title: "Page Not Found | CampusNotes",
@@ -246,7 +224,7 @@ app.use((req, res) => {
 });
 
 
-const PORT = process.env.PORT || 3000; // Cloud का पोर्ट लो, वरना 3000
+const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

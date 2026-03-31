@@ -73,7 +73,6 @@ const noteSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Add text index for efficient searching
 noteSchema.index({
   title: "text",
   description: "text",

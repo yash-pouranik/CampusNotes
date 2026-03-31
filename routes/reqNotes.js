@@ -5,7 +5,6 @@ const { isLoggedIn, checkAccess } = require("../middlewares");
 const RequestNote = require("../models/reqNotes");
 const { queueBulkEmails } = require("../queues/bulkEmail.queue");
 
-// GET FOR - Request Notes List
 router.get('/requestnotes', async (req, res) => {
   const requests = await RequestNote.find({})
     .populate('user', 'username name avatar') 
@@ -20,7 +19,6 @@ router.get('/requestnotes', async (req, res) => {
 });
 
 
-// POST FOR - Create new request
 router.post('/requestnotes', isLoggedIn, checkAccess, async (req, res) => {
   try {
     const { content } = req.body;
@@ -48,7 +46,6 @@ router.post('/requestnotes', isLoggedIn, checkAccess, async (req, res) => {
       postedBy: newRequest.user.username || newRequest.user.name,
     };
 
-    // Fire-and-forget: queue all email jobs without blocking the response
     queueBulkEmails(requestData).catch(err => {
       console.error("❌ Failed to queue bulk emails:", err.message);
     });
@@ -63,8 +60,6 @@ router.post('/requestnotes', isLoggedIn, checkAccess, async (req, res) => {
 });
 
 
-
-// POST FOR - Delete request
 router.post('/requestnotes/:id/delete', isLoggedIn, checkAccess, async (req, res) => {
   const { id } = req.params;
   const requestNote = await RequestNote.findById(id);
@@ -74,7 +69,6 @@ router.post('/requestnotes/:id/delete', isLoggedIn, checkAccess, async (req, res
     return res.redirect("/requestnotes");
   }
 
-  // Permission check
   if (requestNote.user.equals(req.user._id) || req.user.role === "moderator") {
     await RequestNote.findByIdAndDelete(id);
     req.flash("success", "Request deleted successfully.");
@@ -86,7 +80,6 @@ router.post('/requestnotes/:id/delete', isLoggedIn, checkAccess, async (req, res
 });
 
 
-// POST FOR - Add comment
 router.post('/requestnotes/:id/comment', isLoggedIn, checkAccess, async (req, res) => {
   try {
     const { id } = req.params;

@@ -12,9 +12,6 @@ Disallow: /notes/*/upvote
 Disallow: /requestnotes/*/delete
 Disallow: /requestnotes/*/comment
 
-# --- Block Login/Register ---
-Disallow: /login
-Disallow: /register
 
 # --- Block Actions ---
 Disallow: /notes/*/edit

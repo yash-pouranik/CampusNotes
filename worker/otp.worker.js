@@ -3,13 +3,6 @@ const { Worker } = require('bullmq');
 const { sendOTP } = require("../config/mailer");
 const redisConnection = require("../config/redis")
 
-// // Your email sending utility (e.g., using )
-// const sendEmail = async (to, subject, body) => {
-//     //  transport setup goes here
-//     // ...
-//     console.log(`Sending email to ${to} with subject: ${subject}`);
-//     // Example: await transporter.sendMail(...)
-// };
 
 const worker = new Worker('otpEmailQueue', async job => {
     const { user, otp } = job.data;

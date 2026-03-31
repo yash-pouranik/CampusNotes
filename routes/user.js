@@ -7,10 +7,8 @@ const multer = require("multer");
 const { storage, cloudinary, deleteFromAllAccounts  } = require("../config/cloud");
 const upload = multer({ 
   storage,
-  limits: { fileSize: 5 * 1024 * 1024 } // max 5MB
+  limits: { fileSize: 5 * 1024 * 1024 }
 });
-
-
 
 
 router.get("/profile/:id", async (req, res, next) => {
@@ -22,16 +20,14 @@ router.get("/profile/:id", async (req, res, next) => {
       return next();
     }
 
-    // get all notes uploaded by user (verified + unverified)
     const notes = await Note.find({ uploadedBy: user._id })
       .populate("subject", "name");
 
-    // count uploaded
     user.uploaded = notes.length;
 
     res.render("user/profile", {
       user,
-      notes, // 👈 send to EJS
+      notes,
       title: user.username || user.name || "Profile",
     });
   } catch (e) {
@@ -40,8 +36,6 @@ router.get("/profile/:id", async (req, res, next) => {
     return next();
   }
 });
-
-
 
 
 router.get("/rankings", async (req, res) => {
@@ -62,7 +56,6 @@ router.get("/rankings", async (req, res) => {
 });
 
 
-// GET FOR - Edit Profile Page
 router.get("/profile/:id/edit", isLoggedIn, checkAccess, async (req, res) => {
   try {
     if (req.user._id.toString() !== req.params.id && !req.user.roles.isModerator) {
@@ -89,7 +82,6 @@ router.get("/profile/:id/edit", isLoggedIn, checkAccess, async (req, res) => {
 });
 
 
-// PUT FOR - Update Profile
 router.put("/profile/:id/edit", isLoggedIn, checkAccess, async (req, res) => {
   try {
     if (req.user._id.toString() !== req.params.id && !req.user.roles.isModerator) {
@@ -121,9 +113,6 @@ router.put("/profile/:id/edit", isLoggedIn, checkAccess, async (req, res) => {
   }
 });
 
-// ...existing code...
-// ...existing code...
-// PUT FOR - Update Avatar
 router.put("/profile/avatar", isLoggedIn, checkAccess, upload.single("avatar"), async (req, res) => {
   try {
     if (!req.file) {
@@ -137,23 +126,20 @@ router.put("/profile/avatar", isLoggedIn, checkAccess, upload.single("avatar"), 
       return res.redirect("/profile");
     }
 
-    // Helper to extract public_id from a Cloudinary URL
     const extractPublicId = (url) => {
       try {
         const idx = url.indexOf('/upload/');
         if (idx === -1) return null;
         const afterUpload = url.slice(idx + '/upload/'.length);
-        // remove version prefix like v12345/ if present
         const maybeWithVersion = afterUpload.split('/');
         if (maybeWithVersion[0].startsWith('v')) maybeWithVersion.shift();
         const pathWithExt = maybeWithVersion.join('/');
-        return pathWithExt.replace(/\.[^.]+$/, ''); // remove extension
+        return pathWithExt.replace(/\.[^.]+$/, '');
       } catch (e) {
         return null;
       }
     };
 
-    // Delete old avatar if exists and appears to be from Cloudinary
     if (user.avatar && user.avatar.includes('res.cloudinary.com') && !user.avatar.includes('dummy_profile')) {
       try {
         const oldPublicId = extractPublicId(user.avatar);
@@ -165,7 +151,6 @@ router.put("/profile/avatar", isLoggedIn, checkAccess, upload.single("avatar"), 
       }
     }
 
-    // Upload buffer to Cloudinary (supports memoryStorage)
     let uploadResult;
     if (req.file.buffer) {
       const dataUri = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
@@ -177,7 +162,6 @@ router.put("/profile/avatar", isLoggedIn, checkAccess, upload.single("avatar"), 
         overwrite: true
       });
     } else {
-      // fallback for other multer returns (path/secure_url)
       if (req.file.path) uploadResult = { secure_url: req.file.path, public_id: req.file.filename || null };
       else if (req.file.secure_url) uploadResult = { secure_url: req.file.secure_url, public_id: req.file.public_id || null };
     }
@@ -188,11 +172,9 @@ router.put("/profile/avatar", isLoggedIn, checkAccess, upload.single("avatar"), 
       return res.redirect(`/profile/${req.user._id}`);
     }
 
-    // Save new avatar URL
-    user.avatar = uploadResult.secure_url + (uploadResult.secure_url.includes('?') ? '&' : '?') + `t=${Date.now()}`; // cache-bust
+    user.avatar = uploadResult.secure_url + (uploadResult.secure_url.includes('?') ? '&' : '?') + `t=${Date.now()}`;
     await user.save();
 
-    // Update session so UI reflects new avatar immediately
     if (typeof req.logIn === "function") {
       req.logIn(user, (err) => {
         if (err) console.warn("Session update failed:", err);
@@ -210,10 +192,6 @@ router.put("/profile/avatar", isLoggedIn, checkAccess, upload.single("avatar"), 
     res.redirect(`/profile/${req.user._id}`);
   }
 });
-// ...existing code...
-// ...existing code...
-
-
 
 
 module.exports = router;

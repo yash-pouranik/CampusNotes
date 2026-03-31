@@ -10,9 +10,6 @@ const { sendAccountVerificationMail } = require("../config/mailer")
 const triviaQuestions = require("../config/trivia");
 
 
-
-
-
 router.get("/verify", isLoggedIn, (req, res) => {
   if (!req.user.verification?.verified) {
     return res.render("verify/form", { title: "Verify Account", showAds: false });
@@ -21,7 +18,6 @@ router.get("/verify", isLoggedIn, (req, res) => {
   res.redirect("/explore");
 });
 
-// POST FOR - Submit Verification
 router.post("/verify", isLoggedIn, checkAccess, upload.single("idProof"), async (req, res) => {
   if (req.user.verification?.verified) {
     req.flash("success", "You are already verified!");
@@ -33,25 +29,19 @@ router.post("/verify", isLoggedIn, checkAccess, upload.single("idProof"), async 
   res.redirect("/explore");
 });
 
-// --- Trivia Verification Routes ---
 
 router.get("/verify/question", isLoggedIn, (req, res) => {
-  // Check if user is already verified
   if (req.user.verification?.verified) {
     return res.status(400).json({ error: "You are already verified." });
   }
 
-  // Get a random question
   const randomQuestion = triviaQuestions[Math.floor(Math.random() * triviaQuestions.length)];
 
-  // Store the question ID in the user's session to prevent cheating
   req.session.triviaQuestionId = randomQuestion.id;
 
-  // Send only the question to the frontend, not the answer
   res.json({ question: randomQuestion.question, id: randomQuestion.id });
 });
 
-// POST FOR - Check Trivia Answer
 router.post("/verify/check-answer", isLoggedIn, checkAccess, async (req, res) => {
   const { answer, questionId } = req.body;
   const sessionQuestionId = req.session.triviaQuestionId;
@@ -64,25 +54,20 @@ router.post("/verify/check-answer", isLoggedIn, checkAccess, async (req, res) =>
     });
   }
 
-  // Find the question from our config file
   const question = triviaQuestions.find(q => q.id.toString() === sessionQuestionId.toString());
 
-  // Clean up and compare the answers
   const isCorrect = answer && question && (answer.trim().toLowerCase() === question.answer.toLowerCase());
 
   if (isCorrect) {
-    // If answer is correct, update the user's profile
     await User.findByIdAndUpdate(req.user._id, {
       "verification.verified": true,
       "verification.verifiedAt": new Date()
     });
-    // Clear the question ID from the session
     delete req.session.triviaQuestionId;
 
     req.flash("success", "Verification successful! You are now verified.");
     return res.redirect("/explore");
   } else {
-    // If incorrect
     return res.render("verify/form", {
       title: "Verify Account",
       showAds: false,
@@ -135,12 +120,6 @@ router.post("/admin/verify/:id", isModerator, async (req, res) => {
 
   res.redirect("/admin/verify-requests");
 });
-
-
-
-
-
-
 
 
 module.exports = router;

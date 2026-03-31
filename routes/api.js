@@ -12,10 +12,8 @@ const aiService = require("../services/ai");
 const Subscriber = require("../models/Subscriber");
 
 
-// Route to get list of all notes for the AI Chat dropdown
 router.get("/notes/list", isLoggedIn, async (req, res) => {
     try {
-        // Fetch all notes, selecting only _id and title to keep it light
         const notes = await Note.find({}, "_id title").sort({ createdAt: -1 });
         res.json(notes);
     } catch (error) {
@@ -25,7 +23,6 @@ router.get("/notes/list", isLoggedIn, async (req, res) => {
 });
 
 
-// This is our new AI route
 router.post("/notes/:id/ask", isLoggedIn, async (req, res) => {
     try {
         const note = await Note.findById(req.params.id);
@@ -33,32 +30,25 @@ router.post("/notes/:id/ask", isLoggedIn, async (req, res) => {
             return res.status(404).json({ error: "Note not found." });
         }
 
-        // Get the user's question from the request, default to "summarize"
         const userQuestion = req.body.question || "Summarize this document in 5 bullet points.";
 
         let contextText = "";
 
-        // 1. Download the PDF file from Cloudinary (Primitive Text Extraction)
-        // Note: For 'Vision' model support, the AIService would need to handle base64.
-        // For Groq (Llama), we *must* extract text. 
         if (note.fileUrl) {
             try {
                 const response = await axios.get(note.fileUrl, { responseType: 'arraybuffer' });
                 const pdfBuffer = response.data;
                 const data = await pdf(pdfBuffer);
-                contextText = data.text.trim().substring(0, 12000); // 12k char context limit
+                contextText = data.text.trim().substring(0, 12000);
             } catch (err) {
                 console.log("PDF Parse Error:", err.message);
             }
         }
 
-        // 2. Generate Answer via Service
-        // We package the question as a single user message
         const messages = [{ role: 'user', content: userQuestion }];
 
         const aiResponseText = await aiService.generateResponse(messages, contextText);
 
-        // 3. Send the AI's answer back to the frontend
         res.json({ answer: aiResponseText });
 
     } catch (error) {
@@ -78,17 +68,14 @@ router.get("/notes/:id/check-pdf", async (req, res) => {
             return res.status(404).json({ error: "Note not found." });
         }
 
-        // PDF download karein
         const response = await axios.get(note.fileUrl, {
             responseType: 'arraybuffer'
         });
         const pdfBuffer = response.data;
 
-        // PDF se text nikalne ki koshish karein
         const data = await pdf(pdfBuffer);
         const documentText = data.text.trim();
 
-        // Check karein ki text hai ya nahi (100 characters se zyada)
         if (documentText.length > 100) {
             res.json({ isTyped: true });
         } else {
@@ -100,8 +87,6 @@ router.get("/notes/:id/check-pdf", async (req, res) => {
         res.status(500).json({ error: "Could not check PDF type." });
     }
 });
-
-
 
 
 router.get("/notes/:sec", async (req, res) => {
@@ -119,11 +104,7 @@ router.get("/notes/:sec", async (req, res) => {
         const notes = await Note.find()
             .populate("uploadedBy", "username socialLinks");
 
-        // If you only want titles:
-        // const noteTitles = notes.map(note => note.title);
-        // return res.json(noteTitles);
 
-        // Otherwise return full notes:
         return res.json(notes);
 
     } catch (e) {
@@ -133,15 +114,6 @@ router.get("/notes/:sec", async (req, res) => {
 });
 
 
-
-
-// 2. Answer Verify Karne Ke Liye (Deleted - Moved to verify.js)
-// router.post("/verify-trivia", ...)
-
-// ok
-
-
-// Newsletter Subscription
 router.post("/subscribe", async (req, res) => {
     try {
         const { email } = req.body;
@@ -149,7 +121,6 @@ router.post("/subscribe", async (req, res) => {
             return res.status(400).json({ error: "Email is required" });
         }
 
-        // Check if already subscribed
         const existing = await Subscriber.findOne({ email });
         if (existing) {
             return res.status(400).json({ error: "You are already subscribed." });
