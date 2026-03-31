@@ -97,12 +97,7 @@
                            class="w-full bg-surface-dark-lighter border border-border-dark rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-colors">
                 </div>
   
-                <!-- DESCRIPTION -->
-                <div>
-                    <label for="description" class="block text-sm font-medium text-gray-400 mb-1">Description</label>
-                    <textarea name="description" id="description" rows="3" placeholder="Brief summary of what's inside..."
-                              class="w-full bg-surface-dark-lighter border border-border-dark rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-colors"></textarea>
-                </div>
+
   
                 <!-- DROPDOWNS GRID -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -446,7 +441,6 @@
         // Prepare backend payload
         const noteDetails = {
           title: form.title.value,
-          description: form.description.value,
           subject: document.getElementById('subjectInput').value,
           newSubject: form.newSubject ? form.newSubject.value : "",
           course: document.getElementById('courseInput').value,
