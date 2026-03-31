@@ -1,20 +1,12 @@
-// config/mailer.js
 const { Resend } = require("resend");
 const User = require("../models/user");
 
-// Initialize Resend with your API key from .env
 const resend = new Resend(process.env.RESEND_API_KEY);
-const fromEmail = "CampusNotes <campusnotes@bitbros.in>"; // Verified email on Resend
+const fromEmail = "CampusNotes <campusnotes@bitbros.in>";
 
-/**
- * Sends a notification to all users (except the poster) about a new note request.
- */
-// config/mailer.js
-// ... (aapka baaki code jaise Resend setup, fromEmail, etc.)
 
 module.exports.sendNewRequestMail = async (requestData) => {
   try {
-    // Exclude the request poster
     const users = await User.find(
       { _id: { $ne: requestData._id } },
       "email"
@@ -27,18 +19,16 @@ module.exports.sendNewRequestMail = async (requestData) => {
       return;
     }
 
-    // --- BATCHING LOGIC SHURU ---
-    const batchSize = 50; // Resend ki limit
+    const batchSize = 50;
 
     for (let i = 0; i < emailList.length; i += batchSize) {
-      // Har baar 50 email ka ek naya group banayega
       const batch = emailList.slice(i, i + batchSize);
 
       console.log(`Sending mail to batch ${Math.floor(i / batchSize) + 1}...`);
 
       const { data, error } = await resend.emails.send({
         from: fromEmail,
-        to: batch, // ✅ Sirf uss 50 ke group ko bhejega
+        to: batch,
         subject: "New Notes Request Posted!",
         html: `
         <div style="font-family: 'Inter', system-ui, -apple-system, sans-serif; background-color: #050505; color: #ffffff; margin: 0; padding: 40px 20px;">
@@ -77,16 +67,13 @@ module.exports.sendNewRequestMail = async (requestData) => {
       `,
       });
 
-      // Har batch ka error check karega
       if (error) {
         console.error(`Resend API Error (Batch ${Math.floor(i / batchSize) + 1}):`, error);
-        // Agar ek batch fail ho, to agle par jaao
         continue;
       }
 
       console.log(`✅ Batch ${Math.floor(i / batchSize) + 1} sent:`, data.id);
     }
-    // --- BATCHING LOGIC KHATM ---
 
     console.log("✅ All new request email batches processed.");
 
@@ -97,11 +84,6 @@ module.exports.sendNewRequestMail = async (requestData) => {
 
 module.exports.sendNewRequestMailOnce = async (email, requestData) => {
   try {
-    // Exclude the request poster
-    // const users = await User.find(
-    //   { _id: { $ne: requestData._id } },
-    //   "email"
-    // );
       const { data, error } = await resend.emails.send({
         from: fromEmail,
         to: [email],
@@ -143,7 +125,6 @@ module.exports.sendNewRequestMailOnce = async (email, requestData) => {
       `,
       });
 
-      // Har batch ka error check karega
       if (error) {
         console.error(`Resend API Error`, error);
       }
@@ -155,9 +136,6 @@ module.exports.sendNewRequestMailOnce = async (email, requestData) => {
   }
 };
 
-/**
- * Sends a password reset OTP to a specific user.
- */
 module.exports.sendOTP = async (user, otp) => {
   try {
     const { data, error } = await resend.emails.send({
@@ -198,10 +176,9 @@ module.exports.sendOTP = async (user, otp) => {
       `,
     });
 
-    // NEW - This will print the detailed error from Resend
     if (error) {
-      console.error("Resend API Error:", error); // Log the full error object
-      throw new Error("Failed to send email via Resend."); // Throw a generic message
+      console.error("Resend API Error:", error);
+      throw new Error("Failed to send email via Resend.");
     }
 
     console.log("✅ OTP sent successfully via Resend to:", user.email);
@@ -210,9 +187,6 @@ module.exports.sendOTP = async (user, otp) => {
   }
 };
 
-/**
- * Sends a notification about the status of a user's uploaded note.
- */
 module.exports.sendVerificationMail = async (mail, status) => {
   try {
     const user = await User.findOne({ email: mail });
@@ -225,9 +199,8 @@ module.exports.sendVerificationMail = async (mail, status) => {
     }
 
     const isApproved = status === "Approved";
-    const statusColor = isApproved ? "#22c55e" : "#ef4444"; // Green or Red (Keeping these as success/error indicators, but styled w/ theme context)
+    const statusColor = isApproved ? "#22c55e" : "#ef4444";
 
-    // Using theme accents for container but status colors for the specific status
     const { data, error } = await resend.emails.send({
       from: fromEmail,
       to: [user.email],
@@ -276,9 +249,6 @@ module.exports.sendVerificationMail = async (mail, status) => {
   }
 };
 
-/**
- * Sends a notification about the user's account verification status.
- */
 module.exports.sendAccountVerificationMail = async (mail, status) => {
   try {
     const user = await User.findOne({ email: mail });

@@ -22,19 +22,19 @@ router.post("/oauth2callback", async (req, res) => {
 
     if (!user) {
       user = await User.create({
-        username: payload.email.split("@")[0], // simple username
+        username: payload.email.split("@")[0],
         name: payload.name,
         email: payload.email,
         avatar: payload.picture,
-        course: "B.Tech CSE", // or default
-        password: Math.random().toString(36).slice(-8), // dummy, will be hashed
+        course: "B.Tech CSE",
+        password: Math.random().toString(36).slice(-8),
       });
     }
 
     req.login(user, (err) => {
       if (err) throw err;
       console.log("loggedin");
-      res.json({ success: true, userId: user._id }); // send JSON
+      res.json({ success: true, userId: user._id });
     });
 
   } catch (err) {
@@ -44,15 +44,10 @@ router.post("/oauth2callback", async (req, res) => {
 });
 
 
-
-
-
 router.get("/auth/linkedin", (req, res) => {
   req.flash("success", "Linkedin Login is currently in development")
   res.redirect("/login-n");
 })
-
-
 
 
 router.get("/login-n", notLoggedIn, (req, res) => {
@@ -65,11 +60,9 @@ router.get("/register-n", notLoggedIn, (req, res) => {
 })
 
 
-
 router.post("/register", notLoggedIn, async (req, res) => {
   const { username, email, password, course, name, gender } = req.body;
   try {
-    // Check if username or email already exists
     const existingUser = await User.findOne({
       $or: [{ username }, { email: email.toLowerCase() }]
     });
@@ -79,7 +72,6 @@ router.post("/register", notLoggedIn, async (req, res) => {
       return res.redirect("/register-n");
     }
 
-    // Create new user
     const user = new User({
       username,
       name,
@@ -93,10 +85,8 @@ router.post("/register", notLoggedIn, async (req, res) => {
     req.flash("success", "Account created successfully! Please login.");
     res.redirect("/login-n");
   } catch (err) {
-    // Log error server-side for debugging
     console.error("Registration error:", err);
 
-    // Send generic error message to user
     req.flash("error", "Registration failed. Please try again.");
     res.redirect("/register-n");
   }
@@ -107,28 +97,24 @@ router.post("/login",
   passport.authenticate("local", {
     successRedirect: "/explore",
     failureRedirect: "/login-n",
-    failureFlash: true // this sends the message to req.flash("error")
+    failureFlash: true
   })
 );
 
 
-
 router.get('/logout', (req, res, next) => {
   req.logout(err => {
-    if (err) return next(err); // handle error
+    if (err) return next(err);
     req.flash("success", "Logged you out successfully!");
-    res.redirect('/login-n'); // redirect after logout
+    res.redirect('/login-n');
   });
 });
 
-// forgot page
 router.get("/forgot", (req, res) => {
   res.render("auth/forgot", { step: "email", title: "forgot password", showAds: false });
 });
 
 
-
-// send otp
 router.post("/forgot/send-otp", async (req, res) => {
   const { email } = req.body;
   const user = await User.findOne({ email });
@@ -142,7 +128,7 @@ router.post("/forgot/send-otp", async (req, res) => {
 
   const otp = Math.floor(100000 + Math.random() * 900000);
   user.resetOtp = otp;
-  user.otpExpiry = Date.now() + 10 * 60 * 1000; // 10min
+  user.otpExpiry = Date.now() + 10 * 60 * 1000;
   await user.save();
 
   console.log("OTP for", email, "is", otp);
@@ -161,8 +147,6 @@ router.post("/forgot/send-otp", async (req, res) => {
 });
 
 
-
-// verify otp + change password
 router.post("/forgot/verify", async (req, res) => {
   const { email, otp, password, confirmPassword } = req.body;
 
@@ -205,7 +189,6 @@ router.post("/forgot/verify", async (req, res) => {
   }
 
 
-  // 🚀 yaha plain-text set kar do, schema hook auto-hash karega
   user.password = password;
   user.resetOtp = undefined;
   user.otpExpiry = undefined;
@@ -216,8 +199,6 @@ router.post("/forgot/verify", async (req, res) => {
 });
 
 
-
-// resend otp
 router.post("/forgot/resend", async (req, res) => {
   const { email } = req.body;
   const user = await User.findOne({ email });

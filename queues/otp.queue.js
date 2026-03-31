@@ -9,7 +9,7 @@ const emailQueue = new Queue('otpEmailQueue', {
 async function addEmailJob(data, delay = 0) {
     await emailQueue.add('sendWelcomeEmail', data, {
         delay: delay,
-        attempts: 3, // Retry up to 3 times on failure
+        attempts: 3,
         backoff: {
             type: 'exponential',
             delay: 5000,

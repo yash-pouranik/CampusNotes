@@ -1,4 +1,3 @@
-// adminRoutes.js
 const express = require("express");
 const router = express.Router();
 const Note = require("../models/note");
@@ -7,7 +6,6 @@ const DownloadLog = require("../models/downloadLog");
 const RequestNote = require("../models/reqNotes");
 const { isLoggedIn, isModerator } = require("../middlewares");
 
-// GET FOR - Dashboard Stats
 router.get("/", isLoggedIn, isModerator, async (req, res) => {
 
   try {
@@ -19,7 +17,7 @@ router.get("/", isLoggedIn, isModerator, async (req, res) => {
       User.countDocuments(),
       Note.countDocuments(),
       Note.aggregate([{ $group: { _id: null, total: { $sum: "$downloadCount" } } }]),
-      User.find().sort({ createdAt: -1 }).limit(5).lean(), // Added .lean()
+      User.find().sort({ createdAt: -1 }).limit(5).lean(),
       Note.find({}).sort({ downloadCount: -1 }).limit(12).select("title course downloadCount").lean()
     ]);
 
@@ -27,11 +25,9 @@ router.get("/", isLoggedIn, isModerator, async (req, res) => {
     const totalDownloads = totalDownloadsAgg[0]?.total || 0;
     const downloadsLast7Days = await DownloadLog.countDocuments({ downloadedAt: { $gte: sevenDaysAgo } });
 
-    // === Unique Traffic Stats ===
     const totalUniqueDownloads = await DownloadLog.countDocuments();
     const uniqueSessions = (await DownloadLog.distinct("downloaderId")).length;
     const uniqueIps = (await DownloadLog.distinct("ip")).length;
-
 
 
     const LastDownloads = await DownloadLog.find()
@@ -39,7 +35,6 @@ router.get("/", isLoggedIn, isModerator, async (req, res) => {
       .sort({ downloadedAt: -1 })
       .limit(10);
 
-    // === User Engagement ===
     const newSignups = await User.countDocuments({ createdAt: { $gte: sevenDaysAgo } });
     const verifiedUsers = await User.countDocuments({ "verification.verified": true });
     const unverifiedUsers = totalUsers - verifiedUsers;
@@ -49,7 +44,6 @@ router.get("/", isLoggedIn, isModerator, async (req, res) => {
       { $limit: 3 }
     ]);
 
-    // === Content & Moderation ===
     const notesPendingVerification = await Note.countDocuments({ isVerified: false });
     const newNoteUploads = await Note.countDocuments({ createdAt: { $gte: sevenDaysAgo } });
 
@@ -58,7 +52,6 @@ router.get("/", isLoggedIn, isModerator, async (req, res) => {
       { $sort: { notes: -1 } },
     ]);
 
-    // === Daily Downloads (Last 7 Days) for Line Chart ===
     const dailyDownloads = await DownloadLog.aggregate([
       { $match: { downloadedAt: { $gte: sevenDaysAgo } } },
       {
@@ -70,7 +63,6 @@ router.get("/", isLoggedIn, isModerator, async (req, res) => {
       { $sort: { _id: 1 } }
     ]);
 
-    // Fill in missing days with 0
     const last7DaysData = [];
     for (let i = 6; i >= 0; i--) {
       const d = new Date();
@@ -81,28 +73,24 @@ router.get("/", isLoggedIn, isModerator, async (req, res) => {
     }
 
     res.render("admin/adminDashboard", {
-      // Core Stats
       totalUsers,
       totalNotes,
       totalDownloads,
       downloadsLast7Days,
-      // Unique Traffic
       totalUniqueDownloads,
       uniqueSessions,
       uniqueIps,
-      // User Engagement
       newSignups,
       verifiedUsers,
       unverifiedUsers,
       topContributors,
-      // Content & Moderation
       notesPendingVerification,
       newNoteUploads,
       topNotes,
       courseWise,
       fiveLastUsers,
       LastDownloads,
-      last7DaysData // Passed for Line Chart
+      last7DaysData
     });
   } catch (err) {
     console.error("Admin Dashboard Error:", err);
@@ -110,7 +98,6 @@ router.get("/", isLoggedIn, isModerator, async (req, res) => {
   }
 });
 
-// GET FOR - User Management Page
 router.get("/users", isLoggedIn, isModerator, async (req, res) => {
   try {
     const { q } = req.query;
@@ -154,7 +141,6 @@ router.get("/users", isLoggedIn, isModerator, async (req, res) => {
   }
 });
 
-// POST FOR - Toggle Block User
 router.post("/users/:id/toggle-block", isLoggedIn, isModerator, async (req, res) => {
   try {
     const { id } = req.params;
@@ -165,7 +151,6 @@ router.post("/users/:id/toggle-block", isLoggedIn, isModerator, async (req, res)
       return res.redirect("back");
     }
 
-    // Don't block self
     if (user._id.toString() === req.user._id.toString()) {
       req.flash("error", "You cannot block yourself.");
       return res.redirect("back");

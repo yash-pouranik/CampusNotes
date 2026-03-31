@@ -1,4 +1,3 @@
-// yash-pouranik/campusnotes/CampusNotes-00dc19acc7e2ab4dd04f19bd9f985da839b07861/middlewares.js
 
 module.exports.isLoggedIn = (req, res, next) => {
   if (!req.isAuthenticated()) {
