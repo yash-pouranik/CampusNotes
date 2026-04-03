@@ -19,6 +19,9 @@ const worker = new Worker('bulkEmailQueue', async job => {
             await sendNewRequestMailOnce(email, job.data.requestData);
         }
     } catch (err) {
+        if (err.code === 'QUOTA_EXCEEDED') {
+            console.warn(`🕒 Quota reached. Delaying job ${job.id} for retry.`);
+        }
         console.error(`❌ Error in worker handler for ${job.id}:`, err.message);
         throw err;
     }
