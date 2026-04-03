@@ -5,6 +5,7 @@ const User = require("../models/user");
 const DownloadLog = require("../models/downloadLog");
 const RequestNote = require("../models/reqNotes");
 const { isLoggedIn, isModerator } = require("../middlewares");
+const { queueInvitationEmails } = require("../queues/bulkEmail.queue");
 
 router.get("/", isLoggedIn, isModerator, async (req, res) => {
 
@@ -164,6 +165,61 @@ router.post("/users/:id/toggle-block", isLoggedIn, isModerator, async (req, res)
   } catch (err) {
     console.error(err);
     req.flash("error", "Something went wrong.");
+    res.redirect("back");
+  }
+});
+
+router.get("/bulk-invite", isLoggedIn, isModerator, async (req, res) => {
+  res.render("admin/bulkInvite", {
+    title: "Bulk Invite | CampusNotes",
+    success: req.flash("success"),
+    error: req.flash("error")
+  });
+});
+
+router.post("/bulk-invite", isLoggedIn, isModerator, async (req, res) => {
+  try {
+    const { studentData } = req.body;
+    if (!studentData) {
+      req.flash("error", "No data provided.");
+      return res.redirect("back");
+    }
+
+    const lines = studentData.split("\n").filter(l => l.trim().length > 0);
+    const students = lines.map(line => {
+      const parts = line.split(",").map(p => p.trim());
+      if (parts.length >= 2) {
+        return { name: parts[0], email: parts[1] };
+      } else if (parts.length === 1 && parts[0].includes("@")) {
+        return { name: "Student", email: parts[0] };
+      }
+      return null;
+    }).filter(s => s !== null);
+
+    if (students.length === 0) {
+      req.flash("error", "Invalid data format. Please use 'Name, Email' format.");
+      return res.redirect("back");
+    }
+
+    const [totalUsers, totalNotes, totalDownloadsAgg] = await Promise.all([
+      User.countDocuments(),
+      Note.countDocuments(),
+      Note.aggregate([{ $group: { _id: null, total: { $sum: "$downloadCount" } } }])
+    ]);
+
+    const stats = {
+      totalUsers: totalUsers || 0,
+      totalNotes: totalNotes || 0,
+      totalDownloads: totalDownloadsAgg[0]?.total || 0
+    };
+
+    await queueInvitationEmails(students, stats);
+
+    req.flash("success", `Successfully queued invitations for ${students.length} students!`);
+    res.redirect("back");
+  } catch (err) {
+    console.error("Bulk Invite Error:", err);
+    req.flash("error", "Failed to queue invitations. Please check server logs.");
     res.redirect("back");
   }
 });
