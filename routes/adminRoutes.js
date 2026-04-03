@@ -6,6 +6,7 @@ const DownloadLog = require("../models/downloadLog");
 const RequestNote = require("../models/reqNotes");
 const { isLoggedIn, isModerator } = require("../middlewares");
 const { queueInvitationEmails } = require("../queues/bulkEmail.queue");
+const emailLimiter = require("../services/emailLimiter");
 
 router.get("/", isLoggedIn, isModerator, async (req, res) => {
 
@@ -91,7 +92,8 @@ router.get("/", isLoggedIn, isModerator, async (req, res) => {
       courseWise,
       fiveLastUsers,
       LastDownloads,
-      last7DaysData
+      last7DaysData,
+      emailStatus: await emailLimiter.getStatus()
     });
   } catch (err) {
     console.error("Admin Dashboard Error:", err);

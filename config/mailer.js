@@ -1,5 +1,6 @@
 const { Resend } = require("resend");
 const User = require("../models/user");
+const emailLimiter = require("../services/emailLimiter");
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const fromEmail = "CampusNotes <campusnotes@bitbros.in>";
@@ -14,6 +15,31 @@ const COLORS = {
   textMuted: "#6B7280", // Medium gray
   border: "#E5E7EB" // Light gray border
 };
+
+/**
+ * Internal helper to send emails with quota checking.
+ * Throws error if quota exceeded, so BullMQ can retry later.
+ */
+async function safeSend(mailOptions, type = "bulk") {
+  const recipients = Array.isArray(mailOptions.to) ? mailOptions.to.length : 1;
+  const { canSend, count } = await emailLimiter.checkQuota(type, recipients);
+
+  if (!canSend) {
+    const error = new Error(`Quota exceeded for ${type} emails. Daily limit: ${emailLimiter.DAILY_LIMIT}, Current count: ${count}, Requested: ${recipients}`);
+    error.code = "QUOTA_EXCEEDED";
+    throw error;
+  }
+
+  const { data, error } = await resend.emails.send(mailOptions);
+
+  if (error) {
+    console.error(`Resend API Error:`, error);
+    throw new Error(error.message || "Email delivery failed");
+  }
+
+  await emailLimiter.incrementSent(recipients);
+  return data;
+}
 
 
 module.exports.sendNewRequestMail = async (requestData) => {
@@ -37,7 +63,7 @@ module.exports.sendNewRequestMail = async (requestData) => {
 
       console.log(`Sending mail to batch ${Math.floor(i / batchSize) + 1}...`);
 
-      const { data, error } = await resend.emails.send({
+      await safeSend({
         from: fromEmail,
         to: batch,
         subject: "New Notes Request Posted!",
@@ -76,26 +102,22 @@ module.exports.sendNewRequestMail = async (requestData) => {
           </div>
         </div>
       `,
-      });
+      }, "bulk");
 
-      if (error) {
-        console.error(`Resend API Error (Batch ${Math.floor(i / batchSize) + 1}):`, error);
-        continue;
-      }
-
-      console.log(`✅ Batch ${Math.floor(i / batchSize) + 1} sent:`, data.id);
+      console.log(`✅ Batch ${Math.floor(i / batchSize) + 1} sent.`);
     }
 
     console.log("✅ All new request email batches processed.");
 
   } catch (err) {
     console.error("❌ Error in sendNewRequestMail function:", err.message);
+    throw err; // Allow queue to retry
   }
 };
 
 module.exports.sendNewRequestMailOnce = async (email, requestData) => {
   try {
-      const { data, error } = await resend.emails.send({
+      await safeSend({
         from: fromEmail,
         to: [email],
         subject: "New Notes Request Posted!",
@@ -134,22 +156,17 @@ module.exports.sendNewRequestMailOnce = async (email, requestData) => {
           </div>
         </div>
       `,
-      });
-
-      if (error) {
-        console.error(`Resend API Error`, error);
-      }
-
-      console.log(`Mail sent to ${email}`);
+      }, "bulk");
 
   } catch (err) {
-    console.error("❌ Error in sendNewRequestMail function:", err.message);
+    console.error("❌ Error in sendNewRequestMailOnce function:", err.message);
+    throw err;
   }
 };
 
 module.exports.sendOTP = async (user, otp) => {
   try {
-    const { data, error } = await resend.emails.send({
+    await safeSend({
       from: fromEmail,
       to: [user.email],
       subject: "OTP for Password Reset!",
@@ -185,16 +202,12 @@ module.exports.sendOTP = async (user, otp) => {
           </div>
         </div>
       `,
-    });
+    }, "critical");
 
-    if (error) {
-      console.error("Resend API Error:", error);
-      throw new Error("Failed to send email via Resend.");
-    }
-
-    console.log("✅ OTP sent successfully via Resend to:", user.email);
+    console.log("✅ OTP processed via safeSend to:", user.email);
   } catch (err) {
-    console.error("❌ Error sending OTP:", err);
+    console.error("❌ Error sending OTP:", err.message);
+    throw err;
   }
 };
 
@@ -212,7 +225,7 @@ module.exports.sendVerificationMail = async (mail, status) => {
     const isApproved = status === "Approved";
     const statusColor = isApproved ? "#22c55e" : "#ef4444";
 
-    const { data, error } = await resend.emails.send({
+    await safeSend({
       from: fromEmail,
       to: [user.email],
       subject: `Your uploaded note is ${status}`,
@@ -248,15 +261,12 @@ module.exports.sendVerificationMail = async (mail, status) => {
           </div>
         </div>
       `,
-    });
+    }, "critical");
 
-    if (error) {
-      throw new Error(error);
-    }
-
-    console.log("✅ Note status mail sent successfully to:", user.email);
+    console.log("✅ Note status mail processed via safeSend to:", user.email);
   } catch (err) {
-    console.error("❌ Error sending verification mail:", err);
+    console.error("❌ Error sending verification mail:", err.message);
+    throw err;
   }
 };
 
@@ -271,7 +281,7 @@ module.exports.sendAccountVerificationMail = async (mail, status) => {
     const isVerified = status === "Verified";
     const statusColor = isVerified ? "#22c55e" : "#ef4444";
 
-    const { data, error } = await resend.emails.send({
+    await safeSend({
       from: fromEmail,
       to: [user.email],
       subject: `Your CampusNotes Account is ${status}`,
@@ -305,21 +315,18 @@ module.exports.sendAccountVerificationMail = async (mail, status) => {
           </div>
         </div>
       `,
-    });
+    }, "critical");
 
-    if (error) {
-      throw new Error(error);
-    }
-
-    console.log("✅ Account status mail sent successfully to:", user.email);
+    console.log("✅ Account status mail processed via safeSend to:", user.email);
   } catch (err) {
-    console.error("❌ Error sending account verification mail:", err);
+    console.error("❌ Error sending account verification mail:", err.message);
+    throw err;
   }
 };
 
 module.exports.sendInvitationMail = async (email, name, stats) => {
   try {
-    const { data, error } = await resend.emails.send({
+    await safeSend({
       from: fromEmail,
       to: [email],
       subject: "Join your peers on CampusNotes 🎓",
@@ -375,12 +382,10 @@ module.exports.sendInvitationMail = async (email, name, stats) => {
           </div>
         </div>
       `,
-    });
+    }, "bulk");
 
-    if (error) {
-      console.error("Resend API Error (Invitation):", error);
-    }
   } catch (err) {
     console.error("❌ Error in sendInvitationMail:", err.message);
+    throw err;
   }
 };

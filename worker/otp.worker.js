@@ -5,8 +5,15 @@ const redisConnection = require("../config/redis")
 
 
 const worker = new Worker('otpEmailQueue', async job => {
-    const { user, otp } = job.data;
-    await sendOTP(user, otp);
+    try {
+        const { user, otp } = job.data;
+        await sendOTP(user, otp);
+    } catch (err) {
+        if (err.code === 'QUOTA_EXCEEDED') {
+            console.error(`🔴 HARD LIMIT REACHED: OTP for ${job.data.user.email} failed.`);
+        }
+        throw err;
+    }
 }, { connection: redisConnection });
 
 worker.on('completed', job => {

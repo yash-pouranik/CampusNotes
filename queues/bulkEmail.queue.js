@@ -24,8 +24,8 @@ async function queueBulkEmails(requestData) {
                 'sendBulkEmail',
                 { email: user.email, requestData },
                 {
-                    attempts: 3,
-                    backoff: { type: 'exponential', delay: 5000 },
+                    attempts: 30,            // up to 30 retries = 30 hours coverage
+                    backoff: { type: 'fixed', delay: 3600000 }, // retry every 1 hour
                     removeOnComplete: true,
                     removeOnFail: false,
                 }
@@ -45,8 +45,8 @@ async function queueInvitationEmails(students, stats) {
                 'sendInvitationEmail',
                 { email: student.email, name: student.name, stats },
                 {
-                    attempts: 3,
-                    backoff: { type: 'exponential', delay: 5000 },
+                    attempts: 30,            // up to 30 retries = 30 hours coverage
+                    backoff: { type: 'fixed', delay: 3600000 }, // retry every 1 hour
                     removeOnComplete: true,
                     removeOnFail: false,
                 }
