@@ -38,4 +38,24 @@ async function queueBulkEmails(requestData) {
     }
 }
 
-module.exports = { queueBulkEmails };
+async function queueInvitationEmails(students, stats) {
+    try {
+        for (const student of students) {
+            await bulkEmailQueue.add(
+                'sendInvitationEmail',
+                { email: student.email, name: student.name, stats },
+                {
+                    attempts: 3,
+                    backoff: { type: 'exponential', delay: 5000 },
+                    removeOnComplete: true,
+                    removeOnFail: false,
+                }
+            );
+        }
+        console.log(`✅ Queued ${students.length} invitation email jobs.`);
+    } catch (err) {
+        console.error("❌ Error queueing invitation emails:", err.message);
+    }
+}
+
+module.exports = { queueBulkEmails, queueInvitationEmails };
