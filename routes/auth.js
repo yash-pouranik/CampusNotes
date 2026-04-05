@@ -1,4 +1,5 @@
 const express = require('express');
+const crypto = require('crypto');
 const passport = require('passport');
 const router = express.Router();
 const User = require("../models/user")
@@ -21,13 +22,22 @@ router.post("/oauth2callback", async (req, res) => {
     let user = await User.findOne({ email: payload.email });
 
     if (!user) {
+      let baseUsername = payload.email.split("@")[0];
+      let username = baseUsername;
+
+      // Handle username collision by appending random suffix
+      const existingUsername = await User.findOne({ username });
+      if (existingUsername) {
+        username = `${baseUsername}_${crypto.randomBytes(3).toString('hex')}`;
+      }
+
       user = await User.create({
-        username: payload.email.split("@")[0],
+        username,
         name: payload.name,
         email: payload.email,
         avatar: payload.picture,
         course: "B.Tech CSE",
-        password: Math.random().toString(36).slice(-8),
+        password: crypto.randomBytes(32).toString('hex'),
       });
     }
 
@@ -131,7 +141,7 @@ router.post("/forgot/send-otp", async (req, res) => {
   user.otpExpiry = Date.now() + 10 * 60 * 1000;
   await user.save();
 
-  console.log("OTP for", email, "is", otp);
+  // OTP is sent via email — not logged to console for security
   const data = {
     user: user,
     otp: otp
@@ -215,7 +225,9 @@ router.post("/forgot/resend", async (req, res) => {
   user.otpExpiry = Date.now() + 10 * 60 * 1000;
   await user.save();
 
-  console.log("Resent OTP for", email, "is", otp);
+  // Send the OTP email (was missing — OTP was generated but never sent)
+  const data = { user, otp };
+  addEmailJob(data, 5000);
 
   res.render("auth/forgot", {
     step: "otp",
