@@ -43,10 +43,13 @@ router.post("/oauth2callback", async (req, res) => {
           break; // Success — exit retry loop
         } catch (err) {
           // 11000 = MongoDB duplicate key error — retry with a new suffix
-          if (err.code === 11000 && err.keyPattern?.username && attempt < MAX_RETRIES - 1) {
-            continue;
+          if (err.code === 11000 && err.keyPattern?.username) {
+            if (attempt < MAX_RETRIES - 1) continue;
+            // All retries exhausted — this is a server-side issue, not an auth failure
+            console.error("Username allocation exhausted for:", payload.email);
+            return res.status(500).json({ success: false, error: "Account creation failed. Please try again." });
           }
-          throw err; // Non-username error or max retries exhausted
+          throw err; // Non-username error — bubble to outer catch
         }
       }
     }
@@ -151,10 +154,10 @@ router.post("/forgot/send-otp", async (req, res) => {
   user.otpExpiry = Date.now() + 10 * 60 * 1000;
   await user.save();
 
-  // OTP is sent via email — not logged to console for security
+  // Only send the minimal fields the mailer needs — avoid serializing the full Mongoose document
   const data = {
-    user: user,
-    otp: otp
+    user: { email: user.email, name: user.name, username: user.username },
+    otp
   };
   addEmailJob(data, 5000)
 
@@ -235,8 +238,11 @@ router.post("/forgot/resend", async (req, res) => {
   user.otpExpiry = Date.now() + 10 * 60 * 1000;
   await user.save();
 
-  // Send the OTP email (was missing — OTP was generated but never sent)
-  const data = { user, otp };
+  // Only send the minimal fields the mailer needs — avoid serializing the full Mongoose document
+  const data = {
+    user: { email: user.email, name: user.name, username: user.username },
+    otp
+  };
   addEmailJob(data, 5000);
 
   res.render("auth/forgot", {
