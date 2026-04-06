@@ -22,23 +22,33 @@ router.post("/oauth2callback", async (req, res) => {
     let user = await User.findOne({ email: payload.email });
 
     if (!user) {
-      let baseUsername = payload.email.split("@")[0];
-      let username = baseUsername;
+      const baseUsername = payload.email.split("@")[0];
 
-      // Handle username collision by appending random suffix
-      const existingUsername = await User.findOne({ username });
-      if (existingUsername) {
-        username = `${baseUsername}_${crypto.randomBytes(3).toString('hex')}`;
+      // Retry loop to handle username collision atomically (avoids TOCTOU race)
+      const MAX_RETRIES = 5;
+      for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+        try {
+          const username = attempt === 0
+            ? baseUsername
+            : `${baseUsername}_${crypto.randomBytes(3).toString('hex')}`;
+
+          user = await User.create({
+            username,
+            name: payload.name,
+            email: payload.email,
+            avatar: payload.picture,
+            course: "B.Tech CSE",
+            password: crypto.randomBytes(32).toString('hex'),
+          });
+          break; // Success — exit retry loop
+        } catch (err) {
+          // 11000 = MongoDB duplicate key error — retry with a new suffix
+          if (err.code === 11000 && err.keyPattern?.username && attempt < MAX_RETRIES - 1) {
+            continue;
+          }
+          throw err; // Non-username error or max retries exhausted
+        }
       }
-
-      user = await User.create({
-        username,
-        name: payload.name,
-        email: payload.email,
-        avatar: payload.picture,
-        course: "B.Tech CSE",
-        password: crypto.randomBytes(32).toString('hex'),
-      });
     }
 
     req.login(user, (err) => {
@@ -136,7 +146,7 @@ router.post("/forgot/send-otp", async (req, res) => {
     });
   }
 
-  const otp = Math.floor(100000 + Math.random() * 900000);
+  const otp = crypto.randomInt(100000, 999999);
   user.resetOtp = otp;
   user.otpExpiry = Date.now() + 10 * 60 * 1000;
   await user.save();
@@ -220,7 +230,7 @@ router.post("/forgot/resend", async (req, res) => {
     });
   }
 
-  const otp = Math.floor(100000 + Math.random() * 900000);
+  const otp = crypto.randomInt(100000, 999999);
   user.resetOtp = otp;
   user.otpExpiry = Date.now() + 10 * 60 * 1000;
   await user.save();
