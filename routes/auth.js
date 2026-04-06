@@ -1,4 +1,5 @@
 const express = require('express');
+const crypto = require('crypto');
 const passport = require('passport');
 const router = express.Router();
 const User = require("../models/user")
@@ -21,14 +22,36 @@ router.post("/oauth2callback", async (req, res) => {
     let user = await User.findOne({ email: payload.email });
 
     if (!user) {
-      user = await User.create({
-        username: payload.email.split("@")[0],
-        name: payload.name,
-        email: payload.email,
-        avatar: payload.picture,
-        course: "B.Tech CSE",
-        password: Math.random().toString(36).slice(-8),
-      });
+      const baseUsername = payload.email.split("@")[0];
+
+      // Retry loop to handle username collision atomically (avoids TOCTOU race)
+      const MAX_RETRIES = 5;
+      for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+        try {
+          const username = attempt === 0
+            ? baseUsername
+            : `${baseUsername}_${crypto.randomBytes(3).toString('hex')}`;
+
+          user = await User.create({
+            username,
+            name: payload.name,
+            email: payload.email,
+            avatar: payload.picture,
+            course: "B.Tech CSE",
+            password: crypto.randomBytes(32).toString('hex'),
+          });
+          break;
+        } catch (err) {
+          if (err.code === 11000 && err.keyPattern?.username) {
+            if (attempt < MAX_RETRIES - 1) continue;
+            // All retries exhausted — this is a server-side issue, not an auth failure
+            const redactedEmail = crypto.createHash('sha256').update(payload.email).digest('hex').slice(0, 12);
+            console.error("Username allocation exhausted for user [hash:", redactedEmail, "]");
+            return res.status(500).json({ success: false, error: "Account creation failed. Please try again." });
+          }
+          throw err; // Non-username error — bubble to outer catch
+        }
+      }
     }
 
     req.login(user, (err) => {
@@ -126,15 +149,15 @@ router.post("/forgot/send-otp", async (req, res) => {
     });
   }
 
-  const otp = Math.floor(100000 + Math.random() * 900000);
+  const otp = crypto.randomInt(100000, 999999);
   user.resetOtp = otp;
   user.otpExpiry = Date.now() + 10 * 60 * 1000;
   await user.save();
 
-  console.log("OTP for", email, "is", otp);
+  // Only send the minimal fields the mailer needs — avoid serializing the full Mongoose document
   const data = {
-    user: user,
-    otp: otp
+    user: { email: user.email, name: user.name, username: user.username },
+    otp
   };
   addEmailJob(data, 5000)
 
@@ -210,12 +233,28 @@ router.post("/forgot/resend", async (req, res) => {
     });
   }
 
-  const otp = Math.floor(100000 + Math.random() * 900000);
+  const otp = crypto.randomInt(100000, 999999);
   user.resetOtp = otp;
   user.otpExpiry = Date.now() + 10 * 60 * 1000;
   await user.save();
 
-  console.log("Resent OTP for", email, "is", otp);
+  // Only send the minimal fields the mailer needs — avoid serializing the full Mongoose document
+  const data = {
+    user: { email: user.email, name: user.name, username: user.username },
+    otp
+  };
+
+  try {
+    await addEmailJob(data, 5000);
+  } catch (err) {
+    console.error("Failed to enqueue OTP resend email:", err.message);
+    return res.render("auth/forgot", {
+      step: "otp",
+      email,
+      flash: { type: "error", message: "Failed to resend OTP. Please try again." },
+      title: "forgot password"
+    });
+  }
 
   res.render("auth/forgot", {
     step: "otp",
