@@ -40,13 +40,13 @@ router.post("/oauth2callback", async (req, res) => {
             course: "B.Tech CSE",
             password: crypto.randomBytes(32).toString('hex'),
           });
-          break; // Success — exit retry loop
+          break;
         } catch (err) {
-          // 11000 = MongoDB duplicate key error — retry with a new suffix
           if (err.code === 11000 && err.keyPattern?.username) {
             if (attempt < MAX_RETRIES - 1) continue;
             // All retries exhausted — this is a server-side issue, not an auth failure
-            console.error("Username allocation exhausted for:", payload.email);
+            const redactedEmail = crypto.createHash('sha256').update(payload.email).digest('hex').slice(0, 12);
+            console.error("Username allocation exhausted for user [hash:", redactedEmail, "]");
             return res.status(500).json({ success: false, error: "Account creation failed. Please try again." });
           }
           throw err; // Non-username error — bubble to outer catch
@@ -243,7 +243,18 @@ router.post("/forgot/resend", async (req, res) => {
     user: { email: user.email, name: user.name, username: user.username },
     otp
   };
-  addEmailJob(data, 5000);
+
+  try {
+    await addEmailJob(data, 5000);
+  } catch (err) {
+    console.error("Failed to enqueue OTP resend email:", err.message);
+    return res.render("auth/forgot", {
+      step: "otp",
+      email,
+      flash: { type: "error", message: "Failed to resend OTP. Please try again." },
+      title: "forgot password"
+    });
+  }
 
   res.render("auth/forgot", {
     step: "otp",
