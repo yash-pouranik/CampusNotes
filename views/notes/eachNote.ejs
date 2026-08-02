@@ -61,9 +61,53 @@
     .prose-invert {
       color: #d1d5db;
     }
-    .prose-invert strong { color: #fff; }
+    .prose-invert strong { color: #fff; font-weight: 600; }
+    .prose-invert em { font-style: italic; }
     .prose-invert ul { list-style-type: disc; padding-left: 1.5rem; margin: 1rem 0; }
+    .prose-invert ol { list-style-type: decimal; padding-left: 1.5rem; margin: 1rem 0; }
     .prose-invert li { margin-bottom: 0.5rem; }
+    .prose-invert p { margin-bottom: 0.75rem; line-height: 1.6; }
+    .prose-invert p:last-child { margin-bottom: 0; }
+    .prose-invert h1, .prose-invert h2, .prose-invert h3, .prose-invert h4, .prose-invert h5, .prose-invert h6 {
+      color: #fff;
+      font-weight: 700;
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .prose-invert h1 { font-size: 1.5rem; }
+    .prose-invert h2 { font-size: 1.35rem; }
+    .prose-invert h3 { font-size: 1.2rem; }
+    .prose-invert h4 { font-size: 1.1rem; }
+    .prose-invert a { color: #3b82f6; text-decoration: underline; }
+    .prose-invert a:hover { color: #60a5fa; }
+    .prose-invert blockquote {
+      border-left: 4px solid #4b5563;
+      padding-left: 1rem;
+      margin: 1rem 0;
+      color: #9ca3af;
+      font-style: italic;
+    }
+    .prose-invert code {
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 0.2rem 0.4rem;
+      border-radius: 0.25rem;
+      font-size: 0.875em;
+      font-family: monospace;
+    }
+    .prose-invert pre {
+      background-color: rgba(0, 0, 0, 0.3);
+      padding: 1rem;
+      border-radius: 0.5rem;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+    .prose-invert pre code {
+      background-color: transparent;
+      padding: 0;
+      border-radius: 0;
+      font-size: inherit;
+      color: inherit;
+    }
   </style>
 </head>
 
@@ -255,9 +299,11 @@
                  </div>
                  
                  <div class="mt-6">
-                     <span class="text-xs uppercase font-bold tracking-wider text-gray-500 block mb-2">Description</span>
-                     <p class="text-sm text-gray-400 leading-relaxed"><%= note.description || 'No description provided.' %></p>
-                 </div>
+                      <span class="text-xs uppercase font-bold tracking-wider text-gray-500 block mb-2">Description</span>
+                      <div id="note-description-container" class="text-sm text-gray-400 leading-relaxed prose-invert">
+                          <%= note.description || 'No description provided.' %>
+                      </div>
+                  </div>
 
                  <!-- OWNER CONTROLS -->
                  <% if (typeof currUser !== 'undefined' &&
@@ -378,6 +424,17 @@
 
 
     document.addEventListener('DOMContentLoaded', async () => {
+        // Render description markdown
+        try {
+            const rawDescription = <%- JSON.stringify(note.description || 'No description provided.') %>;
+            const descriptionContainer = document.getElementById('note-description-container');
+            if (descriptionContainer && rawDescription) {
+                descriptionContainer.innerHTML = converter.makeHtml(rawDescription);
+            }
+        } catch (e) {
+            console.error("Error rendering description", e);
+        }
+
         try {
             const res = await axios.get(`/api/notes/${noteId}/check-pdf`);
             if (res.data.isTyped) {
