@@ -14,7 +14,7 @@ const Subscriber = require("../models/Subscriber");
 
 router.get("/notes/list", isLoggedIn, async (req, res) => {
     try {
-        const notes = await Note.find({}, "_id title").sort({ createdAt: -1 });
+        const notes = await Note.find({}, "_id slug title").sort({ createdAt: -1 });
         res.json(notes);
     } catch (error) {
         console.error("Error fetching note list:", error);
@@ -25,7 +25,10 @@ router.get("/notes/list", isLoggedIn, async (req, res) => {
 
 router.post("/notes/:id/ask", isLoggedIn, async (req, res) => {
     try {
-        const note = await Note.findById(req.params.id);
+        const note = mongoose.Types.ObjectId.isValid(req.params.id) 
+            ? await Note.findById(req.params.id) 
+            : await Note.findOne({ slug: req.params.id });
+
         if (!note) {
             return res.status(404).json({ error: "Note not found." });
         }
@@ -63,7 +66,10 @@ router.post("/notes/:id/ask", isLoggedIn, async (req, res) => {
 
 router.get("/notes/:id/check-pdf", async (req, res) => {
     try {
-        const note = await Note.findById(req.params.id);
+        const note = mongoose.Types.ObjectId.isValid(req.params.id) 
+            ? await Note.findById(req.params.id) 
+            : await Note.findOne({ slug: req.params.id });
+
         if (!note) {
             return res.status(404).json({ error: "Note not found." });
         }
@@ -103,7 +109,6 @@ router.get("/notes/:sec", async (req, res) => {
 
         const notes = await Note.find()
             .populate("uploadedBy", "username socialLinks");
-
 
         return res.json(notes);
 

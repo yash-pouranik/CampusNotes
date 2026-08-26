@@ -7,8 +7,15 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
   
-  <!-- Font Awesome (Preserving existing dep if needed, but switching main UI to Material) -->
+  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+
+  <!-- Schema.org Structured Data (JSON-LD) for Rich Google Snippets -->
+  <% if (typeof schemaData !== 'undefined' && schemaData) { %>
+    <script type="application/ld+json">
+      <%- schemaData %>
+    </script>
+  <% } %>
 
   <!-- Tailwind CSS & Config -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -18,12 +25,12 @@
       theme: {
         extend: {
           colors: {
-            "primary": "#FF5722", // Core Orange
+            "primary": "#FF5722",
             "primary-hover": "#F4511E",
             "accent-blue": "#3B82F6",
             "accent-green": "#22C55E",
             "accent-purple": "#A855F7",
-            "background-dark": "#050505", // Deep Black
+            "background-dark": "#050505",
             "surface-dark": "#0A0A0A",
             "surface-dark-lighter": "#171717",
             "border-dark": "#27272A",
@@ -57,7 +64,7 @@
       border: 1px solid #27272A;
     }
 
-    /* Markdown Styles for AI Output */
+    /* Markdown Styles for Server Rendered AI Output */
     .prose-invert {
       color: #d1d5db;
     }
@@ -94,20 +101,6 @@
       font-size: 0.875em;
       font-family: monospace;
     }
-    .prose-invert pre {
-      background-color: rgba(0, 0, 0, 0.3);
-      padding: 1rem;
-      border-radius: 0.5rem;
-      overflow-x: auto;
-      margin: 1rem 0;
-    }
-    .prose-invert pre code {
-      background-color: transparent;
-      padding: 0;
-      border-radius: 0;
-      font-size: inherit;
-      color: inherit;
-    }
   </style>
 </head>
 
@@ -115,9 +108,30 @@
   
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     
+    <!-- SEO Breadcrumb Navigation -->
+    <nav class="flex items-center text-xs text-gray-400 mb-6 gap-2 flex-wrap" aria-label="Breadcrumb">
+      <a href="/" class="hover:text-primary transition-colors flex items-center gap-1">
+        <span class="material-icons-outlined text-sm">home</span> Home
+      </a>
+      <span>/</span>
+      <a href="/explore" class="hover:text-primary transition-colors">Explore</a>
+      <% if (note.course) { %>
+        <span>/</span>
+        <a href="/explore?course=<%= encodeURIComponent(note.course) %>" class="hover:text-primary transition-colors"><%= note.course %></a>
+      <% } %>
+      <% if (note.semester) { %>
+        <span>/</span>
+        <a href="/explore?course=<%= encodeURIComponent(note.course || '') %>&semester=<%= note.semester %>" class="hover:text-primary transition-colors">Sem <%= note.semester %></a>
+      <% } %>
+      <% if (note.subject && note.subject.name) { %>
+        <span>/</span>
+        <span class="text-gray-300 font-medium truncate max-w-[200px]"><%= note.subject.name %></span>
+      <% } %>
+    </nav>
+
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
       
-      <!-- LEFT COLUMN: PREVIEWER (Col Span 2) -->
+      <!-- LEFT COLUMN: PREVIEWER & RICH CONTENT (Col Span 2) -->
       <main class="lg:col-span-2 space-y-8">
         
         <!-- Preview Card -->
@@ -126,9 +140,11 @@
            <div class="px-4 py-3 border-b border-border-dark bg-surface-dark-lighter flex justify-between items-center">
               <div class="flex items-center gap-2 text-sm text-gray-400">
                 <span class="material-icons-outlined text-base">visibility</span>
-                Preview Mode
+                Document Preview
               </div>
-              <!-- 'Open Original' removed to ensure download tracking via main button -->
+              <a href="/notes/<%= note.slug || note._id %>/download" class="text-xs text-primary hover:underline flex items-center gap-1">
+                <span class="material-icons-outlined text-sm">download</span> Quick Download
+              </a>
            </div>
 
            <!-- Content -->
@@ -151,7 +167,7 @@
                 <% if (fileId) { %>
                   <iframe 
                     src="https://docs.google.com/gview?url=https://drive.google.com/uc?export=download&id=<%= fileId %>&embedded=true" 
-                    class="w-full h-[800px] border-none" 
+                    class="w-full h-[700px] border-none" 
                     allow="autoplay">
                   </iframe>
                 <% } else { %>
@@ -164,21 +180,108 @@
               <% } else if (note.fileUrl.toLowerCase().endsWith('.pdf')) { %>
                 <iframe 
                   src="<%= note.fileUrl %>#toolbar=0" 
-                  class="w-full h-[800px] border-none">
+                  class="w-full h-[700px] border-none">
                 </iframe>
             
               <% } else if (/\.(jpg|jpeg|png|gif|webp|avif)$/i.test(note.fileUrl)) { %>
-                <img src="<%= note.fileUrl %>" class="w-full h-auto object-contain" alt="Note Preview">
+                <img src="<%= note.fileUrl %>" class="w-full h-auto object-contain" alt="<%= note.title %> Preview">
                 
               <% } else { %>
                 <div class="flex flex-col items-center justify-center h-full p-12 text-center text-gray-500">
                   <span class="material-icons-outlined text-4xl mb-4">description</span>
-                  <p class="mb-4">No preview available for this file type.</p>
-                  <a href="/notes/<%= note._id %>/download" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors">Download to View</a>
+                  <p class="mb-4">No direct browser preview available for this file type.</p>
+                  <a href="/notes/<%= note.slug || note._id %>/download" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors">Download to View</a>
                 </div>
               <% } %>
            </div>
         </div>
+
+        <!-- SERVER-SIDE RENDERED RICH CONTENT & SYLLABUS OVERVIEW (Solves Thin Content for Googlebot) -->
+        <article class="bg-surface-dark border border-border-dark rounded-xl p-6 sm:p-8 shadow-xl space-y-6">
+          <div class="border-b border-border-dark pb-4 flex items-center justify-between">
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+              <span class="material-icons-outlined text-primary">menu_book</span>
+              About <%= note.title %>
+            </h2>
+            <span class="text-xs bg-primary/10 text-primary border border-primary/20 px-2.5 py-1 rounded-full font-medium">
+              <%= note.course %> - Sem <%= note.semester %>
+            </span>
+          </div>
+
+          <!-- Dynamic Server Rendered HTML -->
+          <div class="prose-invert text-sm text-gray-300 leading-relaxed">
+            <% if (typeof descriptionHtml !== 'undefined' && descriptionHtml && descriptionHtml.length > 30) { %>
+              <%- descriptionHtml %>
+            <% } else { %>
+              <p>
+                <strong><%= note.title %></strong> is a verified student resource for 
+                <strong><%= note.subject?.name || 'this subject' %></strong> in the 
+                <strong><%= note.course %></strong> curriculum (Semester <%= note.semester %>) at 
+                <strong>Shri Vaishnav Vidyapeeth Vishwavidyalaya (SVVV)</strong>.
+              </p>
+              <p>
+                This document includes comprehensive lecture notes, problem solutions, and exam preparation reference points 
+                uploaded to help students revise important course concepts before mid-semester and end-semester examinations.
+              </p>
+            <% } %>
+          </div>
+
+          <!-- Academic Highlights Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-border-dark text-xs">
+            <div class="p-3 bg-surface-dark-lighter rounded-lg border border-border-dark">
+              <span class="text-gray-500 block mb-1">University</span>
+              <strong class="text-white text-sm">SVVV Indore</strong>
+            </div>
+            <div class="p-3 bg-surface-dark-lighter rounded-lg border border-border-dark">
+              <span class="text-gray-500 block mb-1">Subject & Code</span>
+              <strong class="text-white text-sm"><%= note.subject?.name || 'Core Academic' %></strong>
+            </div>
+            <div class="p-3 bg-surface-dark-lighter rounded-lg border border-border-dark">
+              <span class="text-gray-500 block mb-1">Format & Access</span>
+              <strong class="text-accent-green text-sm">Free PDF Download</strong>
+            </div>
+          </div>
+        </article>
+
+        <!-- STRUCTURED FAQs SECTION (High Value SEO Content) -->
+        <section class="bg-surface-dark border border-border-dark rounded-xl p-6 sm:p-8 shadow-xl space-y-4">
+          <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+            <span class="material-icons-outlined text-accent-blue">help_outline</span>
+            Frequently Asked Questions
+          </h3>
+
+          <div class="space-y-3 text-sm">
+            <details class="bg-surface-dark-lighter border border-border-dark rounded-lg p-4 group cursor-pointer" open>
+              <summary class="font-medium text-white flex justify-between items-center list-none">
+                <span>What topics are covered in <%= note.title %>?</span>
+                <span class="material-icons-outlined text-gray-500 group-open:rotate-180 transition-transform">expand_more</span>
+              </summary>
+              <p class="text-gray-400 mt-2 leading-relaxed">
+                This study guide covers core syllabus units and examination questions for <strong><%= note.subject?.name || 'this subject' %></strong> in <strong><%= note.course %></strong> Semester <strong><%= note.semester %></strong> at SVVV.
+              </p>
+            </details>
+
+            <details class="bg-surface-dark-lighter border border-border-dark rounded-lg p-4 group cursor-pointer">
+              <summary class="font-medium text-white flex justify-between items-center list-none">
+                <span>Is this study material free to download?</span>
+                <span class="material-icons-outlined text-gray-500 group-open:rotate-180 transition-transform">expand_more</span>
+              </summary>
+              <p class="text-gray-400 mt-2 leading-relaxed">
+                Yes! All notes, PYQs, and PDFs on CampusNotes are 100% free for all students. Simply click the Download button to save the original file.
+              </p>
+            </details>
+
+            <details class="bg-surface-dark-lighter border border-border-dark rounded-lg p-4 group cursor-pointer">
+              <summary class="font-medium text-white flex justify-between items-center list-none">
+                <span>Who uploaded and verified this note?</span>
+                <span class="material-icons-outlined text-gray-500 group-open:rotate-180 transition-transform">expand_more</span>
+              </summary>
+              <p class="text-gray-400 mt-2 leading-relaxed">
+                Uploaded by student contributor <strong><%= note.uploadedBy?.name || note.uploadedBy?.username || 'Verified Contributor' %></strong> and moderated by the CampusNotes community for quality and relevance.
+              </p>
+            </details>
+          </div>
+        </section>
 
         <!-- AI Assistant / Handwritten Notice -->
         <div id="ai-assistant-wrapper">
@@ -208,7 +311,7 @@
                     <div>
                         <button id="summarize-btn" class="w-full py-3 px-4 bg-surface-dark-lighter hover:bg-white/5 border border-border-dark rounded-lg text-left flex items-center justify-between group transition-colors">
                             <span class="font-medium text-gray-300 group-hover:text-white flex items-center gap-2">
-                                <span class="material-icons-outlined text-primary">summarize</span> Generate Summary
+                                <span class="material-icons-outlined text-primary">summarize</span> Generate AI Summary
                             </span>
                             <span class="material-icons-outlined text-gray-500 group-hover:text-white">chevron_right</span>
                         </button>
@@ -230,8 +333,6 @@
                  </div>
              </div>
         </div>
-
-
 
       </main>
 
@@ -265,11 +366,11 @@
 
                  <!-- ACTION BUTTONS -->
                  <div class="space-y-3 mb-8">
-                     <a href="/notes/<%= note._id %>/download" class="flex items-center justify-center gap-2 w-full py-3 bg-primary hover:bg-primary-hover text-white rounded-lg font-bold shadow-lg shadow-primary/20 transition-all transform hover:-translate-y-0.5">
-                         <span class="material-icons-outlined">download</span> Download
+                     <a href="/notes/<%= note.slug || note._id %>/download" class="flex items-center justify-center gap-2 w-full py-3 bg-primary hover:bg-primary-hover text-white rounded-lg font-bold shadow-lg shadow-primary/20 transition-all transform hover:-translate-y-0.5">
+                         <span class="material-icons-outlined">download</span> Download PDF
                      </a>
                      
-                     <form action="/notes/<%= note._id %>/upvote" method="POST" class="w-full">
+                     <form action="/notes/<%= note.slug || note._id %>/upvote" method="POST" class="w-full">
                          <button class="flex items-center justify-center gap-2 w-full py-3 bg-surface-dark-lighter hover:bg-white/5 border border-border-dark text-gray-300 hover:text-white rounded-lg font-medium transition-colors">
                             <span class="material-icons-outlined text-accent-green">thumb_up</span>
                             <span>Like</span>
@@ -290,20 +391,13 @@
                      </div>
                      <div class="flex items-center justify-between py-2 border-b border-border-dark/50">
                          <span class="text-sm text-gray-500">Semester</span>
-                         <span class="text-sm font-medium text-white"><%= note.semester || 'N/A' %></span>
+                         <span class="text-sm font-medium text-white">Semester <%= note.semester || 'N/A' %></span>
                      </div>
                      <div class="flex items-center justify-between py-2 border-b border-border-dark/50">
                          <span class="text-sm text-gray-500">Downloads</span>
                          <span class="text-sm font-medium text-white"><%= note.downloadCount || 0 %></span>
                      </div>
                  </div>
-                 
-                 <div class="mt-6">
-                      <span class="text-xs uppercase font-bold tracking-wider text-gray-500 block mb-2">Description</span>
-                      <div id="note-description-container" class="text-sm text-gray-400 leading-relaxed prose-invert">
-                          <%= note.description || 'No description provided.' %>
-                      </div>
-                  </div>
 
                  <!-- OWNER CONTROLS -->
                  <% if (typeof currUser !== 'undefined' &&
@@ -311,10 +405,10 @@
                     currUser.roles?.isModerator ||
                     currUser.roles?.isDev)) { %>
                     <div class="mt-8 pt-6 border-t border-border-dark flex gap-3">
-                        <a href="/notes/<%= note._id %>/edit" class="flex-1 py-2 text-sm text-center border border-border-dark rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors">
+                        <a href="/notes/<%= note.slug || note._id %>/edit" class="flex-1 py-2 text-sm text-center border border-border-dark rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors">
                             Edit
                         </a>
-                        <button onclick="openDeleteModal('/notes/<%= note._id %>?_method=DELETE')" class="flex-1 py-2 text-sm text-center border border-red-900/30 bg-red-900/10 rounded-lg text-red-500 hover:bg-red-900/20 transition-colors">
+                        <button onclick="openDeleteModal('/notes/<%= note.slug || note._id %>?_method=DELETE')" class="flex-1 py-2 text-sm text-center border border-red-900/30 bg-red-900/10 rounded-lg text-red-500 hover:bg-red-900/20 transition-colors">
                             Delete
                         </button>
                     </div>
@@ -323,7 +417,7 @@
             </div>
             
             <div class="text-center text-[10px] text-gray-600 px-4">
-                Disclaimer: Use for reference only. CampusNotes is not responsible for grades.
+                Disclaimer: Use for reference only. CampusNotes is not responsible for academic grades.
             </div>
 
          </div>
@@ -331,16 +425,16 @@
 
       <!-- Recommended Notes (Full Width) -->
       <section class="col-span-1 lg:col-span-3 pt-8 border-t border-border-dark">
-          <h3 class="text-xl font-bold text-white mb-6">More Like This</h3>
+          <h3 class="text-xl font-bold text-white mb-6">More Notes Like This</h3>
           
           <div class="space-y-8">
               <!-- Subject Matches -->
-              <% if (subjectNotes.length > 0) { %>
+              <% if (subjectNotes && subjectNotes.length > 0) { %>
                   <div>
-                      <h4 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">In <%= note.subject.name %></h4>
+                      <h4 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">In <%= note.subject ? note.subject.name : 'Same Subject' %></h4>
                       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                           <% subjectNotes.forEach(recNote => { %>
-                              <a href="/notes/<%= recNote._id %>" class="flex items-start gap-4 p-4 rounded-xl bg-surface-dark border border-border-dark hover:border-primary/50 transition-colors group">
+                              <a href="/notes/<%= recNote.slug || recNote._id %>" class="flex items-start gap-4 p-4 rounded-xl bg-surface-dark border border-border-dark hover:border-primary/50 transition-colors group">
                                   <div class="h-10 w-10 rounded-lg bg-surface-dark-lighter border border-border-dark flex items-center justify-center text-gray-500 group-hover:text-primary transition-colors shrink-0">
                                       <span class="material-icons-outlined">description</span>
                                   </div>
@@ -359,12 +453,12 @@
               <% } %>
               
               <!-- Semester Matches -->
-              <% if (semNotes.length > 0) { %>
+              <% if (semNotes && semNotes.length > 0) { %>
                   <div>
                       <h4 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">In Semester <%= note.semester %></h4>
                       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                           <% semNotes.forEach(recNote => { %>
-                              <a href="/notes/<%= recNote._id %>" class="flex items-start gap-4 p-4 rounded-xl bg-surface-dark border border-border-dark hover:border-primary/50 transition-colors group">
+                              <a href="/notes/<%= recNote.slug || recNote._id %>" class="flex items-start gap-4 p-4 rounded-xl bg-surface-dark border border-border-dark hover:border-primary/50 transition-colors group">
                                   <div class="h-10 w-10 rounded-lg bg-surface-dark-lighter border border-border-dark flex items-center justify-center text-gray-500 group-hover:text-primary transition-colors shrink-0">
                                       <span class="material-icons-outlined">description</span>
                                   </div>
@@ -417,24 +511,11 @@
     const answerOutput = document.getElementById('answer-output');
     const noteId = "<%= note._id %>";
 
-
     const aiContainer = document.querySelector('.ai-assistant-card');
     const handwrittenNotice = document.getElementById('handwritten-notice');
     const converter = new showdown.Converter();
 
-
     document.addEventListener('DOMContentLoaded', async () => {
-        // Render description markdown
-        try {
-            const rawDescription = <%- JSON.stringify(note.description || 'No description provided.') %>;
-            const descriptionContainer = document.getElementById('note-description-container');
-            if (descriptionContainer && rawDescription) {
-                descriptionContainer.innerHTML = converter.makeHtml(rawDescription);
-            }
-        } catch (e) {
-            console.error("Error rendering description", e);
-        }
-
         try {
             const res = await axios.get(`/api/notes/${noteId}/check-pdf`);
             if (res.data.isTyped) {
@@ -453,8 +534,6 @@
             }
         }
     });
-
-
 
     // --- Summarize Button Logic ---
     if(summarizeBtn) {
@@ -511,7 +590,6 @@
     }
 </script>
 
-
 <script>
   const deleteModal = document.getElementById("deleteModal");
   const cancelDelete = document.getElementById("cancelDelete");
@@ -530,7 +608,6 @@
       });
   }
 
-  // Close modal when clicked outside
   if(deleteModal) {
       deleteModal.addEventListener("click", (e) => {
         if (e.target === deleteModal) {
@@ -539,5 +616,4 @@
         }
       });
   }
-
 </script>

@@ -7,6 +7,13 @@ const noteSchema = new mongoose.Schema({
     trim: true,
     unique: true,
   },
+  slug: {
+    type: String,
+    unique: true,
+    sparse: true,
+    trim: true,
+    index: true
+  },
   description: {
     type: String,
     trim: true

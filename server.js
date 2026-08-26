@@ -151,61 +151,85 @@ app.get("/", async (req, res) => {
 });
 
 
+app.get("/robots.txt", (req, res) => {
+  res.type("text/plain");
+  res.send(
+`User-agent: *
+Allow: /
+Disallow: /dashboard/
+Disallow: /admin/
+Disallow: /api/
+Disallow: /chat
+Disallow: /health/
+
+Sitemap: https://campusnotes.bitbros.in/sitemap.xml`
+  );
+});
+
 app.get("/sitemap.xml", async (req, res) => {
   try {
     const baseUrl = "https://campusnotes.bitbros.in";
 
-    
     const staticUrls = [
-      "/",
-      "/explore",
-      "/most-downloaded",
-      "/requestnotes",
-      "/rankings",
-      "/login-n",
-      "/register-n",
-      "/bitbros/aboutus",
-      "/faq"
+      { url: "/", priority: "1.0", changefreq: "daily" },
+      { url: "/explore", priority: "0.9", changefreq: "daily" },
+      { url: "/explore?course=B.Tech+CSE", priority: "0.8", changefreq: "weekly" },
+      { url: "/explore?course=B.Tech+IT", priority: "0.8", changefreq: "weekly" },
+      { url: "/explore?course=MBA", priority: "0.7", changefreq: "weekly" },
+      { url: "/explore?course=BBA", priority: "0.7", changefreq: "weekly" },
+      { url: "/explore?course=MCA", priority: "0.7", changefreq: "weekly" },
+      { url: "/explore?course=BCA", priority: "0.7", changefreq: "weekly" },
+      { url: "/most-downloaded", priority: "0.8", changefreq: "daily" },
+      { url: "/requestnotes", priority: "0.7", changefreq: "weekly" },
+      { url: "/rankings", priority: "0.7", changefreq: "weekly" },
+      { url: "/login-n", priority: "0.5", changefreq: "monthly" },
+      { url: "/register-n", priority: "0.5", changefreq: "monthly" },
+      { url: "/bitbros/aboutus", priority: "0.6", changefreq: "monthly" },
+      { url: "/faq", priority: "0.6", changefreq: "monthly" }
     ];
 
-    
-    const notes = await Note.find({ isVerified: true }).select("_id updatedAt").limit(500).sort({ updatedAt: -1 });
+    const notes = await Note.find({ isVerified: { $ne: false } })
+      .select("_id slug updatedAt createdAt")
+      .limit(1000)
+      .sort({ updatedAt: -1 });
+
     const users = await User.find({}).select("_id").limit(200);
 
-    
     let xml = `<?xml version="1.0" encoding="UTF-8"?>
-    <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
 
-    staticUrls.forEach(url => {
+    staticUrls.forEach(item => {
       xml += `
-        <url>
-          <loc>${baseUrl}${url}</loc>
-          <changefreq>weekly</changefreq>
-          <priority>0.8</priority>
-        </url>`;
+  <url>
+    <loc>${baseUrl}${item.url}</loc>
+    <changefreq>${item.changefreq}</changefreq>
+    <priority>${item.priority}</priority>
+  </url>`;
     });
 
-    
     notes.forEach(note => {
+      const noteIdentifier = note.slug || note._id;
+      const lastModDate = note.updatedAt || note.createdAt || new Date();
       xml += `
-        <url>
-          <loc>${baseUrl}/notes/${note._id}</loc>
-          <lastmod>${note.updatedAt ? new Date(note.updatedAt).toISOString() : new Date().toISOString()}</lastmod>
-          <changefreq>weekly</changefreq>
-          <priority>0.9</priority>
-        </url>`;
+  <url>
+    <loc>${baseUrl}/notes/${noteIdentifier}</loc>
+    <lastmod>${new Date(lastModDate).toISOString()}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>`;
     });
 
     users.forEach(user => {
       xml += `
-        <url>
-          <loc>${baseUrl}/profile/${user._id}</loc>
-          <changefreq>weekly</changefreq>
-          <priority>0.6</priority>
-        </url>`;
+  <url>
+    <loc>${baseUrl}/profile/${user._id}</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>`;
     });
 
-    xml += `</urlset>`;
+    xml += `
+</urlset>`;
 
     res.header("Content-Type", "application/xml");
     res.send(xml);

@@ -176,7 +176,7 @@
                   </div>
                   
                   <h3 class="text-lg font-semibold text-white mb-1 line-clamp-2 group-hover:text-primary transition-colors">
-                    <%= note.title %>
+                    <a href="/notes/<%= note.slug || note._id %>"><%= note.title %></a>
                   </h3>
                   <p class="text-sm text-gray-500 mb-4"><%= note.course %></p>
                   
@@ -207,7 +207,7 @@
                         <%= note.createdAt ? new Date(note.createdAt).toLocaleDateString(undefined, {month:'short', day:'numeric'}) : '' %>
                     </span>
                   </div>
-                  <a href="/notes/<%= note._id %>" class="text-white hover:text-primary transition-colors font-medium">View &rarr;</a>
+                  <a href="/notes/<%= note.slug || note._id %>" class="text-white hover:text-primary transition-colors font-medium">View &rarr;</a>
                 </div>
               </div>
             <% }) %>
@@ -358,7 +358,7 @@
                     </div>
                     
                     <h3 class="text-lg font-semibold text-white mb-1 line-clamp-2 group-hover:text-primary transition-colors">
-                      ${note.title}
+                      <a href="/notes/${note.slug || note._id}">${note.title}</a>
                     </h3>
                     <p class="text-sm text-gray-500 mb-4">${note.course}</p>
                     
@@ -381,7 +381,7 @@
                           ${dateStr}
                       </span>
                     </div>
-                    <a href="/notes/${note._id}" class="text-white hover:text-primary transition-colors font-medium">View &rarr;</a>
+                    <a href="/notes/${note.slug || note._id}" class="text-white hover:text-primary transition-colors font-medium">View &rarr;</a>
                   </div>
                 </div>
               `;

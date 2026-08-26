@@ -9,6 +9,23 @@ const { sendVerificationMail } = require("../config/mailer");
 const { cloudinary, getNextAccount } = require("../config/cloud");
 
 
+const { marked } = require('marked');
+const { createNoteSlug } = require('../utils/slugify');
+
+// Helper to find note by ObjectId or Slug
+async function findNoteByIdentifier(identifier, populateQuery = "") {
+  let query;
+  if (mongoose.Types.ObjectId.isValid(identifier)) {
+    query = Note.findById(identifier);
+  } else {
+    query = Note.findOne({ slug: identifier });
+  }
+  if (populateQuery) {
+    query = query.populate(populateQuery);
+  }
+  return await query;
+}
+
 router.get("/api/upload-signature", isLoggedIn, (req, res) => {
   const account = getNextAccount();
 
@@ -95,13 +112,18 @@ router.post("/upload", isLoggedIn, checkAccess, async (req, res) => {
       subjectId = subject;
     }
 
-
     const copied = await Note.find({ title: title });
 
-
     if (copied.length < 1) {
+      let slug = createNoteSlug(title, course, semester);
+      const existingSlug = await Note.findOne({ slug });
+      if (existingSlug) {
+        slug = `${slug}-${Date.now().toString().slice(-4)}`;
+      }
+
       const note = new Note({
         title,
+        slug,
         description: "AI is analyzing this document to generate a high-quality description... Please check back shortly.",
         subject: subjectId,
         course,
@@ -122,7 +144,6 @@ router.post("/upload", isLoggedIn, checkAccess, async (req, res) => {
     } else {
       res.status(409).json({ success: false, error: `A note with this title already exists.${copied}` });
     }
-
 
   } catch (err) {
     console.error(err);
@@ -150,40 +171,85 @@ router.get("/most-downloaded", async (req, res) => {
 
 router.get("/notes/:nid", async (req, res) => {
   try {
-    const file = await Note.findById(req.params.nid)
-      .populate("subject", "name")
-      .populate("uploadedBy", "username name roles verification");
+    const { nid } = req.params;
+    let file = null;
+
+    // 1. If accessed via MongoDB ObjectId, perform a 301 Permanent Redirect to the slug URL for SEO
+    if (mongoose.Types.ObjectId.isValid(nid)) {
+      file = await Note.findById(nid)
+        .populate("subject", "name")
+        .populate("uploadedBy", "username name roles verification");
+
+      if (file) {
+        if (!file.slug) {
+          file.slug = createNoteSlug(file.title, file.course, file.semester);
+          await file.save();
+        }
+        return res.redirect(301, `/notes/${file.slug}`);
+      }
+    }
+
+    // 2. Fetch note by slug
+    if (!file) {
+      file = await Note.findOne({ slug: nid })
+        .populate("subject", "name")
+        .populate("uploadedBy", "username name roles verification");
+    }
 
     if (!file) {
       req.flash("error", "Note doesn't exist!");
       return res.redirect("/explore");
     }
 
-    console.log(file.subject.name);
-    const subId = file.subject._id;
-
-    console.log(file.semester)
+    const subId = file.subject ? file.subject._id : null;
     const fileSemester = file.semester;
 
-    const limit = 30
-
-    const subjectNotes = await Note.find({ subject: subId })
+    const subjectNotes = subId ? await Note.find({ subject: subId, _id: { $ne: file._id } })
       .populate("subject", "name")
       .populate("uploadedBy", "username name roles verification")
       .sort({ createdAt: -1 })
+      .limit(6) : [];
 
-    const semNotes = await Note.find({ semester: fileSemester })
+    const semNotes = fileSemester ? await Note.find({ semester: fileSemester, _id: { $ne: file._id } })
       .populate("subject", "name")
       .populate("uploadedBy", "username name roles verification")
       .sort({ createdAt: -1 })
+      .limit(6) : [];
 
+    // Parse Markdown description to clean Server-Side Rendered HTML for Googlebot
+    const descriptionHtml = file.description ? marked.parse(file.description) : "";
+
+    // Generate Schema.org JSON-LD structured data for Google Rich Results
+    const schemaData = {
+      "@context": "https://schema.org",
+      "@type": "LearningResource",
+      "name": file.title,
+      "description": file.description ? file.description.slice(0, 200).replace(/[*#]/g, '') : `${file.title} study notes and PDF for ${file.course}`,
+      "educationalLevel": file.course,
+      "learningResourceType": "Study Notes",
+      "educationalUse": "Study and Exam Preparation",
+      "inLanguage": "en",
+      "provider": {
+        "@type": "Organization",
+        "name": "CampusNotes",
+        "url": "https://campusnotes.bitbros.in"
+      },
+      "author": {
+        "@type": "Person",
+        "name": file.uploadedBy?.name || file.uploadedBy?.username || "CampusNotes Student"
+      },
+      "datePublished": file.createdAt ? new Date(file.createdAt).toISOString() : new Date().toISOString(),
+      "dateModified": file.updatedAt ? new Date(file.updatedAt).toISOString() : new Date().toISOString()
+    };
 
     res.render("notes/eachNote", {
       note: file,
+      descriptionHtml,
+      schemaData: JSON.stringify(schemaData),
       subjectNotes,
       semNotes,
-      title: `${file.title} | CampusNotes`,
-      description: `${file.description}`
+      title: `${file.title} | ${file.course || 'SVVV'} Notes - CampusNotes`,
+      description: file.description ? file.description.slice(0, 160).replace(/[*#]/g, '') : `Download verified study notes and PDF for ${file.title} - ${file.course} at SVVV.`
     });
   } catch (e) {
     console.error(e);
@@ -194,7 +260,7 @@ router.get("/notes/:nid", async (req, res) => {
 
 router.get("/notes/:nid/download", async (req, res) => {
   try {
-    const note = await Note.findById(req.params.nid);
+    const note = await findNoteByIdentifier(req.params.nid);
     if (!note) {
       return res.status(404).send("Note not found");
     }
@@ -239,7 +305,7 @@ router.get("/explore", async (req, res) => {
     console.time("/explore")
     const { q, course, semester, visibility } = req.query;
 
-    let filter = { isVerified: true };
+    let filter = { isVerified: { $ne: false } };
 
     if (q) {
       filter.$text = { $search: q };
@@ -261,7 +327,7 @@ router.get("/explore", async (req, res) => {
     console.time("Explore-db");
     const [notes, totalNotes] = await Promise.all([
       Note.find(filter, q ? { score: { $meta: "textScore" } } : {})
-        .select("title description subject uploadedBy course semester createdAt fileUrl downloadCount")
+        .select("title slug description subject uploadedBy course semester createdAt fileUrl downloadCount")
         .populate("subject", "name")
         .populate("uploadedBy", "username name avatar roles verification")
         .sort(q ? { score: { $meta: "textScore" } } : { createdAt: -1 })
@@ -304,16 +370,14 @@ router.get("/explore", async (req, res) => {
 
 router.get("/notes/:nid/edit", isLoggedIn, checkAccess, async (req, res) => {
   try {
-    const file = await Note.findById(req.params.nid)
-      .populate("uploadedBy")
-      .populate("subject");
-
-    const noteId = req.params.nid;
+    const file = await findNoteByIdentifier(req.params.nid, "uploadedBy subject");
 
     if (!file) {
       req.flash("error", "Note doesn't exist!");
       return res.redirect("/explore");
     }
+
+    const noteId = file.slug || file._id;
 
     const isOwner = file.uploadedBy._id.toString() === req.user._id.toString();
     const isModerator = req.user.roles?.isModerator;
@@ -366,7 +430,7 @@ router.get("/notes/:nid/edit", isLoggedIn, checkAccess, async (req, res) => {
 
 router.put('/notes/:id', isLoggedIn, checkAccess, async (req, res) => {
   try {
-    const note = await Note.findById(req.params.id).populate("uploadedBy");
+    const note = await findNoteByIdentifier(req.params.id, "uploadedBy");
 
     if (!note) {
       req.flash("error", "Note not found");
@@ -379,16 +443,22 @@ router.put('/notes/:id', isLoggedIn, checkAccess, async (req, res) => {
 
     if (!isOwner && !isModerator && !isDev) {
       req.flash("error", "You are not authorized to edit this note");
-      return res.redirect(`/notes/${req.params.id}`);
+      return res.redirect(`/notes/${note.slug || note._id}`);
     }
 
     if (!mongoose.Types.ObjectId.isValid(req.body.subject)) {
       req.flash("error", "Invalid subject selected");
-      return res.redirect(`/notes/${req.params.id}/edit`);
+      return res.redirect(`/notes/${note.slug || note._id}/edit`);
     }
 
-    await Note.findByIdAndUpdate(req.params.id, {
+    let updatedSlug = note.slug;
+    if (req.body.title && req.body.title !== note.title) {
+      updatedSlug = createNoteSlug(req.body.title, req.body.course || note.course, req.body.semester || note.semester);
+    }
+
+    await Note.findByIdAndUpdate(note._id, {
       title: req.body.title,
+      slug: updatedSlug,
       description: req.body.description,
       tags: req.body.tags ? req.body.tags.split(',').map(t => t.trim()) : [],
       subject: req.body.subject,
@@ -397,18 +467,18 @@ router.put('/notes/:id', isLoggedIn, checkAccess, async (req, res) => {
     });
 
     req.flash("success", "Note updated successfully");
-    res.redirect(`/notes/${req.params.id}`);
+    res.redirect(`/notes/${updatedSlug || note._id}`);
   } catch (err) {
     console.error(err);
     req.flash("error", "Error updating note");
-    res.redirect(`/notes/${req.params.id}/edit`);
+    res.redirect(`/explore`);
   }
 });
 
 
 router.delete("/notes/:id", isLoggedIn, checkAccess, async (req, res) => {
   try {
-    const note = await Note.findById(req.params.id);
+    const note = await findNoteByIdentifier(req.params.id);
 
     if (!note) {
       req.flash("error", "Note not found");
@@ -420,7 +490,7 @@ router.delete("/notes/:id", isLoggedIn, checkAccess, async (req, res) => {
       !req.user.roles?.isModerator
     ) {
       req.flash("error", "You are not authorized to delete this note");
-      return res.redirect(`/notes/${note._id}`);
+      return res.redirect(`/notes/${note.slug || note._id}`);
     }
 
     if (note.fileUrl) {
@@ -530,7 +600,7 @@ router.post('/admin/verify-notes', isModerator, async (req, res) => {
 
 router.post("/notes/:nid/upvote", isLoggedIn, checkAccess, async (req, res) => {
   try {
-    const note = await Note.findById(req.params.nid);
+    const note = await findNoteByIdentifier(req.params.nid);
     if (!note) return res.status(404).send("Note not found");
 
     const userId = req.user._id;
@@ -542,7 +612,7 @@ router.post("/notes/:nid/upvote", isLoggedIn, checkAccess, async (req, res) => {
     }
 
     await note.save();
-    res.redirect(`/notes/${req.params.nid}`);
+    res.redirect(`/notes/${note.slug || note._id}`);
   } catch (err) {
     console.error(err);
     res.status(500).send("Server error");

@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard/
+Disallow: /admin/
+Disallow: /api/
+Disallow: /chat
+Disallow: /health/
+
+Sitemap: https://campusnotes.bitbros.in/sitemap.xml
