@@ -377,6 +377,9 @@
                             <span><%= alreadyLiked ? 'Liked' : 'Like' %></span>
                             <span class="bg-black/30 px-2 py-0.5 rounded text-xs ml-1"><%= note.upvotes.length %></span>
                          </button>
+                         <% if (alreadyLiked) { %>
+                            <p class="text-center text-[11px] text-gray-500 mt-1.5" id="like-undo-hint">Clicking again removes your like</p>
+                         <% } %>
                      </form>
                  </div>
 
