@@ -140,9 +140,10 @@ router.post("/upload", isLoggedIn, checkAccess, async (req, res) => {
           console.error("Queue dispatch error:", qErr);
       }
 
+      req.flash("success", "Note uploaded! It will appear in the library once a moderator verifies it.");
       res.json({ success: true, redirectUrl: "/explore" });
     } else {
-      res.status(409).json({ success: false, error: `A note with this title already exists.${copied}` });
+      res.status(409).json({ success: false, error: "A note with this title already exists." });
     }
 
   } catch (err) {

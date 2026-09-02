@@ -370,10 +370,11 @@
                          <span class="material-icons-outlined">download</span> Download PDF
                      </a>
                      
+                     <% const alreadyLiked = typeof currUser !== 'undefined' && currUser && note.upvotes.some(v => String(v) === String(currUser._id)); %>
                      <form action="/notes/<%= note.slug || note._id %>/upvote" method="POST" class="w-full">
-                         <button class="flex items-center justify-center gap-2 w-full py-3 bg-surface-dark-lighter hover:bg-white/5 border border-border-dark text-gray-300 hover:text-white rounded-lg font-medium transition-colors">
-                            <span class="material-icons-outlined text-accent-green">thumb_up</span>
-                            <span>Like</span>
+                         <button aria-pressed="<%= alreadyLiked ? 'true' : 'false' %>" class="flex items-center justify-center gap-2 w-full py-3 rounded-lg font-medium transition-colors <%= alreadyLiked ? 'bg-primary/15 border border-primary/40 text-primary hover:bg-primary/25' : 'bg-surface-dark-lighter hover:bg-white/5 border border-border-dark text-gray-300 hover:text-white' %>">
+                            <span class="material-icons-outlined <%= alreadyLiked ? 'text-primary' : 'text-accent-green' %>">thumb_up</span>
+                            <span><%= alreadyLiked ? 'Liked' : 'Like' %></span>
                             <span class="bg-black/30 px-2 py-0.5 rounded text-xs ml-1"><%= note.upvotes.length %></span>
                          </button>
                      </form>
