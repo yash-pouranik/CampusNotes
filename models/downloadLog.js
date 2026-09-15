@@ -17,6 +17,10 @@ const downloadLogSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  source: {
+    type: String,
+    default: "Direct"
+  }
 });
 
 downloadLogSchema.index({ note: 1, downloaderId: 1 }, { unique: true });

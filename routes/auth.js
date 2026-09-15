@@ -39,6 +39,7 @@ router.post("/oauth2callback", async (req, res) => {
             avatar: payload.picture,
             course: "B.Tech CSE",
             password: crypto.randomBytes(32).toString('hex'),
+            source: req.cookies.utm_source || "Google"
           });
           break;
         } catch (err) {
@@ -101,7 +102,8 @@ router.post("/register", notLoggedIn, async (req, res) => {
       email: email.toLowerCase(),
       password,
       course,
-      gender
+      gender,
+      source: req.cookies.utm_source || "Direct"
     });
     await user.save();
 

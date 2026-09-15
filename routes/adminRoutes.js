@@ -101,6 +101,114 @@ router.get("/", isLoggedIn, isModerator, async (req, res) => {
   }
 });
 
+router.get("/api/analytics", isLoggedIn, isModerator, async (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+    let dateFilter = {};
+    let dateFilterNotes = {};
+    let dateFilterDownloads = {};
+    
+    if (startDate && endDate) {
+      const start = new Date(startDate);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(endDate);
+      end.setHours(23, 59, 59, 999);
+      
+      dateFilter = { createdAt: { $gte: start, $lte: end } };
+      dateFilterNotes = { createdAt: { $gte: start, $lte: end } };
+      dateFilterDownloads = { downloadedAt: { $gte: start, $lte: end } };
+    }
+
+    const [
+      totalUsers,
+      totalNotes,
+      totalDownloadsAgg,
+      newSignups,
+      newNoteUploads,
+      verifiedUsers,
+      notesPendingVerification,
+      courseWise,
+      dailyDownloads,
+      trafficSources,
+      topNotes,
+      fiveLastUsers,
+      LastDownloads,
+      totalUniqueDownloadsAgg,
+      uniqueSessions,
+      uniqueIps,
+      topContributors
+    ] = await Promise.all([
+      User.countDocuments(dateFilter),
+      Note.countDocuments(dateFilterNotes),
+      DownloadLog.countDocuments(dateFilterDownloads),
+      User.countDocuments(dateFilter),
+      Note.countDocuments(dateFilterNotes),
+      User.countDocuments({ ...dateFilter, "verification.verified": true }),
+      Note.countDocuments({ ...dateFilterNotes, isVerified: false }),
+      Note.aggregate([
+        { $match: dateFilterNotes },
+        { $group: { _id: "$course", notes: { $sum: 1 } } },
+        { $sort: { notes: -1 } },
+      ]),
+      DownloadLog.aggregate([
+        { $match: dateFilterDownloads },
+        {
+          $group: {
+            _id: { $dateToString: { format: "%Y-%m-%d", date: "$downloadedAt" } },
+            count: { $sum: 1 }
+          }
+        },
+        { $sort: { _id: 1 } }
+      ]),
+      User.aggregate([
+        { $match: dateFilter },
+        { $group: { _id: "$source", count: { $sum: 1 } } },
+        { $sort: { count: -1 } }
+      ]),
+      Note.find(dateFilterNotes).sort({ downloadCount: -1 }).limit(10).select("title course downloadCount").lean(),
+      User.find(dateFilter).sort({ createdAt: -1 }).limit(5).lean(),
+      DownloadLog.find(dateFilterDownloads).populate("note").sort({ downloadedAt: -1 }).limit(10).lean(),
+      DownloadLog.countDocuments(dateFilterDownloads),
+      DownloadLog.distinct("downloaderId", dateFilterDownloads),
+      DownloadLog.distinct("ip", dateFilterDownloads),
+      User.aggregate([
+        { $match: dateFilter },
+        { $project: { name: 1, username: 1, avatar: 1, notesCount: { $size: { $ifNull: ["$notes", []] } } } },
+        { $sort: { notesCount: -1 } },
+        { $limit: 3 }
+      ])
+    ]);
+
+    res.json({
+      success: true,
+      data: {
+        totalUsers,
+        totalNotes,
+        totalDownloads: totalDownloadsAgg,
+        newSignups,
+        newNoteUploads,
+        verifiedUsers,
+        unverifiedUsers: totalUsers - verifiedUsers,
+        notesPendingVerification,
+        courseWise,
+        dailyDownloads,
+        trafficSources,
+        topNotes,
+        fiveLastUsers,
+        LastDownloads,
+        totalUniqueDownloads: totalUniqueDownloadsAgg,
+        uniqueSessions: uniqueSessions.length,
+        uniqueIps: uniqueIps.length,
+        topContributors
+      }
+    });
+
+  } catch (err) {
+    console.error("Analytics API Error:", err);
+    res.status(500).json({ success: false, error: "Failed to fetch analytics data" });
+  }
+});
+
 router.get("/users", isLoggedIn, isModerator, async (req, res) => {
   try {
     const { q } = req.query;

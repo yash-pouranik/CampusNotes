@@ -289,6 +289,7 @@ router.get("/notes/:nid/download", async (req, res) => {
         note: note._id,
         downloaderId,
         ip,
+        source: req.cookies.utm_source || "Direct"
       });
     }
 

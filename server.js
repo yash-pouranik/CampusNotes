@@ -65,6 +65,20 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use((req, res, next) => {
+  if (req.query.source) {
+    res.cookie('utm_source', req.query.source, { maxAge: 24 * 60 * 60 * 1000 });
+  } else if (!req.cookies.utm_source && req.headers.referer) {
+    try {
+      const referer = new URL(req.headers.referer);
+      if (!referer.hostname.includes('campusnotes') && !referer.hostname.includes('localhost')) {
+        res.cookie('utm_source', referer.hostname, { maxAge: 24 * 60 * 60 * 1000 });
+      }
+    } catch (e) {}
+  }
+  next();
+});
+
+app.use((req, res, next) => {
   res.locals.currUser = req.user;
   res.locals.success_msg = req.flash("success");
   res.locals.error_msg = req.flash("error");

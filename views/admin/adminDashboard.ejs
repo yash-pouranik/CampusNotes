@@ -12,6 +12,11 @@
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Toastr for Error handling notifications -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
   <script>
     tailwind.config = {
       darkMode: "class",
@@ -61,11 +66,20 @@
     ::-webkit-scrollbar-track { background: #050505; }
     ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #555; }
+    #loader { display: none; }
+    .loading-overlay {
+      position: absolute; inset: 0; background: rgba(5,5,5,0.7); z-index: 50;
+      display: flex; justify-content: center; align-items: center; border-radius: inherit;
+    }
   </style>
 </head>
 <body class="min-h-screen p-4 mt-14 md:p-8">
 
-  <div class="max-w-7xl mx-auto space-y-8 animate-fade-in">
+  <div class="max-w-7xl mx-auto space-y-8 animate-fade-in relative">
+
+    <div id="loader" class="loading-overlay hidden">
+        <i class="fa-solid fa-spinner fa-spin text-primary text-4xl"></i>
+    </div>
 
     <!-- HEADER -->
     <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
@@ -79,7 +93,24 @@
         </div>
       </div>
 
-      <div class="flex items-center gap-3">
+      <div class="flex flex-wrap items-center gap-3">
+        
+        <!-- Filter Controls -->
+        <div class="flex items-center gap-2 bg-surface-dark-lighter border border-border-dark p-2 rounded-xl">
+            <select id="dateFilterPreset" class="bg-surface-dark text-white text-sm rounded px-2 py-1 outline-none border border-border-dark">
+                <option value="all">All Time</option>
+                <option value="7">Last 7 Days</option>
+                <option value="30">Last 30 Days</option>
+                <option value="custom">Custom Range</option>
+            </select>
+            <div id="customDateWrap" class="hidden flex items-center gap-2">
+                <input type="date" id="startDate" class="bg-surface-dark text-white text-sm rounded px-2 py-1 outline-none border border-border-dark">
+                <span class="text-gray-500">-</span>
+                <input type="date" id="endDate" class="bg-surface-dark text-white text-sm rounded px-2 py-1 outline-none border border-border-dark">
+                <button id="applyCustomDateBtn" class="text-xs bg-primary text-white px-2 py-1 rounded">Apply</button>
+            </div>
+        </div>
+
         <a href="/dashboard/bulk-invite" class="hidden md:flex items-center gap-2 px-4 py-2 bg-primary/10 border border-primary/20 text-primary rounded-xl hover:bg-primary/20 transition-all font-semibold text-sm">
           <i class="fa-solid fa-paper-plane"></i>
           <span>Bulk Invite</span>
@@ -115,40 +146,36 @@
 
     <!-- MAIN STAT CARDS -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      <!-- Total Users -->
       <div class="glass-card rounded-xl p-5 relative overflow-hidden group">
         <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
             <i class="fa-solid fa-users text-4xl text-blue-500"></i>
         </div>
         <p class="text-gray-500 text-xs font-medium uppercase tracking-wider mb-1">Total Users</p>
-        <div class="text-2xl font-bold text-white"><%= totalUsers %></div>
+        <div id="statTotalUsers" class="text-2xl font-bold text-white"><%= totalUsers %></div>
       </div>
 
-      <!-- Total Notes -->
       <div class="glass-card rounded-xl p-5 relative overflow-hidden group">
         <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
             <i class="fa-solid fa-file-lines text-4xl text-purple-500"></i>
         </div>
         <p class="text-gray-500 text-xs font-medium uppercase tracking-wider mb-1">Total Notes</p>
-        <div class="text-2xl font-bold text-white"><%= totalNotes %></div>
+        <div id="statTotalNotes" class="text-2xl font-bold text-white"><%= totalNotes %></div>
       </div>
 
-      <!-- Total Downloads -->
       <div class="glass-card rounded-xl p-5 relative overflow-hidden group">
         <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
             <i class="fa-solid fa-download text-4xl text-green-500"></i>
         </div>
         <p class="text-gray-500 text-xs font-medium uppercase tracking-wider mb-1">Total Downloads</p>
-        <div class="text-2xl font-bold text-white"><%= totalDownloads %></div>
+        <div id="statTotalDownloads" class="text-2xl font-bold text-white"><%= totalDownloads %></div>
       </div>
 
-      <!-- Recent Downloads -->
       <div class="glass-card rounded-xl p-5 relative overflow-hidden group">
         <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
             <i class="fa-solid fa-calendar-week text-4xl text-orange-500"></i>
         </div>
-        <p class="text-gray-500 text-xs font-medium uppercase tracking-wider mb-1">Downloads (7d)</p>
-        <div class="text-2xl font-bold text-white"><%= downloadsLast7Days %></div>
+        <p class="text-gray-500 text-xs font-medium uppercase tracking-wider mb-1">Downloads (Period)</p>
+        <div id="statDownloadsPeriod" class="text-2xl font-bold text-white"><%= totalDownloads %></div>
       </div>
     </div>
 
@@ -162,7 +189,7 @@
                 <div class="flex justify-between items-start">
                     <div>
                         <p class="text-gray-500 text-xs uppercase">Unique Downloads</p>
-                        <h3 class="text-xl font-bold text-white mt-1"><%= totalUniqueDownloads %></h3>
+                        <h3 id="statTotalUniqueDownloads" class="text-xl font-bold text-white mt-1"><%= totalUniqueDownloads %></h3>
                     </div>
                     <div class="p-2 bg-purple-500/10 rounded-lg text-purple-400"><i class="fa-solid fa-fingerprint"></i></div>
                 </div>
@@ -171,7 +198,7 @@
                 <div class="flex justify-between items-start">
                     <div>
                         <p class="text-gray-500 text-xs uppercase">Unique Sessions</p>
-                        <h3 class="text-xl font-bold text-white mt-1"><%= uniqueSessions %></h3>
+                        <h3 id="statUniqueSessions" class="text-xl font-bold text-white mt-1"><%= uniqueSessions %></h3>
                     </div>
                     <div class="p-2 bg-blue-500/10 rounded-lg text-blue-400"><i class="fa-solid fa-stopwatch"></i></div>
                 </div>
@@ -180,7 +207,7 @@
                 <div class="flex justify-between items-start">
                     <div>
                         <p class="text-gray-500 text-xs uppercase">Unique IPs</p>
-                        <h3 class="text-xl font-bold text-white mt-1"><%= uniqueIps %></h3>
+                        <h3 id="statUniqueIps" class="text-xl font-bold text-white mt-1"><%= uniqueIps %></h3>
                     </div>
                     <div class="p-2 bg-green-500/10 rounded-lg text-green-400"><i class="fa-solid fa-network-wired"></i></div>
                 </div>
@@ -198,17 +225,17 @@
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="glass-card rounded-xl p-4 text-center">
                     <i class="fa-solid fa-user-plus text-primary mb-2"></i>
-                    <div class="text-2xl font-bold text-white"><%= newSignups %></div>
-                    <p class="text-xs text-gray-500">New Signups (7d)</p>
+                    <div id="statNewSignups" class="text-2xl font-bold text-white"><%= newSignups %></div>
+                    <p class="text-xs text-gray-500">Signups (Period)</p>
                 </div>
                 <div class="glass-card rounded-xl p-4 text-center">
                     <i class="fa-solid fa-circle-check text-green-500 mb-2"></i>
-                    <div class="text-2xl font-bold text-white"><%= verifiedUsers %></div>
+                    <div id="statVerifiedUsers" class="text-2xl font-bold text-white"><%= verifiedUsers %></div>
                     <p class="text-xs text-gray-500">Verified Users</p>
                 </div>
                 <div class="glass-card rounded-xl p-4 text-center">
                     <i class="fa-solid fa-circle-xmark text-red-500 mb-2"></i>
-                    <div class="text-2xl font-bold text-white"><%= unverifiedUsers %></div>
+                    <div id="statUnverifiedUsers" class="text-2xl font-bold text-white"><%= unverifiedUsers %></div>
                     <p class="text-xs text-gray-500">Unverified</p>
                 </div>
             </div>
@@ -225,7 +252,7 @@
                         <i class="fa-solid fa-hourglass-half text-xl"></i>
                     </div>
                     <div>
-                        <div class="text-2xl font-bold text-white"><%= notesPendingVerification %></div>
+                        <div id="statNotesPending" class="text-2xl font-bold text-white"><%= notesPendingVerification %></div>
                         <p class="text-xs text-gray-500">Pending Verification</p>
                     </div>
                 </div>
@@ -234,8 +261,8 @@
                         <i class="fa-solid fa-cloud-arrow-up text-xl"></i>
                     </div>
                     <div>
-                        <div class="text-2xl font-bold text-white"><%= newNoteUploads %></div>
-                        <p class="text-xs text-gray-500">Uploads (7d)</p>
+                        <div id="statNewNoteUploads" class="text-2xl font-bold text-white"><%= newNoteUploads %></div>
+                        <p class="text-xs text-gray-500">Uploads (Period)</p>
                     </div>
                 </div>
             </div>
@@ -245,30 +272,38 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        <!-- CHART SECTION -->
-        <div class="lg:col-span-2">
-            <h2 class="text-lg font-semibold text-white mb-4">Notes Distribution</h2>
-            <div class="glass-card rounded-xl p-4 h-[300px] flex items-center justify-center">
-                <canvas id="courseChart" style="max-height: 100%; width: 100%;"></canvas>
+        <!-- CHARTS SECTION -->
+        <div class="lg:col-span-2 space-y-6">
+            <div>
+                <h2 class="text-lg font-semibold text-white mb-4">Notes Distribution</h2>
+                <div class="glass-card rounded-xl p-4 h-[300px] flex items-center justify-center">
+                    <canvas id="courseChart" style="max-height: 100%; width: 100%;"></canvas>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Daily Downloads Line Chart -->
+                <div>
+                    <h2 class="text-lg font-semibold text-white mb-4">Daily Downloads</h2>
+                    <div class="glass-card rounded-xl p-4 h-[250px]">
+                        <canvas id="downloadsChart"></canvas>
+                    </div>
+                </div>
+                <!-- Traffic Sources Pie Chart -->
+                <div>
+                    <h2 class="text-lg font-semibold text-white mb-4">Traffic Sources</h2>
+                    <div class="glass-card rounded-xl p-4 h-[250px] flex items-center justify-center">
+                        <canvas id="sourceChart"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- TOP CONTRIBUTORS -->
         <div>
-            <h2 class="text-lg font-semibold text-white mb-4">Top Contributors</h2>
-            <div class="space-y-3">
-                <% topContributors.forEach(user => { %>
-                    <div class="glass-card rounded-xl p-3 flex items-center gap-3 hover:bg-surface-dark-lighter transition-colors cursor-default">
-                        <img src="<%= user.avatar || '/images/dummy_profile.avif' %>" class="w-10 h-10 rounded-full object-cover border border-border-dark" alt="">
-                        <div class="flex-1 min-w-0">
-                            <h3 class="text-sm font-medium text-white truncate"><%= user.name %></h3>
-                            <p class="text-xs text-gray-500 truncate">@<%= user.username %></p>
-                        </div>
-                        <div class="text-primary font-bold text-sm bg-primary/10 px-2 py-1 rounded-md">
-                            <i class="fa-solid fa-file-pen text-xs mr-1"></i><%= user.notesCount %>
-                        </div>
-                    </div>
-                <% }) %>
+            <h2 class="text-lg font-semibold text-white mb-4">Top Contributors (Period)</h2>
+            <div class="space-y-3" id="topContributorsContainer">
+                <!-- Injected via JS -->
             </div>
         </div>
     </div>
@@ -276,7 +311,6 @@
 
     <!-- TABLES GRID -->
     <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
-        
         <!-- TOP NOTES -->
         <div>
             <h2 class="text-lg font-semibold text-white mb-4">Top Notes</h2>
@@ -290,14 +324,8 @@
                                 <th class="px-6 py-3 font-medium text-right">Downloads</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-border-dark">
-                            <% topNotes.forEach(note => { %>
-                                <tr class="hover:bg-white/5 transition-colors">
-                                    <td class="px-6 py-3 font-medium text-white truncate max-w-[150px]"><%= note.title %></td>
-                                    <td class="px-6 py-3"><span class="bg-border-dark px-2 py-0.5 rounded text-xs text-gray-300"><%= note.course %></span></td>
-                                    <td class="px-6 py-3 text-right text-primary"><i class="fa-solid fa-download mr-1"></i><%= note.downloadCount %></td>
-                                </tr>
-                            <% }) %>
+                        <tbody id="topNotesTable" class="divide-y divide-border-dark">
+                            <!-- Injected via JS -->
                         </tbody>
                     </table>
                 </div>
@@ -306,52 +334,24 @@
 
         <!-- RECENT ACTIVITY -->
         <div class="space-y-8">
-            
-            <!-- Recent Users -->
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-lg font-semibold text-white">Recent Users</h2>
                 <a href="/dashboard/users" class="text-xs text-primary hover:underline">See All Users</a>
             </div>
-                <div class="glass-card rounded-xl overflow-hidden">
-                    <table class="w-full text-left text-sm text-gray-400">
-                        <thead class="bg-surface-dark-lighter text-xs uppercase text-gray-500">
-                            <tr>
-                                <th class="px-4 py-3">User</th>
-                                <th class="px-4 py-3 text-right">Joined</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-border-dark">
-                            <% fiveLastUsers.forEach(u => { %>
-                                <tr class="hover:bg-white/5 transition-colors">
-                                    <td class="px-4 py-3">
-                                        <div class="flex items-center gap-3">
-                                            <div>
-                                                <div class="font-medium text-white"><%= u.name %></div>
-                                                <div class="text-xs text-gray-500">@<%= u.username %></div>
-                                            </div>
-                                            <% if (u.isBlocked) { %>
-                                                <span class="px-2 py-0.5 bg-red-500/10 text-red-500 text-[10px] font-bold rounded uppercase tracking-wider">Blocked</span>
-                                            <% } %>
-                                        </div>
-                                    </td>
-                                    <td class="px-4 py-3 text-right">
-                                        <div class="flex flex-col items-end gap-1">
-                                            <div class="text-xs text-gray-500"><%= new Date(u.createdAt).toLocaleDateString() %></div>
-                                            <form action="/dashboard/users/<%= u._id %>/toggle-block" method="POST">
-                                                <button type="submit" class="text-[10px] font-bold uppercase transition-colors <%= u.isBlocked ? 'text-green-500 hover:text-green-400' : 'text-red-500 hover:text-red-400' %>">
-                                                    <%= u.isBlocked ? 'Unblock' : 'Block' %>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
-                            <% }) %>
-                        </tbody>
-                    </table>
-                </div>
+            <div class="glass-card rounded-xl overflow-hidden">
+                <table class="w-full text-left text-sm text-gray-400">
+                    <thead class="bg-surface-dark-lighter text-xs uppercase text-gray-500">
+                        <tr>
+                            <th class="px-4 py-3">User</th>
+                            <th class="px-4 py-3 text-right">Joined</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recentUsersTable" class="divide-y divide-border-dark">
+                        <!-- Injected via JS -->
+                    </tbody>
+                </table>
             </div>
 
-            <!-- Recent Downloads -->
             <div>
                 <h2 class="text-lg font-semibold text-white mb-4">Recent Downloads</h2>
                 <div class="glass-card rounded-xl overflow-hidden">
@@ -362,68 +362,180 @@
                                 <th class="px-4 py-3 text-right">Time</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-border-dark">
-                            <% LastDownloads.forEach(dl => { %>
-                                <tr class="hover:bg-white/5 transition-colors">
-                                    <td class="px-4 py-3 truncate max-w-[200px] text-white"><%= dl.note ? dl.note.title : 'Unknown' %></td>
-                                    <td class="px-4 py-3 text-right text-xs"><%= new Date(dl.downloadedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) %></td>
-                                </tr>
-                            <% }) %>
+                        <tbody id="recentDownloadsTable" class="divide-y divide-border-dark">
+                            <!-- Injected via JS -->
                         </tbody>
                     </table>
                 </div>
             </div>
-
         </div>
     </div>
 
   </div>
 
-
 <script>
-  const ctx = document.getElementById("courseChart").getContext("2d");
-  const data = <%- JSON.stringify(courseWise) %>;
+  let courseChartInst, downloadsChartInst, sourceChartInst;
 
-  new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels: data.map(c => c._id),
-      datasets: [{
-        label: "Notes",
-        data: data.map(c => c.notes),
-        backgroundColor: "rgba(255, 87, 34, 0.6)", // Primary Orange
-        borderColor: "rgba(255, 87, 34, 1)",
-        borderWidth: 1,
-        borderRadius: 6,
-        hoverBackgroundColor: "rgba(255, 87, 34, 0.8)",
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-            backgroundColor: '#171717',
-            titleColor: '#fff',
-            bodyColor: '#ccc',
-            borderColor: '#333',
-            borderWidth: 1,
-            padding: 10
-        }
-      },
-      scales: {
-        y: { 
-            beginAtZero: true, 
-            grid: { color: 'rgba(255, 255, 255, 0.05)' },
-            ticks: { color: "#9ca3af" } 
-        },
-        x: { 
-            grid: { display: false },
-            ticks: { color: "#9ca3af" } 
-        }
-      }
+  // Reusable Chart options for dark mode
+  const chartOptions = {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { backgroundColor: '#171717', titleColor: '#fff', bodyColor: '#ccc', borderColor: '#333', borderWidth: 1 }
     }
+  };
+
+  function initCharts() {
+    const ctxCourse = document.getElementById("courseChart").getContext("2d");
+    courseChartInst = new Chart(ctxCourse, { type: "bar", data: { labels: [], datasets: [] }, options: { ...chartOptions, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: "#9ca3af" } }, x: { grid: { display: false }, ticks: { color: "#9ca3af" } } } } });
+
+    const ctxDl = document.getElementById("downloadsChart").getContext("2d");
+    downloadsChartInst = new Chart(ctxDl, { type: "line", data: { labels: [], datasets: [] }, options: { ...chartOptions, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: "#9ca3af" } }, x: { grid: { display: false }, ticks: { color: "#9ca3af" } } } } });
+
+    const ctxSrc = document.getElementById("sourceChart").getContext("2d");
+    sourceChartInst = new Chart(ctxSrc, { type: "doughnut", data: { labels: [], datasets: [] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: '#9ca3af' } } } } });
+  }
+
+  async function fetchAnalytics(startDate = null, endDate = null) {
+      const loader = document.getElementById('loader');
+      loader.classList.remove('hidden');
+      
+      let url = '/dashboard/api/analytics';
+      if(startDate && endDate) {
+          url += `?startDate=${startDate}&endDate=${endDate}`;
+      }
+
+      try {
+          const res = await fetch(url);
+          const json = await res.json();
+          if(!json.success) throw new Error(json.error || 'Failed to fetch data');
+
+          updateDashboard(json.data);
+      } catch (err) {
+          toastr.error(err.message, "Analytics Error");
+      } finally {
+          loader.classList.add('hidden');
+      }
+  }
+
+  function updateDashboard(data) {
+      // Numbers
+      document.getElementById('statTotalUsers').innerText = data.totalUsers || 0;
+      document.getElementById('statTotalNotes').innerText = data.totalNotes || 0;
+      document.getElementById('statTotalDownloads').innerText = data.totalDownloads || 0;
+      document.getElementById('statDownloadsPeriod').innerText = data.totalDownloads || 0;
+      document.getElementById('statTotalUniqueDownloads').innerText = data.totalUniqueDownloads || 0;
+      document.getElementById('statUniqueSessions').innerText = data.uniqueSessions || 0;
+      document.getElementById('statUniqueIps').innerText = data.uniqueIps || 0;
+      document.getElementById('statNewSignups').innerText = data.newSignups || 0;
+      document.getElementById('statVerifiedUsers').innerText = data.verifiedUsers || 0;
+      document.getElementById('statUnverifiedUsers').innerText = data.unverifiedUsers || 0;
+      document.getElementById('statNotesPending').innerText = data.notesPendingVerification || 0;
+      document.getElementById('statNewNoteUploads').innerText = data.newNoteUploads || 0;
+
+      // Charts
+      courseChartInst.data = {
+          labels: (data.courseWise || []).map(c => c._id),
+          datasets: [{ label: "Notes", data: (data.courseWise || []).map(c => c.notes), backgroundColor: "rgba(255, 87, 34, 0.6)", borderColor: "rgba(255, 87, 34, 1)", borderWidth: 1, borderRadius: 6 }]
+      };
+      courseChartInst.update();
+
+      downloadsChartInst.data = {
+          labels: (data.dailyDownloads || []).map(d => d._id),
+          datasets: [{ label: "Downloads", data: (data.dailyDownloads || []).map(d => d.count), borderColor: "#2979FF", backgroundColor: "rgba(41, 121, 255, 0.2)", fill: true, tension: 0.3 }]
+      };
+      downloadsChartInst.update();
+
+      const bgColors = ['#FF5722', '#8A2BE2', '#2979FF', '#10B981', '#F59E0B', '#EF4444'];
+      sourceChartInst.data = {
+          labels: (data.trafficSources || []).map(s => s._id || 'Unknown'),
+          datasets: [{ data: (data.trafficSources || []).map(s => s.count), backgroundColor: bgColors }]
+      };
+      sourceChartInst.update();
+
+      // Top Notes Table
+      const notesHtml = (data.topNotes || []).map(note => `
+          <tr class="hover:bg-white/5 transition-colors">
+              <td class="px-6 py-3 font-medium text-white truncate max-w-[150px]">${note.title}</td>
+              <td class="px-6 py-3"><span class="bg-border-dark px-2 py-0.5 rounded text-xs text-gray-300">${note.course}</span></td>
+              <td class="px-6 py-3 text-right text-primary"><i class="fa-solid fa-download mr-1"></i>${note.downloadCount}</td>
+          </tr>
+      `).join('');
+      document.getElementById('topNotesTable').innerHTML = notesHtml;
+
+      // Recent Users
+      const usersHtml = (data.fiveLastUsers || []).map(u => `
+          <tr class="hover:bg-white/5 transition-colors">
+              <td class="px-4 py-3">
+                  <div class="flex items-center gap-3">
+                      <div>
+                          <div class="font-medium text-white">${u.name}</div>
+                          <div class="text-xs text-gray-500">@${u.username}</div>
+                      </div>
+                      ${u.isBlocked ? '<span class="px-2 py-0.5 bg-red-500/10 text-red-500 text-[10px] font-bold rounded uppercase tracking-wider">Blocked</span>' : ''}
+                  </div>
+              </td>
+              <td class="px-4 py-3 text-right">
+                  <div class="text-xs text-gray-500">${new Date(u.createdAt).toLocaleDateString()}</div>
+              </td>
+          </tr>
+      `).join('');
+      document.getElementById('recentUsersTable').innerHTML = usersHtml;
+
+      // Recent Downloads
+      const dlsHtml = (data.LastDownloads || []).map(dl => `
+          <tr class="hover:bg-white/5 transition-colors">
+              <td class="px-4 py-3 truncate max-w-[200px] text-white">${dl.note ? dl.note.title : 'Unknown'}</td>
+              <td class="px-4 py-3 text-right text-xs">${new Date(dl.downloadedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</td>
+          </tr>
+      `).join('');
+      document.getElementById('recentDownloadsTable').innerHTML = dlsHtml;
+
+      // Top Contributors
+      const contribHtml = (data.topContributors || []).map(user => `
+          <div class="glass-card rounded-xl p-3 flex items-center gap-3 hover:bg-surface-dark-lighter transition-colors cursor-default">
+              <img src="${user.avatar || '/images/dummy_profile.avif'}" class="w-10 h-10 rounded-full object-cover border border-border-dark" alt="">
+              <div class="flex-1 min-w-0">
+                  <h3 class="text-sm font-medium text-white truncate">${user.name}</h3>
+                  <p class="text-xs text-gray-500 truncate">@${user.username}</p>
+              </div>
+              <div class="text-primary font-bold text-sm bg-primary/10 px-2 py-1 rounded-md">
+                  <i class="fa-solid fa-file-pen text-xs mr-1"></i>${user.notesCount}
+              </div>
+          </div>
+      `).join('');
+      document.getElementById('topContributorsContainer').innerHTML = contribHtml;
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+      initCharts();
+      fetchAnalytics(); // Load all time by default or server default
+      
+      const filter = document.getElementById('dateFilterPreset');
+      const customWrap = document.getElementById('customDateWrap');
+
+      filter.addEventListener('change', (e) => {
+          const val = e.target.value;
+          if(val === 'custom') {
+              customWrap.classList.remove('hidden');
+          } else {
+              customWrap.classList.add('hidden');
+              if(val === 'all') {
+                  fetchAnalytics();
+              } else {
+                  const d = new Date();
+                  d.setDate(d.getDate() - parseInt(val));
+                  fetchAnalytics(d.toISOString(), new Date().toISOString());
+              }
+          }
+      });
+
+      document.getElementById('applyCustomDateBtn').addEventListener('click', () => {
+          const start = document.getElementById('startDate').value;
+          const end = document.getElementById('endDate').value;
+          if(!start || !end) return toastr.warning("Please select both dates");
+          fetchAnalytics(start, end);
+      });
   });
 </script>
 
