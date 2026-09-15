@@ -486,7 +486,10 @@
       const dlsHtml = (data.LastDownloads || []).map(dl => `
           <tr class="hover:bg-white/5 transition-colors">
               <td class="px-4 py-3 truncate max-w-[200px] text-white">${dl.note ? dl.note.title : 'Unknown'}</td>
-              <td class="px-4 py-3 text-right text-xs">${new Date(dl.downloadedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</td>
+              <td class="px-4 py-3 text-right text-xs">
+                  ${new Date(dl.downloadedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })} 
+                  ${new Date(dl.downloadedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+              </td>
           </tr>
       `).join('');
       document.getElementById('recentDownloadsTable').innerHTML = dlsHtml;

@@ -168,7 +168,7 @@ router.get("/api/analytics", isLoggedIn, isModerator, async (req, res) => {
         { $group: { _id: "$source", count: { $sum: 1 } } },
         { $sort: { count: -1 } }
       ]),
-      Note.find(dateFilterNotes).sort({ downloadCount: -1 }).limit(10).select("title course downloadCount").lean(),
+      Note.find({}).sort({ downloadCount: -1 }).limit(10).select("title course downloadCount").lean(),
       User.find(dateFilter).sort({ createdAt: -1 }).limit(5).lean(),
       DownloadLog.find(dateFilterDownloads).populate("note").sort({ downloadedAt: -1 }).limit(10).lean(),
       DownloadLog.countDocuments(dateFilterDownloads),
