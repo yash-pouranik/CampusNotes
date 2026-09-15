@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
 
   <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Toastr for Error handling notifications -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
@@ -276,8 +276,8 @@
         <div class="lg:col-span-2 space-y-6">
             <div>
                 <h2 class="text-lg font-semibold text-white mb-4">Notes Distribution</h2>
-                <div class="glass-card rounded-xl p-4 h-[300px] flex items-center justify-center">
-                    <canvas id="courseChart" style="max-height: 100%; width: 100%;"></canvas>
+                <div class="glass-card rounded-xl p-4 h-[350px]">
+                    <div id="courseChart" class="w-full h-full"></div>
                 </div>
             </div>
             
@@ -285,15 +285,15 @@
                 <!-- Daily Downloads Line Chart -->
                 <div>
                     <h2 class="text-lg font-semibold text-white mb-4">Daily Downloads</h2>
-                    <div class="glass-card rounded-xl p-4 h-[250px]">
-                        <canvas id="downloadsChart"></canvas>
+                    <div class="glass-card rounded-xl p-4 h-[300px]">
+                        <div id="downloadsChart" class="w-full h-full"></div>
                     </div>
                 </div>
                 <!-- Traffic Sources Pie Chart -->
                 <div>
                     <h2 class="text-lg font-semibold text-white mb-4">Traffic Sources</h2>
-                    <div class="glass-card rounded-xl p-4 h-[250px] flex items-center justify-center">
-                        <canvas id="sourceChart"></canvas>
+                    <div class="glass-card rounded-xl p-4 h-[300px] flex items-center justify-center">
+                        <div id="sourceChart" class="w-full h-full"></div>
                     </div>
                 </div>
             </div>
@@ -376,24 +376,51 @@
 <script>
   let courseChartInst, downloadsChartInst, sourceChartInst;
 
-  // Reusable Chart options for dark mode
-  const chartOptions = {
-    responsive: true, maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-      tooltip: { backgroundColor: '#171717', titleColor: '#fff', bodyColor: '#ccc', borderColor: '#333', borderWidth: 1 }
-    }
-  };
+  const darkTheme = { mode: 'dark', palette: 'palette1', monochrome: { enabled: false } };
 
   function initCharts() {
-    const ctxCourse = document.getElementById("courseChart").getContext("2d");
-    courseChartInst = new Chart(ctxCourse, { type: "bar", data: { labels: [], datasets: [] }, options: { ...chartOptions, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: "#9ca3af" } }, x: { grid: { display: false }, ticks: { color: "#9ca3af" } } } } });
+      const courseOptions = {
+          chart: { type: 'bar', height: '100%', parentHeightOffset: 0, toolbar: { show: false }, background: 'transparent' },
+          theme: darkTheme,
+          series: [],
+          xaxis: { categories: [], labels: { style: { colors: '#9ca3af' } }, axisBorder: { show: false }, axisTicks: { show: false } },
+          yaxis: { labels: { style: { colors: '#9ca3af' } } },
+          plotOptions: { bar: { borderRadius: 6, distributed: true } },
+          colors: ['#FF5722', '#8A2BE2', '#2979FF', '#10B981', '#F59E0B'],
+          dataLabels: { enabled: false },
+          legend: { show: false },
+          grid: { borderColor: 'rgba(255, 255, 255, 0.05)', strokeDashArray: 4 }
+      };
+      courseChartInst = new ApexCharts(document.querySelector("#courseChart"), courseOptions);
+      courseChartInst.render();
 
-    const ctxDl = document.getElementById("downloadsChart").getContext("2d");
-    downloadsChartInst = new Chart(ctxDl, { type: "line", data: { labels: [], datasets: [] }, options: { ...chartOptions, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: "#9ca3af" } }, x: { grid: { display: false }, ticks: { color: "#9ca3af" } } } } });
+      const downloadsOptions = {
+          chart: { type: 'area', height: '100%', parentHeightOffset: 0, toolbar: { show: false }, background: 'transparent' },
+          theme: darkTheme,
+          series: [],
+          xaxis: { categories: [], labels: { style: { colors: '#9ca3af' } }, axisBorder: { show: false }, axisTicks: { show: false } },
+          yaxis: { labels: { style: { colors: '#9ca3af' } } },
+          colors: ['#2979FF'],
+          fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.05, stops: [0, 100] } },
+          dataLabels: { enabled: false },
+          stroke: { curve: 'smooth', width: 3 },
+          grid: { borderColor: 'rgba(255, 255, 255, 0.05)', strokeDashArray: 4 }
+      };
+      downloadsChartInst = new ApexCharts(document.querySelector("#downloadsChart"), downloadsOptions);
+      downloadsChartInst.render();
 
-    const ctxSrc = document.getElementById("sourceChart").getContext("2d");
-    sourceChartInst = new Chart(ctxSrc, { type: "doughnut", data: { labels: [], datasets: [] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: '#9ca3af' } } } } });
+      const sourceOptions = {
+          chart: { type: 'donut', height: '100%', parentHeightOffset: 0, background: 'transparent' },
+          theme: darkTheme,
+          series: [],
+          labels: [],
+          colors: ['#FF5722', '#8A2BE2', '#2979FF', '#10B981', '#F59E0B', '#EF4444'],
+          stroke: { show: false },
+          dataLabels: { enabled: false },
+          legend: { position: 'bottom', labels: { colors: '#9ca3af' } }
+      };
+      sourceChartInst = new ApexCharts(document.querySelector("#sourceChart"), sourceOptions);
+      sourceChartInst.render();
   }
 
   async function fetchAnalytics(startDate = null, endDate = null) {
@@ -434,24 +461,26 @@
       document.getElementById('statNewNoteUploads').innerText = data.newNoteUploads || 0;
 
       // Charts
-      courseChartInst.data = {
-          labels: (data.courseWise || []).map(c => c._id),
-          datasets: [{ label: "Notes", data: (data.courseWise || []).map(c => c.notes), backgroundColor: "rgba(255, 87, 34, 0.6)", borderColor: "rgba(255, 87, 34, 1)", borderWidth: 1, borderRadius: 6 }]
-      };
-      courseChartInst.update();
+      courseChartInst.updateOptions({
+          xaxis: { categories: (data.courseWise || []).map(c => c._id) }
+      });
+      courseChartInst.updateSeries([{
+          name: 'Notes',
+          data: (data.courseWise || []).map(c => c.notes)
+      }]);
 
-      downloadsChartInst.data = {
-          labels: (data.dailyDownloads || []).map(d => d._id),
-          datasets: [{ label: "Downloads", data: (data.dailyDownloads || []).map(d => d.count), borderColor: "#2979FF", backgroundColor: "rgba(41, 121, 255, 0.2)", fill: true, tension: 0.3 }]
-      };
-      downloadsChartInst.update();
+      downloadsChartInst.updateOptions({
+          xaxis: { categories: (data.dailyDownloads || []).map(d => d._id) }
+      });
+      downloadsChartInst.updateSeries([{
+          name: 'Downloads',
+          data: (data.dailyDownloads || []).map(d => d.count)
+      }]);
 
-      const bgColors = ['#FF5722', '#8A2BE2', '#2979FF', '#10B981', '#F59E0B', '#EF4444'];
-      sourceChartInst.data = {
-          labels: (data.trafficSources || []).map(s => s._id || 'Unknown'),
-          datasets: [{ data: (data.trafficSources || []).map(s => s.count), backgroundColor: bgColors }]
-      };
-      sourceChartInst.update();
+      sourceChartInst.updateOptions({
+          labels: (data.trafficSources || []).map(s => s._id || 'Unknown')
+      });
+      sourceChartInst.updateSeries((data.trafficSources || []).map(s => s.count));
 
       // Top Notes Table
       const notesHtml = (data.topNotes || []).map(note => `
