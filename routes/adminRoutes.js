@@ -163,8 +163,8 @@ router.get("/api/analytics", isLoggedIn, isModerator, async (req, res) => {
         },
         { $sort: { _id: 1 } }
       ]),
-      User.aggregate([
-        { $match: dateFilter },
+      DownloadLog.aggregate([
+        { $match: dateFilterDownloads },
         { $group: { _id: "$source", count: { $sum: 1 } } },
         { $sort: { count: -1 } }
       ]),
