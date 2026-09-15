@@ -140,7 +140,10 @@ router.get("/api/analytics", isLoggedIn, isModerator, async (req, res) => {
     ] = await Promise.all([
       User.countDocuments(dateFilter),
       Note.countDocuments(dateFilterNotes),
-      DownloadLog.countDocuments(dateFilterDownloads),
+      Note.aggregate([
+        { $match: dateFilterNotes },
+        { $group: { _id: null, total: { $sum: "$downloadCount" } } }
+      ]),
       User.countDocuments(dateFilter),
       Note.countDocuments(dateFilterNotes),
       User.countDocuments({ ...dateFilter, "verification.verified": true }),
@@ -184,7 +187,7 @@ router.get("/api/analytics", isLoggedIn, isModerator, async (req, res) => {
       data: {
         totalUsers,
         totalNotes,
-        totalDownloads: totalDownloadsAgg,
+        totalDownloads: totalDownloadsAgg[0]?.total || 0,
         newSignups,
         newNoteUploads,
         verifiedUsers,
