@@ -167,7 +167,7 @@
   
                   <!-- Password -->
                   <div>
-                      <input type="password" name="password" placeholder="Password (Min 6 chars, 1 Upper, 1 Number)" required 
+                      <input type="password" name="password" placeholder="Password (Min 8 chars, 1 Upper, 1 Lower, 1 Number)" required 
                              class="w-full bg-surface-dark-lighter border border-border-dark rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-colors">
                   </div>
   
@@ -310,9 +310,9 @@
         e.preventDefault(); return;
       }
   
-      const passRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{6,}$/;
+      const passRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/;
       if (!passRegex.test(password)) {
-        alert("⚠️ Password must have 1 uppercase, 1 lowercase & 1 number.");
+        alert("⚠️ Password must be 8+ characters with 1 uppercase, 1 lowercase & 1 number.");
         e.preventDefault(); return;
       }
   

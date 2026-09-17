@@ -96,6 +96,12 @@ router.post("/register", notLoggedIn, async (req, res) => {
       return res.redirect("/register-n");
     }
 
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/;
+    if (!passwordRegex.test(password || "")) {
+      req.flash("error", "Password must be at least 8 characters with 1 uppercase, 1 lowercase & 1 number.");
+      return res.redirect("/register-n");
+    }
+
     const user = new User({
       username,
       name,
@@ -206,10 +212,10 @@ router.post("/forgot/verify", async (req, res) => {
     });
   }
 
-  const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
+  const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/;
 
-  if (!passwordRegex.test(req.body.password)) {
-    req.flash("error", "Password must be 8+ chars, include uppercase, number, and special character.");
+  if (!passwordRegex.test(req.body.password || "")) {
+    req.flash("error", "Password must be at least 8 characters with 1 uppercase, 1 lowercase & 1 number.");
     return res.redirect("/forgot");
   }
 
