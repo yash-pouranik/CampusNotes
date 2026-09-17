@@ -128,7 +128,8 @@ app.get("/", async (req, res) => {
 
     if (cachedContributors && (now - lastCacheTime < CACHE_TTL)) {
        return res.render("home/index", {
-         title: "CampusNotes | Your Campus, Your Notes - SVVV",
+         title: "CampusNotes | Free SVVV & RGPV Notes, Study Materials & PYQs",
+         description: "Download free verified SVVV notes, RGPV study materials, previous year questions (PYQs), and unit-wise exam notes for B.Tech, MBA, MCA and BCA.",
          topContributors: cachedContributors
        });
     }
@@ -155,14 +156,16 @@ app.get("/", async (req, res) => {
     lastCacheTime = now;
 
     res.render("home/index", {
-      title: "CampusNotes | Your Campus, Your Notes - SVVV",
+      title: "CampusNotes | Free SVVV & RGPV Notes, Study Materials & PYQs",
+      description: "Download free verified SVVV notes, RGPV study materials, previous year questions (PYQs), and unit-wise exam notes for B.Tech, MBA, MCA and BCA.",
       topContributors
     });
 
   } catch (err) {
     console.error("Home Route Error:", err);
     res.render("home/index", {
-      title: "CampusNotes",
+      title: "CampusNotes | Free SVVV & RGPV Notes, Study Materials & PYQs",
+      description: "Download free verified SVVV notes, RGPV study materials, and PYQs.",
       topContributors: cachedContributors || []
     });
   }
@@ -191,12 +194,17 @@ app.get("/sitemap.xml", async (req, res) => {
     const staticUrls = [
       { url: "/", priority: "1.0", changefreq: "daily" },
       { url: "/explore", priority: "0.9", changefreq: "daily" },
-      { url: "/explore?course=B.Tech+CSE", priority: "0.8", changefreq: "weekly" },
+      { url: "/explore?course=B.Tech+CSE", priority: "0.9", changefreq: "daily" },
       { url: "/explore?course=B.Tech+IT", priority: "0.8", changefreq: "weekly" },
       { url: "/explore?course=MBA", priority: "0.7", changefreq: "weekly" },
       { url: "/explore?course=BBA", priority: "0.7", changefreq: "weekly" },
       { url: "/explore?course=MCA", priority: "0.7", changefreq: "weekly" },
       { url: "/explore?course=BCA", priority: "0.7", changefreq: "weekly" },
+      { url: "/explore?q=TOC", priority: "0.8", changefreq: "weekly" },
+      { url: "/explore?q=DBMS", priority: "0.8", changefreq: "weekly" },
+      { url: "/explore?q=PYQs", priority: "0.8", changefreq: "weekly" },
+      { url: "/explore?q=SVVV", priority: "0.8", changefreq: "weekly" },
+      { url: "/explore?q=RGPV", priority: "0.8", changefreq: "weekly" },
       { url: "/most-downloaded", priority: "0.8", changefreq: "daily" },
       { url: "/requestnotes", priority: "0.7", changefreq: "weekly" },
       { url: "/rankings", priority: "0.7", changefreq: "weekly" },

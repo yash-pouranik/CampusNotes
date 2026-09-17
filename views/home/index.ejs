@@ -115,13 +115,13 @@
     </h1>
     
     <p class="mt-4 max-w-2xl mx-auto text-lg md:text-xl text-gray-400 font-light leading-relaxed">
-      A student-driven platform for sharing notes, study materials & academic resources. 
-      <span class="text-gray-300 font-medium">Built for SVVV.</span>
+      A student-driven platform for sharing verified handwritten notes, study materials, PYQs & academic resources. 
+      <span class="text-gray-300 font-medium">Built for SVVV, RGPV & University Students.</span>
     </p>
     
     <div class="mt-10 flex flex-col sm:flex-row justify-center gap-4">
       <a class="bg-primary hover:bg-primary-hover text-white px-8 py-3.5 rounded-lg font-semibold text-lg transition-all shadow-[0_0_20px_rgba(255,87,34,0.3)] hover:shadow-[0_0_30px_rgba(255,87,34,0.5)] flex items-center justify-center gap-2 group border border-transparent" href="/explore">
-        Explore Notes
+        Explore Notes & PYQs
         <span class="material-icons-outlined group-hover:translate-x-1 transition-transform text-xl">arrow_forward</span>
       </a>
       <a class="bg-surface-dark hover:bg-surface-dark-lighter border border-border-dark hover:border-gray-500 text-white px-8 py-3.5 rounded-lg font-semibold text-lg transition-all flex items-center justify-center gap-2" href="/upload">
@@ -130,15 +130,28 @@
       </a>
     </div>
 
-    <!-- Quick Course Filter Hubs for Search Engines -->
-    <div class="mt-6 flex flex-wrap justify-center items-center gap-2 text-xs text-gray-400">
-      <span class="font-medium text-gray-500">Popular Hubs:</span>
-      <a href="/explore?course=B.Tech+CSE" class="px-3 py-1 rounded-full bg-surface-dark border border-border-dark hover:border-primary hover:text-white transition-colors">B.Tech CSE</a>
-      <a href="/explore?course=B.Tech+IT" class="px-3 py-1 rounded-full bg-surface-dark border border-border-dark hover:border-primary hover:text-white transition-colors">B.Tech IT</a>
-      <a href="/explore?course=MBA" class="px-3 py-1 rounded-full bg-surface-dark border border-border-dark hover:border-primary hover:text-white transition-colors">MBA</a>
-      <a href="/explore?course=BBA" class="px-3 py-1 rounded-full bg-surface-dark border border-border-dark hover:border-primary hover:text-white transition-colors">BBA</a>
-      <a href="/explore?course=MCA" class="px-3 py-1 rounded-full bg-surface-dark border border-border-dark hover:border-primary hover:text-white transition-colors">MCA</a>
-      <a href="/explore?course=BCA" class="px-3 py-1 rounded-full bg-surface-dark border border-border-dark hover:border-primary hover:text-white transition-colors">BCA</a>
+    <!-- Quick Course Filter Hubs & Trending Searches for Search Engines -->
+    <div class="mt-8 flex flex-col items-center gap-3">
+      <div class="flex flex-wrap justify-center items-center gap-2 text-xs text-gray-400">
+        <span class="font-medium text-gray-500">Popular Hubs:</span>
+        <a href="/explore?q=SVVV" class="px-3 py-1 rounded-full bg-primary/10 border border-primary/30 text-primary hover:bg-primary hover:text-white transition-colors">SVVV Notes</a>
+        <a href="/explore?q=RGPV" class="px-3 py-1 rounded-full bg-accent-blue/10 border border-accent-blue/30 text-accent-blue hover:bg-accent-blue hover:text-white transition-colors">RGPV Notes</a>
+        <a href="/explore?course=B.Tech+CSE" class="px-3 py-1 rounded-full bg-surface-dark border border-border-dark hover:border-primary hover:text-white transition-colors">B.Tech CSE</a>
+        <a href="/explore?course=B.Tech+IT" class="px-3 py-1 rounded-full bg-surface-dark border border-border-dark hover:border-primary hover:text-white transition-colors">B.Tech IT</a>
+        <a href="/explore?course=MBA" class="px-3 py-1 rounded-full bg-surface-dark border border-border-dark hover:border-primary hover:text-white transition-colors">MBA</a>
+        <a href="/explore?course=BBA" class="px-3 py-1 rounded-full bg-surface-dark border border-border-dark hover:border-primary hover:text-white transition-colors">BBA</a>
+        <a href="/explore?course=MCA" class="px-3 py-1 rounded-full bg-surface-dark border border-border-dark hover:border-primary hover:text-white transition-colors">MCA</a>
+        <a href="/explore?course=BCA" class="px-3 py-1 rounded-full bg-surface-dark border border-border-dark hover:border-primary hover:text-white transition-colors">BCA</a>
+      </div>
+
+      <div class="flex flex-wrap justify-center items-center gap-2 text-xs text-gray-400">
+        <span class="font-medium text-gray-500">Trending Subjects:</span>
+        <a href="/explore?q=Theory+of+Computation" class="px-2.5 py-0.5 rounded bg-surface-dark-lighter border border-border-dark hover:border-gray-400 hover:text-white transition-colors">TOC (Theory of Computation)</a>
+        <a href="/explore?q=DBMS" class="px-2.5 py-0.5 rounded bg-surface-dark-lighter border border-border-dark hover:border-gray-400 hover:text-white transition-colors">DBMS & PYQs</a>
+        <a href="/explore?q=Operating+Systems" class="px-2.5 py-0.5 rounded bg-surface-dark-lighter border border-border-dark hover:border-gray-400 hover:text-white transition-colors">Operating Systems</a>
+        <a href="/explore?q=Computer+Networks" class="px-2.5 py-0.5 rounded bg-surface-dark-lighter border border-border-dark hover:border-gray-400 hover:text-white transition-colors">Computer Networks</a>
+        <a href="/explore?q=Data+Structures" class="px-2.5 py-0.5 rounded bg-surface-dark-lighter border border-border-dark hover:border-gray-400 hover:text-white transition-colors">Data Structures</a>
+      </div>
     </div>
 
     <!-- Stats Strip -->
@@ -373,38 +386,87 @@
   </div>
 </section>
 
-<!-- FAQ SECTION -->
+<!-- FAQ SECTION WITH SCHEMA.ORG JSON-LD -->
 <section class="py-20 bg-background-dark border-t border-border-dark">
   <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center mb-16">
       <h2 class="text-3xl font-bold text-white mb-4">Frequently Asked Questions</h2>
-      <p class="text-gray-400">Everything you need to know.</p>
+      <p class="text-gray-400">Everything you need to know about notes, PYQs, and study materials.</p>
     </div>
     <div class="space-y-4">
       <div class="saas-card rounded-lg p-6">
         <h3 class="text-lg font-semibold text-white mb-2 flex items-center gap-2">
            <span class="material-icons-outlined text-accent-green text-sm">check_circle</span>
-           Is CampusNotes free?
+           Where can I download free SVVV and RGPV notes?
         </h3>
-        <p class="text-gray-400 text-sm">Yes! CampusNotes is 100% free for all students. No hidden charges.</p>
+        <p class="text-gray-400 text-sm">You can download free, verified handwritten notes, syllabus summaries, and study resources for SVVV (Shri Vaishnav Vidyapeeth Vishwavidyalaya) and RGPV on our <a href="/explore" class="text-primary hover:underline">Explore Page</a> without any paywall.</p>
+      </div>
+      <div class="saas-card rounded-lg p-6">
+        <h3 class="text-lg font-semibold text-white mb-2 flex items-center gap-2">
+           <span class="material-icons-outlined text-accent-blue text-sm">menu_book</span>
+           Can I find subject-specific notes like TOC, DBMS, OS, and CN?
+        </h3>
+        <p class="text-gray-400 text-sm">Yes! We provide unit-wise notes (Unit 1 to 5) and previous year question papers (PYQs) for core CS subjects including Theory of Computation (TOC), Database Management Systems (DBMS), Operating Systems, and Data Structures.</p>
+      </div>
+      <div class="saas-card rounded-lg p-6">
+        <h3 class="text-lg font-semibold text-white mb-2 flex items-center gap-2">
+           <span class="material-icons-outlined text-accent-purple text-sm">psychology</span>
+           What is CampusNotes 2.0 (AI Chat)?
+        </h3>
+        <p class="text-gray-400 text-sm">CampusNotes 2.0 is our new AI-powered study companion. It allows students to chat directly with PDF notes, ask doubts, generate unit summaries, and find answers quickly before exams.</p>
       </div>
       <div class="saas-card rounded-lg p-6">
         <h3 class="text-lg font-semibold text-white mb-2 flex items-center gap-2">
            <span class="material-icons-outlined text-accent-blue text-sm">cloud_upload</span>
-           How to upload notes?
+           How can I upload and contribute my notes?
         </h3>
-        <p class="text-gray-400 text-sm">Create an account, click "Upload Notes", fill details, and attach PDF.</p>
-      </div>
-      <div class="saas-card rounded-lg p-6">
-        <h3 class="text-lg font-semibold text-white mb-2 flex items-center gap-2">
-           <span class="material-icons-outlined text-accent-purple text-sm">shield</span>
-           Are notes verified?
-        </h3>
-        <p class="text-gray-400 text-sm">Yes, verified by moderators to ensure quality and relevance.</p>
+        <p class="text-gray-400 text-sm">Create an account, click "Upload Notes", select your university, course, and semester, and attach your PDF. All notes are verified by moderators to maintain academic quality.</p>
       </div>
     </div>
   </div>
 </section>
+
+<!-- FAQ Schema.org JSON-LD -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Where can I download free SVVV and RGPV notes?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "You can download free verified handwritten notes, syllabus summaries, and study resources for SVVV and RGPV on CampusNotes."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I find subject-specific notes like TOC, DBMS, OS, and CN?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes! CampusNotes provides unit-wise notes (Unit 1 to 5) and previous year question papers (PYQs) for Theory of Computation (TOC), Database Management Systems (DBMS), Operating Systems, and Data Structures."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is CampusNotes 2.0 (AI Chat)?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "CampusNotes 2.0 is an AI-powered study companion that allows students to chat directly with PDF notes, generate summaries, and prepare for semester exams."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How can I upload and contribute notes?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Create a free student account, click Upload Notes, select your course and semester, and upload your PDF."
+      }
+    }
+  ]
+}
+</script>
 
 <!-- CTA SECTION -->
 <section class="py-24 bg-surface-dark border-t border-border-dark relative overflow-hidden">

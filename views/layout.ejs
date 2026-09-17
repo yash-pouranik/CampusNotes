@@ -7,7 +7,7 @@
   <link rel="icon" type="image/x-icon" href="https://jrdvubrvartzcjhutrrw.supabase.co/storage/v1/object/public/dev-files/692a0f26dfde95b8fcbf235f/e12e5c4d-d236-424b-b3a9-f8304984ac42_Untitled_design__18_-removebg-preview.png">
   <link rel="canonical" href="<%= typeof currentUrl !== 'undefined' ? currentUrl : 'https://campusnotes.bitbros.in' %>" />
 
-  <title><%= typeof title !== 'undefined' ? title : 'Campus Notes - SVVV Notes' %></title>
+  <title><%= typeof title !== 'undefined' ? title : 'CampusNotes | Free SVVV & RGPV Notes, Study Materials & PYQs' %></title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,15 +18,43 @@
   <link rel="stylesheet" href="/css/theme.css">
   <link rel="stylesheet" href="/css/ai-chat.css">
 
-  <meta name="description" content="<%= typeof description !== 'undefined' ? description : 'A student-driven platform for sharing notes, study materials & academic resources.' %>">
+  <meta name="description" content="<%= typeof description !== 'undefined' ? description : 'Download free verified SVVV notes, RGPV study materials, previous year questions (PYQs), and unit-wise exam notes for B.Tech CSE, IT, MBA, MCA and BCA.' %>">
   
   <!-- Open Graph / Facebook / WhatsApp -->
   <meta property="og:site_name" content="CampusNotes">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="<%= typeof title !== 'undefined' ? title : 'CampusNotes - Free SVVV Notes, Study Materials & PYQs' %>">
-  <meta property="og:description" content="<%= typeof description !== 'undefined' ? description : 'Download free verified notes, syllabus summaries, and study resources for SVVV students.' %>">
+  <meta property="og:title" content="<%= typeof title !== 'undefined' ? title : 'CampusNotes | Free SVVV & RGPV Notes, Study Materials & PYQs' %>">
+  <meta property="og:description" content="<%= typeof description !== 'undefined' ? description : 'Download free verified SVVV notes, RGPV study materials, previous year questions (PYQs), and unit-wise exam notes for B.Tech CSE, IT, MBA, MCA and BCA.' %>">
   <meta property="og:url" content="<%= typeof currentUrl !== 'undefined' ? currentUrl : 'https://campusnotes.bitbros.in' %>">
   <meta name="twitter:card" content="summary">
+
+  <!-- Schema.org Global Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://campusnotes.bitbros.in/#website",
+        "url": "https://campusnotes.bitbros.in",
+        "name": "CampusNotes",
+        "description": "Free SVVV & RGPV college notes, study materials, and PYQs platform for students.",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://campusnotes.bitbros.in/explore?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      },
+      {
+        "@type": "Organization",
+        "@id": "https://campusnotes.bitbros.in/#organization",
+        "name": "CampusNotes",
+        "url": "https://campusnotes.bitbros.in",
+        "logo": "https://jrdvubrvartzcjhutrrw.supabase.co/storage/v1/object/public/dev-files/692a0f26dfde95b8fcbf235f/e12e5c4d-d236-424b-b3a9-f8304984ac42_Untitled_design__18_-removebg-preview.png"
+      }
+    ]
+  }
+  </script>
 
   <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
 

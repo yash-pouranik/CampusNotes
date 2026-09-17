@@ -222,24 +222,58 @@ router.get("/notes/:nid", async (req, res) => {
     // Generate Schema.org JSON-LD structured data for Google Rich Results
     const schemaData = {
       "@context": "https://schema.org",
-      "@type": "LearningResource",
-      "name": file.title,
-      "description": file.description ? file.description.slice(0, 200).replace(/[*#]/g, '') : `${file.title} study notes and PDF for ${file.course}`,
-      "educationalLevel": file.course,
-      "learningResourceType": "Study Notes",
-      "educationalUse": "Study and Exam Preparation",
-      "inLanguage": "en",
-      "provider": {
-        "@type": "Organization",
-        "name": "CampusNotes",
-        "url": "https://campusnotes.bitbros.in"
-      },
-      "author": {
-        "@type": "Person",
-        "name": file.uploadedBy?.name || file.uploadedBy?.username || "CampusNotes Student"
-      },
-      "datePublished": file.createdAt ? new Date(file.createdAt).toISOString() : new Date().toISOString(),
-      "dateModified": file.updatedAt ? new Date(file.updatedAt).toISOString() : new Date().toISOString()
+      "@graph": [
+        {
+          "@type": "LearningResource",
+          "@id": `https://campusnotes.bitbros.in/notes/${file.slug || file._id}#learningresource`,
+          "name": file.title,
+          "description": file.description ? file.description.slice(0, 200).replace(/[*#]/g, '') : `${file.title} study notes and PDF for ${file.course}`,
+          "educationalLevel": file.course,
+          "learningResourceType": ["Study Notes", "Exam Questions", "Revision Notes"],
+          "educationalUse": "Study and Exam Preparation",
+          "inLanguage": "en",
+          "provider": {
+            "@type": "Organization",
+            "name": "CampusNotes",
+            "url": "https://campusnotes.bitbros.in"
+          },
+          "author": {
+            "@type": "Person",
+            "name": file.uploadedBy?.name || file.uploadedBy?.username || "CampusNotes Student"
+          },
+          "datePublished": file.createdAt ? new Date(file.createdAt).toISOString() : new Date().toISOString(),
+          "dateModified": file.updatedAt ? new Date(file.updatedAt).toISOString() : new Date().toISOString()
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://campusnotes.bitbros.in"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Explore Notes",
+              "item": "https://campusnotes.bitbros.in/explore"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": file.course || "Courses",
+              "item": `https://campusnotes.bitbros.in/explore?course=${encodeURIComponent(file.course || '')}`
+            },
+            {
+              "@type": "ListItem",
+              "position": 4,
+              "name": file.title,
+              "item": `https://campusnotes.bitbros.in/notes/${file.slug || file._id}`
+            }
+          ]
+        }
+      ]
     };
 
     res.render("notes/eachNote", {
@@ -248,8 +282,8 @@ router.get("/notes/:nid", async (req, res) => {
       schemaData: JSON.stringify(schemaData),
       subjectNotes,
       semNotes,
-      title: `${file.title} | ${file.course || 'SVVV'} Notes - CampusNotes`,
-      description: file.description ? file.description.slice(0, 160).replace(/[*#]/g, '') : `Download verified study notes and PDF for ${file.title} - ${file.course} at SVVV.`
+      title: `${file.title} | ${file.subject?.name ? file.subject.name + ' - ' : ''}${file.course || 'SVVV'} Notes & PYQs - CampusNotes`,
+      description: file.description ? file.description.slice(0, 160).replace(/[*#\n]/g, ' ') : `Download verified study notes and PDF for ${file.title} (${file.course} Sem ${file.semester}) at SVVV & RGPV on CampusNotes.`
     });
   } catch (e) {
     console.error(e);
@@ -348,6 +382,17 @@ router.get("/explore", async (req, res) => {
       });
     }
 
+    let pageTitle = "Explore SVVV & RGPV Notes, Study Materials & PYQs | CampusNotes";
+    let pageDesc = "Browse and download free verified handwritten notes, previous year question papers (PYQs), and unit-wise exam notes for SVVV, RGPV, B.Tech CSE, IT, MBA, MCA, and BCA.";
+
+    if (q) {
+      pageTitle = `"${q}" - Notes & Study Material | CampusNotes`;
+      pageDesc = `Download free study materials, unit notes, and PYQ question papers for "${q}" on CampusNotes.`;
+    } else if (course && course !== "all") {
+      pageTitle = `${course} Notes & PYQs ${semester && semester !== "all" ? 'Sem ' + semester : ''} | SVVV & RGPV - CampusNotes`;
+      pageDesc = `Download free verified notes, assignments, and exam preparation resources for ${course} ${semester && semester !== "all" ? 'Semester ' + semester : ''} students.`;
+    }
+
     console.timeEnd("/explore");
     console.time("ejs-render")
     res.render("notes/explore", {
@@ -358,8 +403,8 @@ router.get("/explore", async (req, res) => {
       visibility,
       currentPage: page,
       totalPages,
-      title: "Explore Notes at SVVV | CampusNotes",
-      description: "Browse and download free notes for B.Tech CSE, BBA, and other courses at Shri Vaishnav Vidyapeeth Vishwavidyalaya (SVVV).",
+      title: pageTitle,
+      description: pageDesc,
     });
     console.timeEnd("ejs-render");
   } catch (err) {
